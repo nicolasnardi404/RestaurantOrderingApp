@@ -1,7 +1,7 @@
-    import React, { useState } from 'react';
-    import axios from 'axios';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-    const CsvUpload = () => {
+const CsvUpload = () => {
     const [isOver, setIsOver] = useState(false);
     const [files, setFiles] = useState([]);
     const [editableData, setEditableData] = useState([]);
@@ -12,21 +12,33 @@
     });
     const [fileDropped, setFileDropped] = useState(false);
 
+    const tipoMapping = {
+        "Primi": 1,
+        "Secondi": 2,
+        "Contorni": 3,
+    };
+
     const sendDataToServer = async () => {
+        // Convert tipo to ID before sending
+        const dataToSend = editableData.map(item => ({
+            ...item,
+            tipo: tipoMapping[item.tipo] || item.tipo
+        }));
+
         try {
-            const response = await axios.post("http://localhost:80/project/draganddrop", editableData, {
+            const response = await axios.post("http://localhost:80/project/draganddrop", dataToSend, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
             console.log(response.data);
             // Reset state after successful send
-            setEditableData([]); // Clear the editable data
-            setNewItem({ nome: '', data: '', tipo: '' }); // Reset the new item state
-            setFiles([]); // Clear the files array
-            setFileDropped(false); // Re-enable the drag-and-drop area
+            setEditableData([]);
+            setNewItem({ nome: '', data: '', tipo: '' });
+            setFiles([]);
+            setFileDropped(false);
         } catch (error) {
-            console.error(error.response.data); 
+            console.error(error.response ? error.response.data : error.message); 
         }
     };
 
@@ -46,16 +58,15 @@
         const data = [];
 
         for (let i = 1; i < lines.length; i++) {
-        const currentLine = lines[i].split(/,(?=(?:[^\"]*"[^"]*")*(?![^\"]*"[^"]*$))/);
-        const obj = {};
+            const currentLine = lines[i].split(/,(?=(?:[^\"]*"[^"]*")*(?![^\"]*"[^"]*$))/);
+            const obj = {};
 
-        for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentLine[j];
+            for (let j = 0; j < headers.length; j++) {
+                obj[headers[j]] = currentLine[j] ? currentLine[j].replace(/[\r\n]+/g, ' ').trim() : '';
+            }
+
+            data.push(obj);
         }
-
-        data.push(obj);
-        }
-
 
         return data;
     };
@@ -64,16 +75,16 @@
         const nomes = [];
 
         data.forEach((row) => {
-        const day = row["Giorno"] || "";
-        ["Primi", "Secondi", "Contorni"].forEach((tipo) => {
-            const nomesString = row[tipo] || "";
-            nomesString.split("\n")
-            .map((nome) => nome.trim())
-            .filter(Boolean)
-            .forEach((nome) => {
-                nomes.push({ nome: nome, data: day, tipo: tipo });
+            const day = row["Giorno"] || "";
+            ["Primi", "Secondi", "Contorni"].forEach((tipo) => {
+                const nomesString = row[tipo] || "";
+                nomesString.split("\n")
+                    .map((nome) => nome.trim())
+                    .filter(Boolean)
+                    .forEach((nome) => {
+                        nomes.push({ nome: nome, data: day, tipo: tipo });
+                    });
             });
-        });
         });
 
         return nomes;
@@ -87,27 +98,27 @@
         setFiles(droppedFiles);
 
         for (let file of droppedFiles) {
-        const reader = new FileReader();
+            const reader = new FileReader();
 
-        reader.onloadend = async () => {
-            const csvContent = reader.result;
-            const parsedData = parseCSV(csvContent);
-            const organizedData = organizeData(parsedData);
+            reader.onloadend = async () => {
+                const csvContent = reader.result;
+                const parsedData = parseCSV(csvContent);
+                const organizedData = organizeData(parsedData);
 
-            const editableFormat = organizedData.map(item => ({
-            nome: item.nome,
-            data: item.data,
-            tipo: item.tipo,
-            }));
+                const editableFormat = organizedData.map(item => ({
+                    nome: item.nome,
+                    data: item.data,
+                    tipo: item.tipo,
+                }));
 
-            setEditableData(editableFormat);
-        };
+                setEditableData(editableFormat);
+            };
 
-        reader.onerror = () => {
-            console.error("There was an issue reading the file.");
-        };
+            reader.onerror = () => {
+                console.error("There was an issue reading the file.");
+            };
 
-        reader.readAsText(file);
+            reader.readAsText(file);
         }
         setFileDropped(true); 
     };
@@ -122,6 +133,7 @@
         setEditableData([...editableData, newItem]);
         setNewItem({ nome: '', data: '', tipo: '' });
     };
+
     const handleInputChange = (index, fieldName) => (event) => {
         const updatedItems = [...editableData];
         updatedItems[index][fieldName] = event.target.value;
@@ -130,78 +142,76 @@
 
     return (
         <div>
-          {!fileDropped && (
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className='drag-drop'
-              style={{
-                backgroundColor: isOver ? "lightgray" : "white",
-              }}
-            >
-              Drag and drop some files here
-            </div>
-          )}
-          {fileDropped && (
-            <div>
-              <table className='container-table'>
-                <thead>
-                  <tr>
-                    <th>Piatto</th>
-                    <th>Giorno</th>
-                    <th>Tipo</th>
-                    <th>Remove</th>
-                  </tr>
-                </thead>
-                <tbody className='container-body'>
-                  {editableData.map((item, index) => (
-                    <tr className="container-row" key={index}>
-                      <td className='nome-item'>
-                        <input
-                          tipo="text"
-                          value={item.nome}
-                          onChange={handleInputChange(index, 'nome')}
-                        />
-                      </td>
-                      <td className='day-item'>
-                        <select value={item.tipo} onChange={(e) => handleInputChange(index, 'tipo')(e)}>
-                          <option value="Lunedì">Lunedì</option>
-                          <option value="Martedì">Martedì</option>
-                          <option value="Mercoledì">Mercoledì</option>
-                          <option value="Giovedì">Giovedì</option>
-                          <option value="Venerdì">Venerdì</option>
-                        </select>
-                      </td>
-                      <td className='tipo-item'>
-                        <select value={item.tipo} onChange={(e) => handleInputChange(index, 'tipo')(e)}>
-                          <option value="Primi">Primi</option>
-                          <option value="Secondi">Secondi</option>
-                          <option value="Contorni">Contorni</option>
-                        </select>
-                      </td>
-                      <td>
-                        <label>
-                          <button onClick={() => removeItem(index)}>X</button>
-                        </label>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div>
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    addItem();
-                }}>
-                    
-                    <button className='btn-classic' tipo="submit">Add Item</button>
-                </form>
-                <button className='btn-classic' onClick={sendDataToServer}>Submit All Data</button> 
-              </div>
-            </div>
-          )}
+            {!fileDropped && (
+                <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className='drag-drop'
+                    style={{
+                        backgroundColor: isOver ? "lightgray" : "white",
+                    }}
+                >
+                    Drag and drop some files here
+                </div>
+            )}
+            {fileDropped && (
+                <div>
+                    <table className='container-table'>
+                        <thead>
+                            <tr>
+                                <th>Piatto</th>
+                                <th>Giorno</th>
+                                <th>Tipo</th>
+                                <th>Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody className='container-body'>
+                            {editableData.map((item, index) => (
+                                <tr className="container-row" key={index}>
+                                    <td className='nome-item'>
+                                        <input
+                                            type="text"
+                                            value={item.nome}
+                                            onChange={handleInputChange(index, 'nome')}
+                                        />
+                                    </td>
+                                    <td className='day-item'>
+                                        <select value={item.data} onChange={(e) => handleInputChange(index, 'data')(e)}>
+                                            <option value="Lunedì">Lunedì</option>
+                                            <option value="Martedì">Martedì</option>
+                                            <option value="Mercoledì">Mercoledì</option>
+                                            <option value="Giovedì">Giovedì</option>
+                                            <option value="Venerdì">Venerdì</option>
+                                        </select>
+                                    </td>
+                                    <td className='tipo-item'>
+                                        <select value={item.tipo} onChange={(e) => handleInputChange(index, 'tipo')(e)}>
+                                            <option value="Primi">Primi</option>
+                                            <option value="Secondi">Secondi</option>
+                                            <option value="Contorni">Contorni</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button onClick={() => removeItem(index)}>X</button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    <div>
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            addItem();
+                        }}>
+                            <button className='btn-classic' type="submit">Add Item</button>
+                        </form>
+                        <button className='btn-classic' onClick={sendDataToServer}>Submit All Data</button>
+                    </div>
+                </div>
+            )}
         </div>
-      );
-    }
-    export default CsvUpload;
+    );
+}
+
+export default CsvUpload;
