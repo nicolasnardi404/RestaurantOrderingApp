@@ -3,7 +3,7 @@
   import Home from "./pages/Home";
   import LogIn from "./pages/LogIn";
   import Menu from "./pages/Menu";
-  import Apps from "./Apps"
+  import MyApp from "./_app";
 
   export default function App() {
     return (
@@ -12,7 +12,7 @@
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/menu" element={<Menu />} />
-          <Route path="/app" element={<Apps />} />
+          <Route path="/test" element={<MyApp />} />
         </Routes>
       </BrowserRouter>
     );
