@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Dropdown } from 'primereact/dropdown'; // Import Dropdown for more complex scenarios
+import { Button } from 'primereact/button'; // Import Button for consistent styling
 import { useNavigate } from 'react-router-dom';
 
 export default function SimpleLogin() {
   const [names, setNames] = useState([]);
-  const [selectedName, setSelectedName] = useState('');
+  const [selectedName, setSelectedName] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,21 +17,22 @@ export default function SimpleLogin() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    localStorage.setItem('nome', selectedName);
-    alert(`Selected name saved: ${selectedName}`);
+    localStorage.setItem('nome', selectedName ? selectedName.nome : '');
+    alert(`Selected name saved: ${selectedName ? selectedName.nome : ''}`);
     navigate('/menu');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label htmlFor="nameSelect">Choose a name:</label>
-      <select id="nameSelect" value={selectedName} onChange={(e) => setSelectedName(e.target.value)}>
-        <option value="">--Please choose a name--</option>
-        {names.map((item, index) => (
-          <option key={index} value={item.nome}>{item.nome}</option>
-        ))}
-      </select>
-      <button type="submit">Submit</button> 
+    <form className='pick-user' onSubmit={handleSubmit}>
+      <Dropdown 
+        className='name-select' 
+        options={names} 
+        optionLabel="nome" 
+        value={selectedName} 
+        onChange={(e) => setSelectedName(e.value)}
+        placeholder="--Scegliere il Nome--"
+      />
+      <Button label="Submit" type="submit" className="p-button-outlined" /> 
     </form>
   );
 }
