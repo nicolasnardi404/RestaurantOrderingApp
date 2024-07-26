@@ -32,16 +32,12 @@
   color: white;
 }
 
-.dish-item, .type-item, .day-item {
+.piatto-item, .tipo-item, .data-item {
   margin-left: 10px;
   margin-right: 10px; /* Adds space to the right */
   text-align: center;
   width: 10em;
   padding: 5px 5px;
-}
-
-.container-body{
- 
 }
 
 .drag-drop {
@@ -52,6 +48,17 @@
   height: 50px;
   width: 300px;
   border: 3px dotted black;
+}
+
+.login{
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  margin: 100px auto;
+}
+
+.item-login{
+  margin: 5px;
 }
 
 .App-link {

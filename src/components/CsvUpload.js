@@ -75,14 +75,14 @@ const CsvUpload = () => {
         const nomes = [];
 
         data.forEach((row) => {
-            const day = row["Giorno"] || "";
+            const data = row["Giorno"] || "";
             ["Primi", "Secondi", "Contorni"].forEach((tipo) => {
                 const nomesString = row[tipo] || "";
                 nomesString.split("\n")
                     .map((nome) => nome.trim())
                     .filter(Boolean)
                     .forEach((nome) => {
-                        nomes.push({ nome: nome, data: day, tipo: tipo });
+                        nomes.push({ nome: nome, data: data, tipo: tipo });
                     });
             });
         });
@@ -176,7 +176,7 @@ const CsvUpload = () => {
                                             onChange={handleInputChange(index, 'nome')}
                                         />
                                     </td>
-                                    <td className='day-item'>
+                                    <td className='data-item'>
                                         <select value={item.data} onChange={(e) => handleInputChange(index, 'data')(e)}>
                                             <option value="Lunedì">Lunedì</option>
                                             <option value="Martedì">Martedì</option>
