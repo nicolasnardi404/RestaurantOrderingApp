@@ -50,6 +50,31 @@
   border: 3px dotted black;
 }
 
+.pick-user{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.remove-btn {
+  width: 24px;           
+  height: 24px;          
+  background-color: red;     
+  cursor: pointer;   
+  margin-left: 5px;  
+}
+.name-select{
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+.cart-items{
+  margin:5px;
+  align-items: center;
+}
+
 .login{
   display: flex;
   flex-direction: column;

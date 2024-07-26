@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar } from 'primereact/calendar';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
 
 function MenuPage() {
   const [dishes, setDishes] = useState([]);
@@ -18,11 +21,24 @@ function MenuPage() {
       .catch(error => console.error('Error fetching dishes:', error));
   }, []);
 
+  const formatDateForComparison = (date) => {
+    if (date instanceof Date) {
+      return date.toISOString().split('T')[0]; // Convert Date to yyyy-mm-dd format
+    } else if (typeof date === 'string') {
+      return new Date(date).toISOString().split('T')[0]; // Convert string to yyyy-mm-dd
+    } else {
+      console.error('Invalid date format:', date);
+      return '';
+    }
+  };
+
   const handleDayChange = (event) => {
-    const selectedDate = event.target.value;
+    const selectedDate = formatDateForComparison(event.value);
     setSelectedDay(selectedDate);
-    setCart({ Primo: null, Secondo: null, Contorno: null }); 
-    const filtered = dishes.filter(dish => dish.data === selectedDate);
+    setCart({ Primo: null, Secondo: null, Contorno: null });
+    
+    // Filter dishes for the selected day
+    const filtered = dishes.filter(dish => formatDateForComparison(dish.data) === selectedDate);
     setFilteredDishes(filtered);
   };
 
@@ -32,6 +48,12 @@ function MenuPage() {
 
   const handleRemoveFromCart = (type) => {
     setCart(prevCart => ({ ...prevCart, [type]: null }));
+  };
+
+  const getDropdownOptions = (type) => {
+    return filteredDishes
+      .filter(dish => convertidTipoPiatto(dish.idTipoPiatto) === type)
+      .map(dish => ({ label: dish.nome, value: dish }));
   };
 
   const handleSubmit = () => {
@@ -72,38 +94,55 @@ function MenuPage() {
       <h1>Welcome, {userName}</h1>
       
       <label htmlFor="daySelect">Choose a day:</label>
-      <input type="date" id="daySelect" value={selectedDay} onChange={handleDayChange} />
+      <Calendar id="daySelect" value={selectedDay} onChange={(e) => handleDayChange(e)} dateFormat='dd/mm/yy'/>
       
       {selectedDay && (
         <>
           <p>Selected Day: {getWeekday(selectedDay)}</p>
-
+  
           <h2>Primi</h2>
-          <ul>{renderDishesByType('Primo')}</ul>
-
+          <Dropdown
+            value={cart.Primo}
+            options={getDropdownOptions('Primo')}
+            onChange={(e) => handleAddToCart('Primo', e.value)}
+            placeholder="Select a dish"
+          />
+          
           <h2>Secondi</h2>
-          <ul>{renderDishesByType('Secondo')}</ul>
-
+          <Dropdown
+            value={cart.Secondo}
+            options={getDropdownOptions('Secondo')}
+            onChange={(e) => handleAddToCart('Secondo', e.value)}
+            placeholder="Select a dish"
+          />
+  
           <h2>Contorni</h2>
-          <ul>{renderDishesByType('Contorno')}</ul>
-
+          <Dropdown
+            value={cart.Contorno}
+            options={getDropdownOptions('Contorno')}
+            onChange={(e) => handleAddToCart('Contorno', e.value)}
+            placeholder="Select a dish"
+          />
+  
           <h2>Shopping Cart</h2>
           <ul>
             {Object.keys(cart).map((type, index) => (
               cart[type] && (
-                <li key={index}>
+                <li className="cart-items" key={index}>
                   {type}: {cart[type].nome}
-                  <button onClick={() => handleRemoveFromCart(type)}>Remove</button>
+                  <Button icon="pi pi-times" className="remove-btn p-button-rounded p-button-danger" onClick={() => handleRemoveFromCart(type)} />
                 </li>
               )
             ))}
           </ul>
-
-          <button onClick={handleSubmit}>Submit</button>
+  
+          <Button label="Submit" icon="pi pi-check" className="p-button-outlined" onClick={handleSubmit}/>
         </>
       )}
     </div>
   );
+  
+
 
   // Function to convert idTipoPiatto values to dish types
   function convertidTipoPiatto(id) {
