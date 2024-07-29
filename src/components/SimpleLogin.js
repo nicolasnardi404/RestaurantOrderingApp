@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Dropdown } from 'primereact/dropdown'; // Import Dropdown for more complex scenarios
-import { Button } from 'primereact/button'; // Import Button for consistent styling
+import { Dropdown } from 'primereact/dropdown';
+import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 
 export default function SimpleLogin() {
@@ -18,7 +18,6 @@ export default function SimpleLogin() {
   const handleSubmit = (event) => {
     event.preventDefault();
     localStorage.setItem('nome', selectedName ? selectedName.nome : '');
-    alert(`Selected name saved: ${selectedName ? selectedName.nome : ''}`);
     navigate('/menu');
   };
 
@@ -32,7 +31,10 @@ export default function SimpleLogin() {
         onChange={(e) => setSelectedName(e.value)}
         placeholder="--Scegliere il Nome--"
       />
-      <Button label="Submit" type="submit" className="p-button-outlined" /> 
+      {/* Conditionally render the button */}
+      {selectedName && (
+        <Button label={selectedName.nome} type="submit" className="btn-classic" />
+      )}
     </form>
   );
 }

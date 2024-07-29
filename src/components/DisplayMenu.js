@@ -2,24 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
 function MenuPage() {
   const [dishes, setDishes] = useState([]);
   const [selectedDay, setSelectedDay] = useState('');
-  const [filteredDishes, setFilteredDishes] = useState([]);
-  const [cart, setCart] = useState({ Primo: null, Secondo: null, Contorno: null });
+  const [cart, setCart] = useState({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null });
+  const [error, setError] = useState('');
   const userName = localStorage.getItem('nome'); // Retrieve user name from localStorage
+  const navigate = useNavigate(); // Initialize useNavigate for redirection
 
   useEffect(() => {
-    fetch('http://localhost/project/menu')
-      .then(response => response.json())
-      .then(data => {
-        setDishes(data.data);
-        setFilteredDishes(data.data);
-        console.log(data);
-      })
-      .catch(error => console.error('Error fetching dishes:', error));
-  }, []);
+    if (selectedDay) {
+      fetch(`http://localhost/project/menu?date=${encodeURIComponent(selectedDay)}`)
+        .then(response => response.json())
+        .then(data => {
+          setDishes(data.data);
+          console.log(data);
+        })
+        .catch(error => console.error('Error fetching dishes:', error));
+    }
+  }, [selectedDay]);
+
+  const handleDayChange = (event) => {
+    const selectedDateFormatted = formatDateForComparison(event.value);
+    setSelectedDay(selectedDateFormatted);
+    setCart({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null }); // Reset cart on day change
+  };
 
   const formatDateForComparison = (date) => {
     if (date instanceof Date) {
@@ -32,61 +41,55 @@ function MenuPage() {
     }
   };
 
-  const handleDayChange = (event) => {
-    const selectedDate = formatDateForComparison(event.value);
-    setSelectedDay(selectedDate);
-    setCart({ Primo: null, Secondo: null, Contorno: null });
-    
-    // Filter dishes for the selected day
-    const filtered = dishes.filter(dish => formatDateForComparison(dish.data) === selectedDate);
-    setFilteredDishes(filtered);
+  const handleDropdownChange = (type, selectedDish) => {
+    setCart(prevCart => ({
+      ...prevCart,
+      [type]: selectedDish // Use null to clear the dropdown if "None" is selected
+    }));
   };
 
-  const handleAddToCart = (type, dish) => {
-    setCart(prevCart => ({ ...prevCart, [type]: dish }));
-  };
+  const validateCart = () => {
+    const { Primo, Secondo, Contorno, PiattoUnico } = cart;
 
-  const handleRemoveFromCart = (type) => {
-    setCart(prevCart => ({ ...prevCart, [type]: null }));
-  };
 
-  const getDropdownOptions = (type) => {
-    return filteredDishes
-      .filter(dish => convertidTipoPiatto(dish.idTipoPiatto) === type)
-      .map(dish => ({ label: dish.nome, value: dish }));
+    // Check if the selection is "None" which should be treated as null
+    const pratoPrimo = Primo === null ? null : Primo;
+    const pratoSecondo = Secondo === null ? null : Secondo;
+    const pratoContorno = Contorno === null ? null : Contorno;
+    const pratoPiattoUnico = PiattoUnico === null ? null : PiattoUnico;
+
+    // Allowed combinations
+    const isValid =
+      (pratoPrimo && pratoSecondo && pratoContorno && !pratoPiattoUnico) || // Primo + Secondo + Contorno
+      (pratoPrimo && pratoPiattoUnico && pratoContorno && !pratoSecondo) || // Primo + Piatto Unico + Contorno
+      (pratoPrimo && pratoContorno && !pratoSecondo && !pratoPiattoUnico) || // Primo + Contorno
+      (pratoSecondo && pratoContorno && !pratoPrimo && !pratoPiattoUnico) || // Secondo + Contorno
+      (pratoPiattoUnico && pratoContorno && !pratoPrimo && !pratoSecondo) || // Piatto Unico + Contorno
+      (pratoPiattoUnico && !pratoPrimo && !pratoSecondo && !pratoContorno); // Piatto Unico only
+
+      console.log(isValid)
+    return isValid;
   };
 
   const handleSubmit = () => {
+    if (!validateCart()) {
+      setError('Selected combination is not valid. Please select a valid combination.');
+      return;
+    }
 
-    //##TODO HANGE ENDPOINT THAT WILL RECEIVE DATA
-
-    fetch('http://localhost/project/???', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(cart),
-    })
-    .then(response => response.json())
-    .then(data => console.log('Submit success:', data))
-    .catch(error => console.error('Error submitting cart:', error));
+    // Redirect to /order page
+    navigate('/order');
   };
 
-  const getWeekday = (date) => {
-    const days = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
-    const day = new Date(date).getDay();
-    return days[day];
-};
-
-  const renderDishesByType = (type) => {
-    return filteredDishes
-      .filter(dish => convertidTipoPiatto(dish.idTipoPiatto) === type)
-      .map((dish, index) => (
-        <li key={index}>
-          {dish.nome}
-          <button onClick={() => handleAddToCart(type, dish)}>Add to Cart</button>
-        </li>
-      ));
+  const getDishesByType = (type) => {
+    // Add a "None" option to allow clearing the selection
+    return [
+      { label: 'None', value: null }, // Option to clear selection
+      ...dishes.filter(dish => dish.idTipoPiatto === type).map(dish => ({
+        label: dish.nome,
+        value: dish
+      }))
+    ];
   };
 
   return (
@@ -94,69 +97,62 @@ function MenuPage() {
       <h1>Welcome, {userName}</h1>
       
       <label htmlFor="daySelect">Choose a day:</label>
-      <Calendar id="daySelect" value={selectedDay} onChange={(e) => handleDayChange(e)} dateFormat='dd/mm/yy'/>
+      <Calendar id="daySelect" value={selectedDay} onChange={(e) => handleDayChange(e)} dateFormat='dd/mm/yy' />
       
       {selectedDay && (
-        <>
-          <p>Selected Day: {getWeekday(selectedDay)}</p>
-  
-          <h2>Primi</h2>
-          <Dropdown
-            value={cart.Primo}
-            options={getDropdownOptions('Primo')}
-            onChange={(e) => handleAddToCart('Primo', e.value)}
-            placeholder="Select a dish"
-          />
-          
-          <h2>Secondi</h2>
-          <Dropdown
-            value={cart.Secondo}
-            options={getDropdownOptions('Secondo')}
-            onChange={(e) => handleAddToCart('Secondo', e.value)}
-            placeholder="Select a dish"
-          />
-  
-          <h2>Contorni</h2>
-          <Dropdown
-            value={cart.Contorno}
-            options={getDropdownOptions('Contorno')}
-            onChange={(e) => handleAddToCart('Contorno', e.value)}
-            placeholder="Select a dish"
-          />
-  
-          <h2>Shopping Cart</h2>
-          <ul>
-            {Object.keys(cart).map((type, index) => (
-              cart[type] && (
-                <li className="cart-items" key={index}>
-                  {type}: {cart[type].nome}
-                  <Button icon="pi pi-times" className="remove-btn p-button-rounded p-button-danger" onClick={() => handleRemoveFromCart(type)} />
-                </li>
-              )
-            ))}
-          </ul>
-  
-          <Button label="Submit" icon="pi pi-check" className="p-button-outlined" onClick={handleSubmit}/>
-        </>
+        <div>
+          <p>Selected Day: {new Date(selectedDay).toLocaleDateString()}</p>
+          <div className='menu'>
+            <div className='tipo-container'>
+              <h2>Primi</h2>
+              <Dropdown
+                value={cart.Primo}
+                options={getDishesByType(1)}
+                onChange={(e) => handleDropdownChange('Primo', e.value)}
+                optionLabel="label"
+                placeholder="Select a Primo dish"
+              />
+            </div>
+            <div className='tipo-container'>
+              <h2>Secondi</h2>
+              <Dropdown
+                value={cart.Secondo}
+                options={getDishesByType(2)}
+                onChange={(e) => handleDropdownChange('Secondo', e.value)}
+                optionLabel="label"
+                placeholder="Select a Secondo dish"
+              />
+            </div>
+            <div className='tipo-container'>
+              <h2>Contorni</h2>
+              <Dropdown
+                value={cart.Contorno}
+                options={getDishesByType(3)}
+                onChange={(e) => handleDropdownChange('Contorno', e.value)}
+                optionLabel="label"
+                placeholder="Select a Contorno dish"
+              />
+            </div>
+            <div className='tipo-container'>
+              <h2>Piatto Unico</h2>
+              <Dropdown
+                value={cart.PiattoUnico}
+                options={getDishesByType(4)}
+                onChange={(e) => handleDropdownChange('PiattoUnico', e.value)}
+                optionLabel="label"
+                placeholder="Select a Piatto Unico dish"
+              />
+            </div>
+            <br />
+          </div>
+          <div className='tipo-container'>
+            {error && <p className="error-message">{error}</p>}
+            <Button label="Submit" icon="pi pi-check" className="btn-classic" onClick={handleSubmit}/>
+          </div>        
+        </div>
       )}
     </div>
   );
-  
-
-
-  // Function to convert idTipoPiatto values to dish types
-  function convertidTipoPiatto(id) {
-    switch (id) {
-      case 1:
-        return 'Primo';
-      case 2:
-        return 'Secondo';
-      case 3:
-        return 'Contorno';
-      default:
-        return 'Unknown';
-    }
-  }
 }
 
 export default MenuPage;

@@ -1,44 +1,52 @@
+body{
+  background-color: whitesmoke;
+  color: #040C39;
+}
+
 .App {
   text-align: center;
 }
-
 
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
 }
 
-.container-table{
+/* drag and drop page */
 
-  margin: 10px auto;
-  border: 1px solid black;
-  border-collapse: collapse;
+.data-table {
+  margin: 2% 10%;
 }
 
-.container-row{
-  border-bottom: 1px solid black;
-  color: red;
-  margin: 50px;
+.input-text{
+  width: 400px; 
+  height: 40px;
+  text-align: center;
 }
+
 
 .btn-classic{
+  width: 400px;
   padding: 4px;
   margin: 3px;
-  border-radius: 4px;
+  border-radius: 8px;
+  display: inline-block;
+  background-color: #39DDE2;
+  margin:auto;
+  padding: 15px;
+  font-size: 1.2em;
+  color: #040C39;
 }
 
 .btn-classic:hover{
-  background-color: black;
-  color: white;
+  background-color: #040C39;
+  color: #F6E8EA;
 }
 
-.piatto-item, .tipo-item, .data-item {
-  margin-left: 10px;
-  margin-right: 10px; /* Adds space to the right */
-  text-align: center;
-  width: 10em;
-  padding: 5px 5px;
+.p-button-rounded:hover{
+  background-color: #040C39;
 }
+
 
 .drag-drop {
   display: flex;
@@ -50,29 +58,19 @@
   border: 3px dotted black;
 }
 
-.pick-user{
+/*log in page*/
+
+.pick-user {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: auto;
-}
-
-.remove-btn {
-  width: 24px;           
-  height: 24px;          
-  background-color: red;     
-  cursor: pointer;   
-  margin-left: 5px;  
-}
-.name-select{
-  margin-top: 50px;
-  margin-bottom: 20px;
-}
-
-.cart-items{
-  margin:5px;
-  align-items: center;
+  margin: 200px auto;
+  width: 500px;
+  padding: 20px; 
+  box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
+  background-color: #2B88E6;
+  border-radius: 10px;
 }
 
 .login{
@@ -85,6 +83,50 @@
 .item-login{
   margin: 5px;
 }
+
+.name-select{
+  margin-top: 30px;
+  margin-bottom: 20px;
+  width: 300px;
+}
+
+/*menu*/
+
+.menu{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 85%;
+  margin: auto;
+  background-color: #39DDE2;
+  border-radius: 10px;
+  color: #040C39;
+}
+
+.tipo-container{
+  display: flex;
+  flex-direction: column;
+  margin: 40px 20px;
+  font-size: 1em;
+}
+
+
+.remove-btn {
+  width: 24px;           
+  height: 24px;          
+  background-color: red;     
+  cursor: pointer;   
+  margin-left: 5px;  
+}
+
+
+.cart-items{
+  margin:5px;
+  align-items: center;
+}
+
 
 .App-link {
   color: #61dafb;

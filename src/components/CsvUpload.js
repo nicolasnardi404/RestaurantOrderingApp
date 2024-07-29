@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Button } from 'primereact/button';
+import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+        
 
 const CsvUpload = () => {
     const [isOver, setIsOver] = useState(false);
@@ -11,6 +17,20 @@ const CsvUpload = () => {
         tipo: '',
     });
     const [fileDropped, setFileDropped] = useState(false);
+
+   const giorniSettimanaOptions = [
+    { label: 'Lunedì', value: 'Lunedì' },
+    { label: 'Martedì', value: 'Martedì' },
+    { label: 'Mercoledì', value: 'Mercoledì' },
+    { label: 'Giovedì', value: 'Giovedì' },
+    { label: 'Venerdì', value: 'Venerdì' },
+];
+
+const tipoOptions = [
+    { label: 'Primi', value: 'Primi' },
+    { label: 'Secondi', value: 'Secondi' },
+    { label: 'Contorni', value: 'Contorni' },
+];
 
     const tipoMapping = {
         "Primi": 1,
@@ -73,23 +93,45 @@ const CsvUpload = () => {
 
     const organizeData = (data) => {
         const nomes = [];
-
+    
         data.forEach((row) => {
-            const data = row["Giorno"] || "";
+            const inputData = row["Giorno"] || "";
+            let matchedDay;
+    
+            // Normalize the input day name by removing accents and other non-alphanumeric characters
+            const normalizedInput = inputData.toLowerCase().replace(/[^\w\s]/gi, '')
+            .replace('lunedi', 'lunedì')
+            .replace('martedi', 'martedì')
+            .replace('mercoledi', 'mercoledì')
+            .replace('giovedi', 'giovedì')
+            .replace('venerdi', 'venerdì');
+    
+            // Find the closest match for the "Giorno" value
+            giorniSettimanaOptions.forEach(option => {
+                if (normalizedInput.includes(option.value.toLowerCase())) {
+                    matchedDay = option;
+                }
+            });
+    
+            if (!matchedDay) {
+                matchedDay = { label: inputData, value: inputData }; // Fallback to raw input if no match found
+            }
+    
             ["Primi", "Secondi", "Contorni"].forEach((tipo) => {
                 const nomesString = row[tipo] || "";
                 nomesString.split("\n")
-                    .map((nome) => nome.trim())
-                    .filter(Boolean)
-                    .forEach((nome) => {
-                        nomes.push({ nome: nome, data: data, tipo: tipo });
+                  .map((nome) => nome.trim())
+                  .filter(Boolean)
+                  .forEach((nome) => {
+                        nomes.push({ nome: nome, data: matchedDay.value, tipo: tipo });
                     });
             });
         });
-
+    
         return nomes;
     };
-
+    
+    
     const handleDrop = async (event) => {
         event.preventDefault();
         setIsOver(false);
@@ -136,9 +178,40 @@ const CsvUpload = () => {
 
     const handleInputChange = (index, fieldName) => (event) => {
         const updatedItems = [...editableData];
-        updatedItems[index][fieldName] = event.target.value;
+        updatedItems[index][fieldName] = event.value; // Note: Use event.value for Dropdown
         setEditableData(updatedItems);
     };
+
+    const renderNome = (rowData, { rowIndex }) => (
+        <InputText
+            className="input-text"
+            type="text"
+            value={rowData.nome}
+            onChange={(e) => handleInputChange(rowIndex, 'nome')(e)}
+        />
+    );
+
+    const renderData = (rowData, { rowIndex }) => (
+        <Dropdown
+            value={rowData.data}
+            options={giorniSettimanaOptions}
+            onChange={(e) => handleInputChange(rowIndex, 'data')(e)}
+            placeholder="Select a Day"
+        />
+    );
+
+    const renderTipo = (rowData, { rowIndex }) => (
+        <Dropdown
+            value={rowData.tipo}
+            options={tipoOptions}
+            onChange={(e) => handleInputChange(rowIndex, 'tipo')(e)}
+            placeholder="Select a Type"
+        />
+    );
+
+    const renderRemove = (rowData, { rowIndex }) => (
+        <Button icon="pi pi-times" className="p-button-rounded p-button-outlined" onClick={() => removeItem(rowIndex)} />
+    );
 
     return (
         <div>
@@ -148,65 +221,27 @@ const CsvUpload = () => {
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                     className='drag-drop'
-                    style={{
-                        backgroundColor: isOver ? "lightgray" : "white",
-                    }}
+                    style={{ backgroundColor: isOver ? "lightgray" : "white" }}
                 >
                     Drag and drop some files here
                 </div>
             )}
             {fileDropped && (
                 <div>
-                    <table className='container-table'>
-                        <thead>
-                            <tr>
-                                <th>Piatto</th>
-                                <th>Giorno</th>
-                                <th>Tipo</th>
-                                <th>Remove</th>
-                            </tr>
-                        </thead>
-                        <tbody className='container-body'>
-                            {editableData.map((item, index) => (
-                                <tr className="container-row" key={index}>
-                                    <td className='nome-item'>
-                                        <input
-                                            type="text"
-                                            value={item.nome}
-                                            onChange={handleInputChange(index, 'nome')}
-                                        />
-                                    </td>
-                                    <td className='data-item'>
-                                        <select value={item.data} onChange={(e) => handleInputChange(index, 'data')(e)}>
-                                            <option value="Lunedì">Lunedì</option>
-                                            <option value="Martedì">Martedì</option>
-                                            <option value="Mercoledì">Mercoledì</option>
-                                            <option value="Giovedì">Giovedì</option>
-                                            <option value="Venerdì">Venerdì</option>
-                                        </select>
-                                    </td>
-                                    <td className='tipo-item'>
-                                        <select value={item.tipo} onChange={(e) => handleInputChange(index, 'tipo')(e)}>
-                                            <option value="Primi">Primi</option>
-                                            <option value="Secondi">Secondi</option>
-                                            <option value="Contorni">Contorni</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <button onClick={() => removeItem(index)}>X</button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <DataTable className='data-table' stripedRows value={editableData}>
+                        <Column className='data-piatto' body={renderNome} header="Piatto" />
+                        <Column body={renderData} header="Giorno" />
+                        <Column body={renderTipo} header="Tipo" />
+                        <Column body={renderRemove} header="Remove" />
+                    </DataTable>
                     <div>
                         <form onSubmit={(e) => {
                             e.preventDefault();
                             addItem();
                         }}>
-                            <button className='btn-classic' type="submit">Add Item</button>
+                            <Button className='btn-classic' type="submit">Aggiungere Piatto</Button>
                         </form>
-                        <button className='btn-classic' onClick={sendDataToServer}>Submit All Data</button>
+                        <Button className='btn-test btn-classic' onClick={sendDataToServer}>Inviare il Menu</Button>
                     </div>
                 </div>
             )}
