@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
+import { locale, addLocale, updateLocaleOption, updateLocaleOptions, localeOption, localeOptions } from 'primereact/api';
+        
 
 function MenuPage() {
   const [dishes, setDishes] = useState([]);
@@ -12,15 +14,31 @@ function MenuPage() {
   const userName = localStorage.getItem('nome'); // Retrieve user name from localStorage
   const navigate = useNavigate(); // Initialize useNavigate for redirection
 
+  locale('it')
+
+  addLocale('it', {
+    firstDayOfWeek: 1,
+    dayNames: ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
+    dayNamesShort: ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'],
+    dayNamesMin: ['D', 'L', 'M', 'M', 'G', 'V', 'S'],
+    monthNames: ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
+    monthNamesShort: ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
+    today: 'Oggi',
+    clear: 'Cancella',
+    // Add any other necessary translations here...
+});
+
+
   useEffect(() => {
+    console.log(selectedDay)
     if (selectedDay) {
-      fetch(`http://localhost/project/menu?date=${encodeURIComponent(selectedDay)}`)
+      fetch(`http://localhost/project/menu?date=${(selectedDay)}`)
         .then(response => response.json())
         .then(data => {
+
           setDishes(data.data);
           console.log(data);
-        })
-        .catch(error => console.error('Error fetching dishes:', error));
+        }).catch(error => console.error('Error fetching dishes:', error));
     }
   }, [selectedDay]);
 
@@ -32,8 +50,9 @@ function MenuPage() {
 
   const formatDateForComparison = (date) => {
     if (date instanceof Date) {
-      return date.toISOString().split('T')[0]; // Convert Date to yyyy-mm-dd format
-    } else if (typeof date === 'string') {
+      const formatDate = date.toLocaleString('IT', {timeZone:'Europe/Rome'}).split(',')
+      return formatDate[0]
+        }else if (typeof date === 'string') {
       return new Date(date).toISOString().split('T')[0]; // Convert string to yyyy-mm-dd
     } else {
       console.error('Invalid date format:', date);
@@ -97,11 +116,11 @@ function MenuPage() {
       <h1>Welcome, {userName}</h1>
       
       <label htmlFor="daySelect">Choose a day:</label>
-      <Calendar id="daySelect" value={selectedDay} onChange={(e) => handleDayChange(e)} dateFormat='dd/mm/yy' />
+      <Calendar id="daySelect" value={selectedDay} onChange={(e) => handleDayChange(e)} dateFormat='dd/mm/yy' locale='it' />
       
       {selectedDay && (
         <div>
-          <p>Selected Day: {new Date(selectedDay).toLocaleDateString()}</p>
+          <p>Selected Day: {selectedDay}</p>
           <div className='menu'>
             <div className='tipo-container'>
               <h2>Primi</h2>
