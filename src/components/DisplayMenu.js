@@ -83,7 +83,7 @@ const formatDateforServer = (date) => {
     const pratoSecondo = Secondo === null ? null : Secondo;
     const pratoContorno = Contorno === null ? null : Contorno;
     const pratoPiattoUnico = PiattoUnico === null ? null : PiattoUnico;
-
+    
     // Allowed combinations
     const isValid =
       (pratoPrimo && pratoSecondo && pratoContorno && !pratoPiattoUnico) || // Primo + Secondo + Contorno
@@ -91,10 +91,8 @@ const formatDateforServer = (date) => {
       (pratoPrimo && pratoContorno && !pratoSecondo && !pratoPiattoUnico) || // Primo + Contorno
       (pratoSecondo && pratoContorno && !pratoPrimo && !pratoPiattoUnico) || // Secondo + Contorno
       (pratoPiattoUnico && pratoContorno && !pratoPrimo && !pratoSecondo) || // Piatto Unico + Contorno
-      (pratoPiattoUnico && !pratoPrimo && !pratoSecondo && !pratoContorno); // Piatto Unico only
-
-      console.log(isValid)
-    return isValid;
+      (pratoPiattoUnico  && !pratoPrimo && !pratoSecondo && !pratoContorno);      // Piatto Unico only
+    return isValid; 
   };
 
   const handleSubmit = () => {
@@ -102,10 +100,44 @@ const formatDateforServer = (date) => {
       setError('Selected combination is not valid. Please select a valid combination.');
       return;
     }
-
-    // Redirect to /order page
-    navigate('/order');
+  
+    const orderData = {
+      username: userName,
+      piatti: {
+        Primo: cart.Primo?.value || null,
+        Secondo: cart.Secondo?.value || null,
+        Contorno: cart.Contorno?.value || null,
+        PiattoUnico: cart.PiattoUnico?.value || null,
+      },
+      data: formatDateforServer(selectedDay),
+    };
+    
+    console.log(orderData); // Just for verification
+    
+    // Serialize the object to a JSON string
+    const jsonString = JSON.stringify(orderData);
+    
+    console.log(jsonString); // Log the JSON string to verify
+    // Send the data to the server
+    fetch('http://localhost:8080/api/order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Order submitted successfully:', data);
+        // Optionally, redirect the user or display a success message
+        navigate('/success-page'); // Example redirection
+      })
+      .catch(error => {
+        console.error('Error submitting order:', error);
+        setError('Failed to submit your order. Please try again.');
+      });
   };
+  
 
   const getDishesByType = (type) => {
     return [
@@ -115,6 +147,7 @@ const formatDateforServer = (date) => {
       }))
     ];
   };
+  
 
   const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
     return (
@@ -122,15 +155,17 @@ const formatDateforServer = (date) => {
         <h2>{type.charAt(0).toUpperCase() + type.slice(1)}</h2>
         <Dropdown
           value={initialValue}
-          options={options}
+          options={[ ...options]} // Prepend "None" option
           onChange={(e) => onValueChange(type, e.value)}
           optionLabel="label"
           placeholder={`Select a ${type} dish`}
+          showClear
         />
-        <Button label="Clear" onClick={() => onValueChange(type, null, true)} />
       </div>
     );
   };
+  
+  
   
 
   return (
@@ -140,10 +175,7 @@ const formatDateforServer = (date) => {
       <label htmlFor="daySelect">Choose a day:</label>
       <Calendar id="daySelect" value={selectedDay} onChange={(e) => handleDayChange(e)} dateFormat='dd/mm/yy' locale='it' />
       
-      {selectedDay && (
         <div>
-          <p>Selected Day: {selectedDay}</p>
-          <div className='menu'>
             {selectedDay && (
               <div>
                 <p>Selected Day: {selectedDay}</p>
@@ -180,14 +212,8 @@ const formatDateforServer = (date) => {
                 </div>        
               </div>
             )}
-            <br />
-          </div>
-          <div className='tipo-container'>
-            {error && <p className="error-message">{error}</p>}
-            <Button label="Submit" icon="pi pi-check" className="btn-classic" onClick={handleSubmit}/>
-          </div>        
+            <br />     
         </div>
-      )}
     </div>
   );
 }
