@@ -47,6 +47,8 @@ const formatDateforServer = (date) => {
     }
   }, [selectedDay]);
 
+  
+
   const handleDayChange = (event) => {
     const selectedDateFormatted = formatDateForComparison(event.value);
     setSelectedDay(selectedDateFormatted);
@@ -106,7 +108,6 @@ const formatDateforServer = (date) => {
   };
 
   const getDishesByType = (type) => {
-    // Add a "None" option to allow clearing the selection
     return [
       ...dishes.filter(dish => dish.idTipoPiatto === type).map(dish => ({
         label: dish.nome,
@@ -114,6 +115,23 @@ const formatDateforServer = (date) => {
       }))
     ];
   };
+
+  const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
+    return (
+      <div className='tipo-container'>
+        <h2>{type.charAt(0).toUpperCase() + type.slice(1)}</h2>
+        <Dropdown
+          value={initialValue}
+          options={options}
+          onChange={(e) => onValueChange(type, e.value)}
+          optionLabel="label"
+          placeholder={`Select a ${type} dish`}
+        />
+        <Button label="Clear" onClick={() => onValueChange(type, null, true)} />
+      </div>
+    );
+  };
+  
 
   return (
     <div>
@@ -126,46 +144,42 @@ const formatDateforServer = (date) => {
         <div>
           <p>Selected Day: {selectedDay}</p>
           <div className='menu'>
-            <div className='tipo-container'>
-              <h2>Primi</h2>
-              <Dropdown
-                value={cart.Primo}
-                options={getDishesByType(1)}
-                onChange={(e) => handleDropdownChange('Primo', e.value)}
-                optionLabel="label"
-                placeholder="Select a Primo dish"
-              />
-            </div>
-            <div className='tipo-container'>
-              <h2>Secondi</h2>
-              <Dropdown
-                value={cart.Secondo}
-                options={getDishesByType(2)}
-                onChange={(e) => handleDropdownChange('Secondo', e.value)}
-                optionLabel="label"
-                placeholder="Select a Secondo dish"
-              />
-            </div>
-            <div className='tipo-container'>
-              <h2>Contorni</h2>
-              <Dropdown
-                value={cart.Contorno}
-                options={getDishesByType(3)}
-                onChange={(e) => handleDropdownChange('Contorno', e.value)}
-                optionLabel="label"
-                placeholder="Select a Contorno dish"
-              />
-            </div>
-            <div className='tipo-container'>
-              <h2>Piatto Unico</h2>
-              <Dropdown
-                value={cart.PiattoUnico}
-                options={getDishesByType(4)}
-                onChange={(e) => handleDropdownChange('PiattoUnico', e.value)}
-                optionLabel="label"
-                placeholder="Select a Piatto Unico dish"
-              />
-            </div>
+            {selectedDay && (
+              <div>
+                <p>Selected Day: {selectedDay}</p>
+                <div className='menu'>
+                  <DishDropdown
+                    type="Primo"
+                    initialValue={cart.Primo}
+                    options={getDishesByType(1)}
+                    onValueChange={handleDropdownChange}
+                  />
+                  <DishDropdown
+                    type="Secondo"
+                    initialValue={cart.Secondo}
+                    options={getDishesByType(2)}
+                    onValueChange={handleDropdownChange}
+                  />
+                  <DishDropdown
+                    type="Contorno"
+                    initialValue={cart.Contorno}
+                    options={getDishesByType(3)}
+                    onValueChange={handleDropdownChange}
+                  />
+                  <DishDropdown
+                    type="PiattoUnico"
+                    initialValue={cart.PiattoUnico}
+                    options={getDishesByType(4)}
+                    onValueChange={handleDropdownChange}
+                  />
+                  <br />
+                </div>
+                <div className='tipo-container'>
+                  {error && <p className="error-message">{error}</p>}
+                  <Button label="Submit" icon="pi pi-check" className="btn-classic" onClick={handleSubmit}/>
+                </div>        
+              </div>
+            )}
             <br />
           </div>
           <div className='tipo-container'>
