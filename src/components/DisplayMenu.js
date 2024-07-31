@@ -11,8 +11,8 @@ function MenuPage() {
   const [selectedDay, setSelectedDay] = useState('');
   const [cart, setCart] = useState({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null });
   const [error, setError] = useState('');
-  const userName = localStorage.getItem('nome'); // Retrieve user name from localStorage
-  const navigate = useNavigate(); // Initialize useNavigate for redirection
+  const userName = localStorage.getItem('nome'); 
+  const navigate = useNavigate();
 
   locale('it')
 
@@ -25,19 +25,24 @@ function MenuPage() {
     monthNamesShort: ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
     today: 'Oggi',
     clear: 'Cancella',
-    // Add any other necessary translations here...
 });
+
+const formatDateforServer = (date) => {
+  const [day, month, year] = date.split('/');
+  return `${year}-${month}-${day}`;
+}
 
 
   useEffect(() => {
     console.log(selectedDay)
-    if (selectedDay) {
-      fetch(`http://localhost/project/menu?date=${(selectedDay)}`)
+    const formDateForServer = formatDateforServer(selectedDay);
+    console.log(formDateForServer)
+    if (formDateForServer) {
+      fetch(`http://localhost:8080/api/piatto/data/${(formDateForServer)}`)
         .then(response => response.json())
         .then(data => {
-
-          setDishes(data.data);
-          console.log(data);
+          console.log(data.map((piatto)=>piatto.nome));
+          setDishes(data)
         }).catch(error => console.error('Error fetching dishes:', error));
     }
   }, [selectedDay]);
@@ -103,7 +108,6 @@ function MenuPage() {
   const getDishesByType = (type) => {
     // Add a "None" option to allow clearing the selection
     return [
-      { label: 'None', value: null }, // Option to clear selection
       ...dishes.filter(dish => dish.idTipoPiatto === type).map(dish => ({
         label: dish.nome,
         value: dish

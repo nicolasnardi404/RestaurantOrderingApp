@@ -9,15 +9,28 @@ export default function SimpleLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost/project/users')
-      .then(response => response.json())
-      .then(data => setNames(data.data))
-      .catch(error => console.error('Error fetching names:', error));
+    fetch('http://localhost:8080/api/users')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); // Convert the response to JSON
+      })
+      .then(data => {
+        // Directly set the names in the state by mapping over the fetched data
+        const namesFromData = data.map(item => item.nome);
+        setNames(namesFromData); // Set the state with the extracted names
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation: ', error);
+      });
   }, []);
+  
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    localStorage.setItem('nome', selectedName ? selectedName.nome : '');
+    localStorage.setItem('nome', selectedName ? selectedName : '');
+    console.log(localStorage)
     navigate('/menu');
   };
 
@@ -33,7 +46,7 @@ export default function SimpleLogin() {
       />
       {/* Conditionally render the button */}
       {selectedName && (
-        <Button label={selectedName.nome} type="submit" className="btn-classic" />
+        <Button label={selectedName} type="submit" className="btn-classic" />
       )}
     </form>
   );
