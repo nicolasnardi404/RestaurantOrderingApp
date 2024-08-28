@@ -12,6 +12,7 @@ function MenuPage() {
   const [cart, setCart] = useState({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null });
   const [error, setError] = useState('');
   const userName = localStorage.getItem('nome'); 
+  const idUser = localStorage.getItem('idUser')
   const navigate = useNavigate();
 
   locale('it')
@@ -103,6 +104,7 @@ const formatDateforServer = (date) => {
   
     const orderData = {
       username: userName,
+      idUser: idUser,
       piatti: {
         Primo: cart.Primo?.value || null,
         Secondo: cart.Secondo?.value || null,

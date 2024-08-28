@@ -15,6 +15,8 @@ const CsvUpload = () => {
         nome: '',
         data: '',
         tipo: '',
+        sempreDisponibile: false,
+
     });
     const [fileDropped, setFileDropped] = useState(false);
 
@@ -178,7 +180,7 @@ const tipoOptions = [
 
     const handleInputChange = (index, fieldName) => (event) => {
         const updatedItems = [...editableData];
-        updatedItems[index][fieldName] = event.value; // Note: Use event.value for Dropdown
+        updatedItems[index][fieldName] = event.value;
         setEditableData(updatedItems);
     };
 
