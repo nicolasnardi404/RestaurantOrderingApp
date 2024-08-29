@@ -18,10 +18,10 @@ export default function SimpleLogin() {
         return response.json(); // Convert the response to JSON
       })
       .then(data => {
-        // Transform the data into an array of objects focusing only on nome and idUser
+        console.log(data)
         const transformedUsers = Object.entries(data).map(([key, value]) => ({
           nome: value.nome,
-          idUser: value.idUser
+          id: value.id
         }));
         setUsers(transformedUsers);
       })
@@ -32,14 +32,22 @@ export default function SimpleLogin() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (selectedName && selectedUserId) {
+    if (selectedName) {
       localStorage.setItem('nome', selectedName);
-      localStorage.setItem('idUser', selectedUserId.toString());
+      localStorage.setItem('id', selectedUserId);
       console.log(localStorage);
       navigate('/menu');
     } else {
       alert("Please select a user");
     }
+  };
+
+  // Function to update the placeholder based on the selected name
+  const updatePlaceholder = () => {
+    if (selectedName) {
+      return `${selectedName}`;
+    }
+    return "--Scegliere il Nome--";
   };
 
   return (
@@ -51,9 +59,9 @@ export default function SimpleLogin() {
         value={selectedName} 
         onChange={(e) => {
           setSelectedName(e.value.nome);
-          setSelectedUserId(e.value.idUser);
+          setSelectedUserId(e.value.id);
         }}
-        placeholder="--Scegliere il Nome--"
+        placeholder={updatePlaceholder()}
       />
       {/* Conditionally render the button */}
       {selectedName && (

@@ -105,6 +105,13 @@ body{
   color: #040C39;
 }
 
+.menu-wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  max-width: 200px;
+}
+
 .tipo-container{
   display: flex;
   flex-direction: column;
