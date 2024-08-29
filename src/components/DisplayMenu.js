@@ -3,14 +3,28 @@ import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
+import { locale, addLocale } from 'primereact/api';
+
+// Set locale for Calendar
+locale('it');
+addLocale('it', {
+  firstDayOfWeek: 1,
+  dayNames: ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
+  dayNamesShort: ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'],
+  dayNamesMin: ['D', 'L', 'M', 'M', 'G', 'V', 'S'],
+  monthNames: ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
+  monthNamesShort: ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
+  today: 'Oggi',
+  clear: 'Cancella',
+});
 
 function MenuPage() {
   const [dishes, setDishes] = useState([]);
-  const [selectedDay, setSelectedDay] = useState('');
+  const [selectedDay, setSelectedDay] = useState(null);
   const [dateSelected, setDateSelected] = useState(false);
-  const [cart, setCart] = useState({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null });
+  const [cart, setCart] = useState({});
   const [error, setError] = useState('');
-  const [selectedMealCombination, setSelectedMealCombination] = useState(null); // Store the selected combination ID
+  const [selectedMealTypes, setSelectedMealTypes] = useState([]);
   const userName = localStorage.getItem('nome');
   const idUser = localStorage.getItem('idUser');
   const navigate = useNavigate();
@@ -28,28 +42,33 @@ function MenuPage() {
     }
   }, [selectedDay]);
 
+  useEffect(() => {
+    // Validate meal types and update error message in real-time
+    updateError();
+  }, [selectedMealTypes, cart]);
+
   const handleDayChange = (event) => {
-    const selectedDateFormatted = formatDateForComparison(event.value);
-    setSelectedDay(selectedDateFormatted);
-    setCart({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null });
+    const selectedDate = event.value;
+    setSelectedDay(selectedDate);
+    setCart({});
+    setSelectedMealTypes([]);
+    setError('');
     setDateSelected(true);
   };
 
-  // Format date for server
   const formatDateforServer = (date) => {
-    const [day, month, year] = date.split('/');
+    const d = date instanceof Date ? date : new Date(date);
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
     return `${year}-${month}-${day}`;
   };
 
   const formatDateForComparison = (date) => {
     if (date instanceof Date) {
-      const formattedDate = date.toLocaleDateString('it-IT');
-      return formattedDate;
-    } else if (typeof date === 'string') {
-      return new Date(date).toLocaleDateString('it-IT');
+      return date.toLocaleDateString('it-IT');
     } else {
-      console.error('Invalid date format:', date);
-      return '';
+      return new Date(date).toLocaleDateString('it-IT');
     }
   };
 
@@ -62,16 +81,13 @@ function MenuPage() {
 
   const handleDateChange = () => {
     setDateSelected(false);
-    setSelectedDay('');
-    setCart({ Primo: null, Secondo: null, Contorno: null, PiattoUnico: null });
-    setSelectedMealCombination(null); // Reset selected combination on date change
+    setSelectedDay(null);
+    setCart({});
+    setSelectedMealTypes([]);
+    setError('');
   };
 
   const handleSubmit = () => {
-    if (!validateCart()) {
-      setError('Please select a valid dish.');
-      return;
-    }
 
     const orderData = {
       username: userName,
@@ -102,6 +118,17 @@ function MenuPage() {
       });
   };
 
+  // Handle checkbox changes
+  const handleCheckboxChange = (mealType) => {
+    setSelectedMealTypes((prevSelected) => {
+      if (prevSelected.includes(mealType)) {
+        return prevSelected.filter(type => type !== mealType);
+      } else {
+        return [...prevSelected, mealType];
+      }
+    });
+  };
+
   // Filter dishes by meal type
   const getFilteredDishes = (mealType) => {
     const typeMapping = {
@@ -114,40 +141,44 @@ function MenuPage() {
     return dishes.filter(dish => dish.idTipoPiatto === typeMapping[mealType]);
   };
 
-  const handleCheckboxChange = (mealId, mealTypes) => {
-    const newMealTypes = getMealTypesByCombination(mealId);
+  // Update error message based on missing meal types
+  const updateError = () => {
+    console.log(cart)
+    const validCombinations = [
+      ['Primo', 'Secondo', 'Contorno'],
+      ['Primo', 'PiattoUnico', 'Contorno'],
+      ['Primo', 'Contorno'],
+      ['Secondo', 'Contorno'],
+      ['PiattoUnico', 'Contorno'],
+      ['PiattoUnico']
+    ];
 
-    // Update the cart, preserving previously selected dishes if they still apply
-    setCart(prevCart => {
-      const newCart = { ...prevCart };
-      Object.keys(newCart).forEach(type => {
-        if (!newMealTypes.includes(type)) {
-          newCart[type] = null;  // Reset dish selection if it's not in the new meal types
-        }
-      });
-      return newCart;
-    });
+    const selectedSet = new Set(selectedMealTypes);
 
-    setSelectedMealCombination(mealId); // Set the selected combination ID
-  };
+    // Find matching valid combinations
+    const matchingCombinations = validCombinations.filter(combination => 
+      combination.every(type => selectedSet.has(type))
+    );
 
-  const validateCart = () => {
-    // Ensure that each required meal type in the selected combination has a selected dish
-    const selectedMealTypes = getMealTypesByCombination(selectedMealCombination);
-    return dateSelected && selectedMealTypes.every(mealType => cart[mealType]);
-  };
-
-  const getMealTypesByCombination = (combinationId) => {
-    // Define meal types for each combination
-    const mealCombinations = {
-      1: ['Primo', 'Secondo', 'Contorno'],
-      2: ['Primo', 'PiattoUnico', 'Contorno'],
-      3: ['Primo', 'Contorno'],
-      4: ['Secondo', 'Contorno'],
-      5: ['PiattoUnico', 'Contorno'],
-      6: ['PiattoUnico']
-    };
-    return mealCombinations[combinationId] || [];
+    // Determine missing items based on the best matching combination
+    if (matchingCombinations.length > 0) {
+      const bestMatch = matchingCombinations[0]; // You can refine this logic if needed
+      const missingItems = bestMatch.filter(type => !selectedSet.has(type));
+      if (missingItems.length > 0) {
+        setError(`You still need to select: ${[...new Set(missingItems)].join(', ')}.`);
+      } else {
+        setError(''); // Clear error if valid combination is met
+      }
+    } else {
+      // If no valid combination is met, list all possible items to select
+      const allPossibleItems = validCombinations.flat();
+      const missingItems = allPossibleItems.filter(type => !selectedSet.has(type));
+      if (missingItems.length > 0) {
+        setError(`Please select at least one dish for: ${[...new Set(missingItems)].join(', ')}.`);
+      } else {
+        setError(''); // Clear error if no items are missing
+      }
+    }
   };
 
   return (
@@ -157,40 +188,36 @@ function MenuPage() {
       {!dateSelected ? (
         <div>
           <label htmlFor="daySelect">Choose a day:</label>
-          <Calendar id="daySelect" value={selectedDay} onChange={handleDayChange} dateFormat='dd/mm/yy' />
+          <Calendar
+            id="daySelect"
+            value={selectedDay}
+            onChange={handleDayChange}
+            dateFormat="dd/mm/yy"
+          />
         </div>
       ) : (
         <div>
-          <p>Selected date: {selectedDay}</p>
+          <p>Selected date: {formatDateForComparison(selectedDay)}</p>
           <Button label="Change Date" onClick={handleDateChange} />
         </div>
       )}
-      
-      <div className="checkbox-container">
-        {[
-          { id: 1, name: 'Primo + Secondo + Contorno', types: ['Primo', 'Secondo', 'Contorno'] },
-          { id: 2, name: 'Primo + Piatto Unico + Contorno', types: ['Primo', 'PiattoUnico', 'Contorno'] },
-          { id: 3, name: 'Primo + Contorno', types: ['Primo', 'Contorno'] },
-          { id: 4, name: 'Secondo + Contorno', types: ['Secondo', 'Contorno'] },
-          { id: 5, name: 'Piatto Unico + Contorno', types: ['PiattoUnico', 'Contorno'] },
-          { id: 6, name: 'Piatto Unico', types: ['PiattoUnico'] },
-        ].map(meal => (
-          <div key={meal.id}>
+
+      {/* Checkbox for each meal type */}
+      <div className="meal-type-checkboxes">
+        {['Primo', 'Secondo', 'Contorno', 'PiattoUnico'].map(mealType => (
+          <div key={mealType}>
             <input
-              type="radio"
-              checked={selectedMealCombination === meal.id} // Check if this radio button is selected
-              onChange={() => handleCheckboxChange(meal.id, meal.types)}
+              type="checkbox"
+              checked={selectedMealTypes.includes(mealType)}
+              onChange={() => handleCheckboxChange(mealType)}
             />
-            <label>{meal.name}</label><br />
+            <label>{mealType}</label><br />
           </div>
         ))}
       </div>
 
-      {dateSelected && !validateCart() && (
-        <p className="error">Please select a valid meal combination.</p>
-      )}
-
-      {getMealTypesByCombination(selectedMealCombination).map(mealType => (
+      {/* Display dropdowns based on selected checkboxes */}
+      {selectedMealTypes.map(mealType => (
         <DishDropdown
           key={mealType}
           type={mealType}
@@ -200,12 +227,14 @@ function MenuPage() {
         />
       ))}
 
+      {/* Error or validation message */}
       {error && <p className="error">{error}</p>}
+
       <Button 
         label="Submit Order" 
         onClick={handleSubmit} 
         className="mt-3" 
-        disabled={!validateCart()}
+        disabled={!!error} // Disable if there is any error
       />
     </div>
   );
@@ -213,7 +242,7 @@ function MenuPage() {
 
 const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
   return (
-    <div className='tipo-container'>
+    <div className="tipo-container">
       <h2>{type.charAt(0).toUpperCase() + type.slice(1)}</h2>
       <Dropdown
         value={initialValue}
