@@ -3,6 +3,7 @@
   import Home from "./pages/Home";
   import LogIn from "./pages/LogIn";
   import Menu from "./pages/Menu";
+  import Historic from "./pages/Historic"
   import MyApp from "./_app";
 
   export default function App() {
@@ -12,6 +13,7 @@
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<LogIn />} />
           <Route path="/menu" element={<Menu />} />
+          <Route path="/historic" element={<Historic />} />
           <Route path="/test" element={<MyApp />} />
         </Routes>
       </BrowserRouter>

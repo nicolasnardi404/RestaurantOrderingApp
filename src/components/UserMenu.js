@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Menu } from 'primereact/menu';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
-import 'primeicons/primeicons.css';
 
 export default function UserMenu() {
   const [visibleLeft, setVisibleLeft] = useState(false);
