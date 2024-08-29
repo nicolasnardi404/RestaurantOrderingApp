@@ -37,13 +37,15 @@ function MenuPage() {
         .then(response => response.json())
         .then(data => {
           setDishes(data);
+          // Extract unique meal types from the data
+          const uniqueMealTypes = [...new Set(data.map(dish => dish.tipo_piatto))];
+          
         })
         .catch(error => console.error('Error fetching dishes:', error));
     }
   }, [selectedDay]);
 
   useEffect(() => {
-    // Validate meal types and update error message in real-time
     updateError();
   }, [selectedMealTypes, cart]);
 
@@ -65,15 +67,11 @@ function MenuPage() {
   };
 
   const formatDateForComparison = (date) => {
-    if (date instanceof Date) {
-      return date.toLocaleDateString('it-IT');
-    } else {
-      return new Date(date).toLocaleDateString('it-IT');
-    }
+    return date instanceof Date ? date.toLocaleDateString('it-IT') : new Date(date).toLocaleDateString('it-IT');
   };
 
   const handleDropdownChange = (type, selectedDish) => {
-    setCart((prevCart) => ({
+    setCart(prevCart => ({
       ...prevCart,
       [type]: selectedDish,
     }));
@@ -88,15 +86,14 @@ function MenuPage() {
   };
 
   const handleSubmit = () => {
-
     const orderData = {
       username: userName,
       idUser: idUser,
       piatti: {
-        Primo: cart.Primo?.idPiatto || null,
-        Secondo: cart.Secondo?.idPiatto || null,
-        Contorno: cart.Contorno?.idPiatto || null,
-        PiattoUnico: cart.PiattoUnico?.idPiatto || null,
+        Primo: cart.Primo?.id || null,
+        Secondo: cart.Secondo?.id || null,
+        Contorno: cart.Contorno?.id || null,
+        PiattoUnico: cart.PiattoUnico?.id || null,
       },
       data: formatDateforServer(selectedDay),
     };
@@ -109,41 +106,26 @@ function MenuPage() {
       body: JSON.stringify(orderData),
     })
       .then(response => response.json())
-      .then(data => {
-        navigate('/success-page');
-      })
+      .then(() => navigate('/success-page'))
       .catch(error => {
         console.error('Error submitting order:', error);
         setError('Failed to submit your order. Please try again.');
       });
   };
 
-  // Handle checkbox changes
   const handleCheckboxChange = (mealType) => {
-    setSelectedMealTypes((prevSelected) => {
-      if (prevSelected.includes(mealType)) {
-        return prevSelected.filter(type => type !== mealType);
-      } else {
-        return [...prevSelected, mealType];
-      }
-    });
+    setSelectedMealTypes(prevSelected =>
+      prevSelected.includes(mealType)
+        ? prevSelected.filter(type => type !== mealType)
+        : [...prevSelected, mealType]
+    );
   };
 
-  // Filter dishes by meal type
   const getFilteredDishes = (mealType) => {
-    const typeMapping = {
-      Primo: 1,
-      Secondo: 2,
-      Contorno: 3,
-      PiattoUnico: 4
-    };
-
-    return dishes.filter(dish => dish.idTipoPiatto === typeMapping[mealType]);
+    return dishes.filter(dish => dish.tipo_piatto === mealType);
   };
 
-  // Update error message based on missing meal types
   const updateError = () => {
-    console.log(cart)
     const validCombinations = [
       ['Primo', 'Secondo', 'Contorno'],
       ['Primo', 'PiattoUnico', 'Contorno'],
@@ -155,29 +137,24 @@ function MenuPage() {
 
     const selectedSet = new Set(selectedMealTypes);
 
-    // Find matching valid combinations
-    const matchingCombinations = validCombinations.filter(combination => 
+    const matchingCombinations = validCombinations.filter(combination =>
       combination.every(type => selectedSet.has(type))
     );
 
-    // Determine missing items based on the best matching combination
     if (matchingCombinations.length > 0) {
-      const bestMatch = matchingCombinations[0]; // You can refine this logic if needed
+      const bestMatch = matchingCombinations[0];
       const missingItems = bestMatch.filter(type => !selectedSet.has(type));
-      if (missingItems.length > 0) {
-        setError(`You still need to select: ${[...new Set(missingItems)].join(', ')}.`);
-      } else {
-        setError(''); // Clear error if valid combination is met
-      }
+      setError(missingItems.length > 0 
+        ? `You still need to select: ${[...new Set(missingItems)].join(', ')}.` 
+        : ''
+      );
     } else {
-      // If no valid combination is met, list all possible items to select
       const allPossibleItems = validCombinations.flat();
       const missingItems = allPossibleItems.filter(type => !selectedSet.has(type));
-      if (missingItems.length > 0) {
-        setError(`Please select at least one dish for: ${[...new Set(missingItems)].join(', ')}.`);
-      } else {
-        setError(''); // Clear error if no items are missing
-      }
+      setError(missingItems.length > 0 
+        ? `Please select at least one dish for: ${[...new Set(missingItems)].join(', ')}.` 
+        : ''
+      );
     }
   };
 
@@ -204,7 +181,7 @@ function MenuPage() {
 
       {/* Checkbox for each meal type */}
       <div className="meal-type-checkboxes">
-        {['Primo', 'Secondo', 'Contorno', 'PiattoUnico'].map(mealType => (
+        {[...new Set(dishes.map(dish => dish.tipo_piatto))].map(mealType => (
           <div key={mealType}>
             <input
               type="checkbox"
@@ -222,7 +199,7 @@ function MenuPage() {
           key={mealType}
           type={mealType}
           initialValue={cart[mealType]}
-          options={getFilteredDishes(mealType)}
+          options={getFilteredDishes(mealType)} // Use filtered dishes here
           onValueChange={handleDropdownChange}
         />
       ))}
@@ -248,7 +225,7 @@ const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
         value={initialValue}
         options={options}
         onChange={(e) => onValueChange(type, e.value)}
-        optionLabel="nome"  // Ensure this matches your actual data structure for dish name
+        optionLabel="nome" 
         placeholder={`Select a ${type} dish`}
         showClear
       />
