@@ -7,6 +7,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";  // Import Dropdown component
 import { UseDataLocal } from "../util/UseDataLocal";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
+import { Card } from "primereact/card";
 
 export default function HistoricComponent() {
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
@@ -183,7 +184,10 @@ export default function HistoricComponent() {
       />
       </div>
       <DataTableComponent data={isFiltered ? dataFiltered : data} columns={columns}></DataTableComponent>
-      <Button onClick={handleClick}>Prenotazione per persona</Button>
+      {
+        isFiltered ? <Card className="card-total">TOTAL:{dataFiltered.length} 
+        </Card> : <Card className="card-total">TOTAL:{data.length} </Card>
+      }
     </div>
   );
 }

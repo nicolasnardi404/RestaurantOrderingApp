@@ -126,6 +126,15 @@ body{
   margin: auto;
 }
 
+.card-total{
+  max-width: 300px;
+  max-height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+}
+
 .calendar-view{
   margin: 20px auto;
   display: flex;
