@@ -4,7 +4,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";  // Import Dropdown component
+import { Dropdown } from "primereact/dropdown";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { Card } from "primereact/card";
@@ -16,33 +16,66 @@ export default function HistoricComponent() {
 
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedMonth, setSelectedMonth] = useState(new Date()); // Start with the current month
-  const [selectedUsername, setSelectedUsername] = useState('');  // State for selected username
+  const [selectedUsername, setSelectedUsername] = useState(''); // State for selected username
   const [data, setData] = useState([]);
-  const [dataFiltered, setDataFiltered] = useState([]);
-  const [isFiltered, setIsFiltered] = useState(false);
   const [showDayCalendar, setShowDayCalendar] = useState(false); // Start with month calendar
-  const [usernames, setUsernames] = useState([]);  // State to store all unique usernames
+  const [usernames, setUsernames] = useState([]); // State to store all unique usernames
   const navigate = useNavigate();
-  const [allowPDF, setAllowPDF]  = useState(false);
+  const [allowPDF, setAllowPDF] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Define the columns array
+  const columns = [
+    { field: 'username', header: 'Nome' },
+    { field: 'reservation_date', header: 'Giorno dell Ordine' },
+    { field: 'tipo_piatti', header: 'Ordine' }
+  ];
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/ordine-element')
-      .then(response => response.json())
-      .then(data => {
+    const fetchData = async () => {
+      if (!selectedMonth) return; // Ensure we have a valid month before fetching
+
+      try {
+        setIsLoading(true);
+        const response = await fetch(`http://localhost:8080/api/ordine/readByMese/${formatURL(selectedMonth)}`);
+        const data = await response.json();
+
+        console.log('Raw fetched data:', data);
+
         const formattedData = data.map(item => ({
           username: item.username,
           reservation_date: formatDate(item.reservation_date),
           tipo_piatti: item.tipo_piatti
         }));
+
+        console.log('Formatted data:', formattedData);
         setData(formattedData);
+        console.log('Current data:', data);
 
         // Extract unique usernames for the dropdown
         const uniqueUsernames = [...new Set(formattedData.map(item => item.username))];
         setUsernames(uniqueUsernames);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        console.log(formattedData);
-      });
-  }, []);
+    fetchData(); // Call the fetch function immediately
+  }, [selectedMonth]);
+
+  function formatURL(inputDate) {
+    if (!inputDate) {
+      return ''; // Return empty string if no date is selected
+    }
+
+    const dateObj = new Date(inputDate);
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+
+    return `${year}-${month}`;
+  }
 
   function formatDateFromCalendar(dateString) {
     const dateObj = new Date(dateString);
@@ -96,9 +129,6 @@ export default function HistoricComponent() {
     if (username) {
       filteredData = filteredData.filter(item => item.username === username);
     }
-
-    setDataFiltered(filteredData);
-    setIsFiltered(true);
   }
 
   function formatDateForMonth(dateString) {
@@ -108,14 +138,12 @@ export default function HistoricComponent() {
     return `${month}/${year}`;
   }
 
-  const formatDate = (dateString) => {
-    const dateToString = String(dateString);
-    const dateSplit = dateToString.split(' ');
-    const date = new Date(dateSplit[0]);
-    return `${new Intl.DateTimeFormat('it-IT').format(date)}`;
-  };
+  function formatDate(dateString) {
+    const dateObj = new Date(dateString);
+    return new Intl.DateTimeFormat('it-IT').format(dateObj);
+  }
 
-  const generatePDF = () => {
+  function generatePDF() {
     const doc = new jsPDF();
 
     // Add title
@@ -130,7 +158,7 @@ export default function HistoricComponent() {
     const tableColumn = ["Nome", "Giorno dell Ordine", "Ordine"];
 
     // Map the data to table rows
-    const tableRows = dataFiltered.map(item => [
+    const tableRows = data.map(item => [
       item.username,
       item.reservation_date,
       item.tipo_piatti,
@@ -140,19 +168,14 @@ export default function HistoricComponent() {
     doc.autoTable({ head: [tableColumn], body: tableRows, startY: 40 });
 
     // Add total count
-    doc.text(`Total Records: ${dataFiltered.length}`, 20, doc.internal.pageSize.height - 20);
+    doc.text(`Total Records: ${data.length}`, 20, doc.internal.pageSize.height - 20);
 
     // Save the PDF
     doc.save(`filtered_data_${selectedUsername}.pdf`);
-  };
-
-  const columns = [
-    { field: 'username', header: 'Nome', body: (rowData) => rowData.username },
-    { field: 'reservation_date', header: 'Giorno dell Ordine', body: (rowData) => rowData.reservation_date },
-    { field: 'tipo_piatti', header: 'Ordine', body: (rowData) => rowData.tipo_piatti }
-  ];
+  }
 
   const DataTableComponent = ({ data, columns }) => {
+    console.log('Rendering DataTableComponent with data:', data);
     return (
       <DataTable className="historic-table" value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
         {columns.map((column, index) => (
@@ -164,7 +187,6 @@ export default function HistoricComponent() {
 
   const handleToggleCalendar = () => {
     setShowDayCalendar(!showDayCalendar);
-    setIsFiltered(false); // Reset filter state when switching calendars
 
     if (!showDayCalendar) {
       // Switching to day view, reset month filter
@@ -218,20 +240,26 @@ export default function HistoricComponent() {
 
       </div>
 
-      <DataTableComponent data={isFiltered ? dataFiltered : data} columns={columns}></DataTableComponent>
-      
-      <Card className="card-total">
-        TOTAL: {isFiltered ? dataFiltered.length : data.length}
-      </Card>
+      {isLoading ? (
+        <p>Loading data...</p>
+      ) : (
+        <>
+          <DataTableComponent data={data} columns={columns}></DataTableComponent>
+          
+          <Card className="card-total">
+            TOTAL: {data.length}
+          </Card>
 
-        {/* PDF Generation Button */}
-        <Button 
-          className="generate-pdf"
-          label="Download PDF" 
-          icon="pi pi-file-pdf" 
-          onClick={generatePDF} 
-          disabled={(!selectedUsername && !allowPDF)}
-        />
+          {/* PDF Generation Button */}
+          <Button 
+            className="generate-pdf"
+            label="Download PDF" 
+            icon="pi pi-file-pdf" 
+            onClick={generatePDF} 
+            disabled={(!selectedUsername && !allowPDF)}
+          />
+        </>
+      )}
     </div>
   );
 }
