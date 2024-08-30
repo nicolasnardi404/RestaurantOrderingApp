@@ -4,19 +4,13 @@ import { Button } from 'primereact/button';
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
 import { locale, addLocale } from 'primereact/api';
-
+import formatDateforServer from '../util/formatDateForServer';
+import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
+import { UseDataLocal } from '../util/UseDataLocal';
 // Set locale for Calendar
-locale('it');
-addLocale('it', {
-  firstDayOfWeek: 1,
-  dayNames: ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'],
-  dayNamesShort: ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'],
-  dayNamesMin: ['D', 'L', 'M', 'M', 'G', 'V', 'S'],
-  monthNames: ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
-  monthNamesShort: ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
-  today: 'Oggi',
-  clear: 'Cancella',
-});
+
+
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 function MenuPage() {
   const [dishes, setDishes] = useState([]);
@@ -58,13 +52,6 @@ function MenuPage() {
     setDateSelected(true);
   };
 
-  const formatDateforServer = (date) => {
-    const d = date instanceof Date ? date : new Date(date);
-    const day = d.getDate().toString().padStart(2, '0');
-    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-    const year = d.getFullYear();
-    return `${year}-${month}-${day}`;
-  };
 
   const formatDateForComparison = (date) => {
     return date instanceof Date ? date.toLocaleDateString('it-IT') : new Date(date).toLocaleDateString('it-IT');
