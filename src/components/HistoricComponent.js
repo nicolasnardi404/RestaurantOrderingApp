@@ -8,6 +8,8 @@ import { Dropdown } from "primereact/dropdown";  // Import Dropdown component
 import { UseDataLocal } from "../util/UseDataLocal";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { Card } from "primereact/card";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 export default function HistoricComponent() {
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
@@ -21,6 +23,7 @@ export default function HistoricComponent() {
   const [showDayCalendar, setShowDayCalendar] = useState(false); // Start with month calendar
   const [usernames, setUsernames] = useState([]);  // State to store all unique usernames
   const navigate = useNavigate();
+  const [allowPDF, setAllowPDF]  = useState(false);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/ordine-element')
@@ -105,15 +108,42 @@ export default function HistoricComponent() {
     return `${month}/${year}`;
   }
 
-  function handleClick() {
-    navigate("/prenotazione-per-persona");
-  }
-
   const formatDate = (dateString) => {
     const dateToString = String(dateString);
     const dateSplit = dateToString.split(' ');
     const date = new Date(dateSplit[0]);
     return `${new Intl.DateTimeFormat('it-IT').format(date)}`;
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.text("Filtered Data Report", 20, 10);
+
+    // Add month and username
+    const formattedMonth = selectedMonth ? formatDateForMonth(selectedMonth) : "N/A";
+    doc.text(`Month: ${formattedMonth}`, 20, 20);
+    doc.text(`Username: ${selectedUsername}`, 20, 30);
+
+    // Define table columns
+    const tableColumn = ["Nome", "Giorno dell Ordine", "Ordine"];
+
+    // Map the data to table rows
+    const tableRows = dataFiltered.map(item => [
+      item.username,
+      item.reservation_date,
+      item.tipo_piatti,
+    ]);
+
+    // Add the table to the PDF
+    doc.autoTable({ head: [tableColumn], body: tableRows, startY: 40 });
+
+    // Add total count
+    doc.text(`Total Records: ${dataFiltered.length}`, 20, doc.internal.pageSize.height - 20);
+
+    // Save the PDF
+    doc.save(`filtered_data_${selectedUsername}.pdf`);
   };
 
   const columns = [
@@ -126,7 +156,7 @@ export default function HistoricComponent() {
     return (
       <DataTable className="historic-table" value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
         {columns.map((column, index) => (
-          <Column key={index} field={column.field} sortable header={column.header}body={column.body}></Column>
+          <Column key={index} field={column.field} sortable header={column.header} body={column.body}></Column>
         ))}
       </DataTable>
     );
@@ -139,55 +169,69 @@ export default function HistoricComponent() {
     if (!showDayCalendar) {
       // Switching to day view, reset month filter
       setSelectedMonth(new Date());
+      handleDayChange({value:selectedDate})
+      setAllowPDF(false);
     } else {
       // Switching to month view, reset day filter and apply month filter
-      setSelectedDate('');
+      setSelectedDate(new Date());
       handleMonthChange({ value: selectedMonth });
+      setAllowPDF(true);
     }
   };
 
   return (
     <div>
       <div className="calendar-view">
+        {/* Conditionally render the calendars */}
+        {showDayCalendar ? (
+          <Calendar
+            id="daySelect"
+            value={selectedDate}
+            onChange={handleDayChange}
+            dateFormat="dd/mm/yy"
+            showIcon
+          />
+        ) : (
+          <Calendar
+            id="monthSelect"
+            value={selectedMonth}
+            onChange={handleMonthChange}
+            view="month"
+            dateFormat="mm/yy"
+            showIcon
+          />
+        )}
 
-      {/* Conditionally render the calendars */}
-      {showDayCalendar ? (
-        <Calendar
-          id="daySelect"
-          value={selectedDate}
-          onChange={handleDayChange}
-          dateFormat="dd/mm/yy"
-          showIcon
+        {/* Toggle Button to switch between calendars */}
+        <Button onClick={handleToggleCalendar}>
+          {showDayCalendar ? 'Switch to Month View' : 'Switch to Day View'}
+        </Button>
+
+        {/* Dropdown for username selection */}
+        <Dropdown
+          value={selectedUsername}
+          options={usernames.map(username => ({ label: username, value: username }))}
+          onChange={handleUsernameChange}
+          placeholder="Select a Username"
+          showClear
         />
-      ) : (
-        <Calendar
-          id="monthSelect"
-          value={selectedMonth}
-          onChange={handleMonthChange}
-          view="month"
-          dateFormat="mm/yy"
-          showIcon
-        />
-      )}
-  
-      {/* Toggle Button to switch between calendars */}
-      <Button  onClick={handleToggleCalendar}>
-        {showDayCalendar ? 'Switch to Month View' : 'Switch to Day View'}
-      </Button>
-      {/* Dropdown for username selection */}
-      <Dropdown
-        value={selectedUsername}
-        options={usernames.map(username => ({ label: username, value: username }))}
-        onChange={handleUsernameChange}
-        placeholder="Select a Username"
-        showClear
-      />
+
       </div>
+
       <DataTableComponent data={isFiltered ? dataFiltered : data} columns={columns}></DataTableComponent>
-      {
-        isFiltered ? <Card className="card-total">TOTAL:{dataFiltered.length} 
-        </Card> : <Card className="card-total">TOTAL:{data.length} </Card>
-      }
+      
+      <Card className="card-total">
+        TOTAL: {isFiltered ? dataFiltered.length : data.length}
+      </Card>
+
+        {/* PDF Generation Button */}
+        <Button 
+          className="generate-pdf"
+          label="Download PDF" 
+          icon="pi pi-file-pdf" 
+          onClick={generatePDF} 
+          disabled={(!selectedUsername && !allowPDF)}
+        />
     </div>
   );
 }

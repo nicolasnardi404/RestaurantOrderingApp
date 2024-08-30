@@ -126,6 +126,13 @@ body{
   margin: auto;
 }
 
+.generate-pdf{
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .card-total{
   max-width: 300px;
   max-height: 80px;
