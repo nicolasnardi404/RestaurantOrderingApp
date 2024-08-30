@@ -209,6 +209,7 @@ const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
     <div className="tipo-container">
       <h2>{type.charAt(0).toUpperCase() + type.slice(1)}</h2>
       <Dropdown
+        className="drop-menu"
         value={initialValue}
         options={options}
         onChange={(e) => onValueChange(type, e.value)}

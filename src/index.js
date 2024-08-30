@@ -4,6 +4,7 @@
   import LogIn from "./pages/LogIn";
   import Menu from "./pages/Menu";
   import Historic from "./pages/Historic"
+  import './App.css'
   // import PrenotazionePerPersona from "./pages/PrenotazionePerPersona"
   
   import MyApp from "./_app";

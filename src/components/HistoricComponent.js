@@ -116,16 +116,16 @@ export default function HistoricComponent() {
   };
 
   const columns = [
-    { field: 'username', header: 'Nome', style: { width: '25%' }, body: (rowData) => rowData.username },
-    { field: 'reservation_date', header: 'Giorno dell Ordine', style: { width: '25%' }, body: (rowData) => rowData.reservation_date },
-    { field: 'tipo_piatti', header: 'Ordine', style: { width: '25%' }, body: (rowData) => rowData.tipo_piatti }
+    { field: 'username', header: 'Nome', body: (rowData) => rowData.username },
+    { field: 'reservation_date', header: 'Giorno dell Ordine', body: (rowData) => rowData.reservation_date },
+    { field: 'tipo_piatti', header: 'Ordine', body: (rowData) => rowData.tipo_piatti }
   ];
 
   const DataTableComponent = ({ data, columns }) => {
     return (
-      <DataTable value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
+      <DataTable className="historic-table" value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]}>
         {columns.map((column, index) => (
-          <Column key={index} field={column.field} sortable header={column.header} style={column.style} body={column.body}></Column>
+          <Column key={index} field={column.field} sortable header={column.header}body={column.body}></Column>
         ))}
       </DataTable>
     );
@@ -147,10 +147,7 @@ export default function HistoricComponent() {
 
   return (
     <div>
-      {/* Toggle Button to switch between calendars */}
-      <Button onClick={handleToggleCalendar}>
-        {showDayCalendar ? 'Switch to Month View' : 'Switch to Day View'}
-      </Button>
+      <div className="calendar-view">
 
       {/* Conditionally render the calendars */}
       {showDayCalendar ? (
@@ -171,21 +168,20 @@ export default function HistoricComponent() {
           showIcon
         />
       )}
-
+  
+      {/* Toggle Button to switch between calendars */}
+      <Button  onClick={handleToggleCalendar}>
+        {showDayCalendar ? 'Switch to Month View' : 'Switch to Day View'}
+      </Button>
       {/* Dropdown for username selection */}
       <Dropdown
         value={selectedUsername}
         options={usernames.map(username => ({ label: username, value: username }))}
         onChange={handleUsernameChange}
         placeholder="Select a Username"
-        style={{ marginTop: '1rem', width: '200px' }}
         showClear
       />
-
-      {isFiltered && (
-        <p>Visualizza ordini per il giorno, il mese o il nome utente selezionato:</p>
-      )}
-
+      </div>
       <DataTableComponent data={isFiltered ? dataFiltered : data} columns={columns}></DataTableComponent>
       <Button onClick={handleClick}>Prenotazione per persona</Button>
     </div>

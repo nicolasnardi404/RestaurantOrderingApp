@@ -106,6 +106,7 @@ body{
 }
 
 .menu-wrapper{
+  position: absolute;
   display: flex;
   flex-direction: column;
   justify-content: left;
@@ -117,6 +118,23 @@ body{
   flex-direction: column;
   margin: 40px 20px;
   font-size: 1em;
+}
+
+
+.historic-table{
+  max-width: 80%;
+  margin: auto;
+}
+
+.calendar-view{
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  gap:20px;
+  min-width: 200px;
+  align-items: center;
 }
 
 

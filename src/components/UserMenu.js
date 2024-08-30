@@ -33,7 +33,7 @@ export default function UserMenu() {
     <div className="menu-wrapper">
       <Button label="Menu" icon="pi pi-align-justify" className="mr-2" onClick={toggleMenuLeft} aria-controls="popup_menu_left" aria-haspopup />
       {visibleLeft && (
-        <Menu model={items} id="popup_menu_left" />
+        <Menu model={items} id="popup_menu_left"  style={{ zIndex: 1 }}/>
       )}
     </div>
   );
