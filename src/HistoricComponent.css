@@ -1,20 +1,30 @@
 .historic-container {
   padding: 20px;
-  max-width: 1200px;
   margin: 0 auto;
+  max-width: 1200px;
 }
 
-.filter-card {
-  max-width: 30%;
-  margin: 20px auto;
+.card-row {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.filter-card .p-card-body {
-  padding: 1.5rem;
+.filter-card,
+.total-orders-card,
+.data-card {
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-card .p-card-body,
+.total-orders-card .p-card-body,
+.data-card .p-card-body {
+  padding: 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .filter-card .p-buttonset {
@@ -23,25 +33,11 @@
 
 .filter-card .p-buttonset .p-button {
   flex: 1;
-  max-width: 100px;
-  margin: 10px auto;
 }
 
 .filter-card .p-calendar,
 .filter-card .p-dropdown {
   width: 100%;
-}
-
-.filter-card .p-field {
-  margin-bottom: 0;
-}
-
-.filter-card .p-grid .p-grid {
-  margin: 0;
-}
-
-.data-card .p-card-body {
-  padding: 0;
 }
 
 .p-field {
@@ -54,13 +50,34 @@
   font-weight: bold;
 }
 
+.total-orders-card {
+  text-align: center;
+}
+
+.total-orders {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.data-card .p-datatable {
+  flex-grow: 1;
+}
+
 .p-datatable-responsive .p-datatable-tbody > tr > td {
   word-break: break-word;
 }
 
 @media screen and (max-width: 768px) {
-  .filter-card .p-grid > div {
-    margin-bottom: 1rem;
+  .card-row {
+    flex-direction: column;
+  }
+
+  .filter-card,
+  .total-orders-card,
+  .data-card {
+    width: 100%;
+    margin-bottom: 20px;
   }
 }
 
