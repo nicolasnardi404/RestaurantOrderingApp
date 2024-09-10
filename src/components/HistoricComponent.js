@@ -5,6 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import { InputSwitch } from 'primereact/inputswitch';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import formatDateforServer from '../util/formatDateForServer';
@@ -24,6 +25,8 @@ const HistoricComponent = () => {
   const [usernames, setUsernames] = useState([]);
   const [viewMode, setViewMode] = useState('month');
   const [totalOrders, setTotalOrders] = useState(0);
+  const [showTotalPerDay, setShowTotalPerDay] = useState(false);
+  const [totalPerDayData, setTotalPerDayData] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -36,6 +39,12 @@ const HistoricComponent = () => {
   useEffect(() => {
     setTotalOrders(filteredData.length);
   }, [filteredData]);
+
+  useEffect(() => {
+    if (showTotalPerDay && data.length > 0) {
+      calculateTotalPerDayData();
+    }
+  }, [showTotalPerDay, data]);
 
   const fetchData = async () => {
     let url;
@@ -50,6 +59,7 @@ const HistoricComponent = () => {
     try {
       const response = await fetch(url);
       const fetchedData = await response.json();
+      console.log(fetchData)
       setData(fetchedData);
 
       const uniqueUsernames = [...new Set(fetchedData.map(item => item.username))];
@@ -86,9 +96,27 @@ const HistoricComponent = () => {
     });
   };
 
+  const calculateTotalPerDayData = () => {
+    const totals = data.reduce((acc, order) => {
+      const date = order.reservation_date.split('T')[0]; // Get only the date part
+      if (!acc[date]) {
+        acc[date] = 0;
+      }
+      acc[date]++;
+      return acc;
+    }, {});
+
+    const totalPerDayArray = Object.entries(totals).map(([date, totalOrders]) => ({
+      date,
+      totalOrders
+    }));
+
+    setTotalPerDayData(totalPerDayArray.sort((a, b) => a.date.localeCompare(b.date)));
+  };
+
   const generatePDF = () => {
-    if (!selectedMonth || !selectedUsername) {
-      alert('Please select both a month and a user to generate the PDF.');
+    if (!selectedMonth) {
+      alert('Please select a month to generate the PDF.');
       return;
     }
 
@@ -113,17 +141,31 @@ const HistoricComponent = () => {
     doc.text(`Total Orders: ${totalOrders}`, 14, 59);
 
     // Add table
-    doc.autoTable({
-      startY: 70,
-      head: [['Date', 'Type of Dishes']],
-      body: filteredData.map(order => [
-        formatDateForDisplay(order.reservation_date),
-        order.tipo_piatti
-      ]),
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-    });
+    if (showTotalPerDay) {
+      doc.autoTable({
+        startY: 70,
+        head: [['Date', 'Total Orders']],
+        body: totalPerDayData.map(item => [
+          formatDateForDisplay(item.date).split(',')[0], // Only date part
+          item.totalOrders
+        ]),
+        styles: { fontSize: 10, cellPadding: 5 },
+        headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+      });
+    } else {
+      doc.autoTable({
+        startY: 70,
+        head: [['Date', 'Type of Dishes']],
+        body: filteredData.map(order => [
+          formatDateForDisplay(order.reservation_date),
+          order.tipo_piatti
+        ]),
+        styles: { fontSize: 10, cellPadding: 5 },
+        headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+      });
+    }
 
     // Add footer
     const pageCount = doc.internal.getNumberOfPages();
@@ -142,6 +184,11 @@ const HistoricComponent = () => {
     // Save the PDF
     doc.save(`${selectedUsername}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_orders.pdf`);
   };
+
+  // Add this console log to check the data
+  console.log('showTotalPerDay:', showTotalPerDay);
+  console.log('totalPerDayData:', totalPerDayData);
+  console.log('filteredData:', filteredData);
 
   return (
     <div className="historic-container">
@@ -164,74 +211,107 @@ const HistoricComponent = () => {
             </div>
           </div>
           <div className="p-field">
-            <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
-            {viewMode === 'month' ? (
-              <Calendar 
-                id="datePicker"
-                value={selectedMonth} 
-                onChange={(e) => setSelectedMonth(e.value)} 
-                view="month" 
-                dateFormat="mm/yy" 
-                showIcon
-              />
-            ) : (
-              <Calendar 
-                id="datePicker"
-                value={selectedDate} 
-                onChange={(e) => setSelectedDate(e.value)} 
-                dateFormat="dd/mm/yy" 
-                showIcon
-              />
-            )}
-          </div>
-          <div className="p-field">
-            <label htmlFor="userDropdown">Seleziona Utente</label>
-            <Dropdown
-              id="userDropdown"
-              value={selectedUsername}
-              options={usernames}
-              onChange={(e) => setSelectedUsername(e.value)}
-              placeholder="Tutti gli utenti"
+            <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+            <InputSwitch
+              id="totalPerDaySwitch"
+              checked={showTotalPerDay}
+              onChange={(e) => setShowTotalPerDay(e.value)}
             />
           </div>
+          <div className="p-field">
+            <label htmlFor="datePicker">Seleziona Mese</label>
+            <Calendar 
+              id="datePicker"
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(e.value)} 
+              view="month" 
+              dateFormat="mm/yy" 
+              showIcon
+            />
+          </div>
+          {!showTotalPerDay && (
+            <div className="p-field">
+              <label htmlFor="userDropdown">Seleziona Utente</label>
+              <Dropdown
+                id="userDropdown"
+                value={selectedUsername}
+                options={usernames}
+                onChange={(e) => setSelectedUsername(e.value)}
+                placeholder="Tutti gli utenti"
+              />
+            </div>
+          )}
         </Card>
 
         <Card className="data-card">
+        {showTotalPerDay ? (
           <DataTable 
-            value={filteredData} 
+            value={totalPerDayData} 
             paginator 
             rows={10} 
             className="p-datatable-responsive"
             emptyMessage="Nessun ordine trovato"
           >
-            <Column field="username" header="Nome Utente" sortable style={{width:'30%'}}/>
             <Column 
-              field="reservation_date" 
-              header="Data Prenotazione" 
-              body={(rowData) => formatDateForDisplay(rowData.reservation_date)}
-              sortable
-              style={{width:'30%'}}
+              field="date" 
+              header="Data" 
+              body={(rowData) => formatDateForDisplay(rowData.date)}
+              sortable 
             />
-            <Column field="tipo_piatti" header="Tipo di Piatti" sortable style={{width:'40%'}}/>
+            <Column 
+              field="totalOrders" 
+              header="Totale Ordini" 
+              sortable 
+            />
           </DataTable>
+           ) : (
+            <DataTable 
+              value={filteredData} 
+              paginator 
+              rows={10} 
+              className="p-datatable-responsive"
+              emptyMessage="Nessun ordine trovato"
+            >
+              <Column 
+                field="username" 
+                header="Nome Utente" 
+                sortable 
+              />
+              <Column 
+                field="reservation_date" 
+                header="Data Prenotazione" 
+                body={(rowData) => formatDateForDisplay(rowData.reservation_date)}
+                sortable
+              />
+              <Column 
+                field="tipo_piatti" 
+                header="Tipo di Piatti" 
+                sortable 
+              />
+            </DataTable>
+          )}
         </Card>
       </div>
 
       <Card className="total-pdf-card">
         <div className="total-orders-section">
           <h3>Total Orders</h3>
-          <p className="total-orders">{totalOrders}</p>
+          <p className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</p>
         </div>
         <div className="pdf-button-section">
           <Button 
             label="Generate PDF" 
             icon="pi pi-file-pdf" 
             onClick={generatePDF} 
-            disabled={!(selectedMonth && selectedUsername)}
+            disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
             className="p-button-lg btn"
           />
         </div>
-        <p>La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente</p>
+        <p>
+          {showTotalPerDay 
+            ? "La generazione del PDF è possibile solo quando è selezionato il mese" 
+            : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
+        </p>
       </Card>
     </div>
   );

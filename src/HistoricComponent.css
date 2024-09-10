@@ -19,7 +19,7 @@
 
 .data-card {
   flex: 2;
-  min-width: 0;
+  max-width: 80%;
 }
 
 .filter-card .p-card-body,
@@ -29,6 +29,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: visible;
 }
 
 .filter-card .p-buttonset {
@@ -54,9 +55,6 @@
   font-weight: bold;
 }
 
-.data-card .p-datatable {
-  flex-grow: 1;
-}
 
 .p-datatable-responsive .p-datatable-tbody > tr > td {
   word-break: break-word;
@@ -99,7 +97,7 @@
 
   .filter-card,
   .data-card {
-    width: 100%;
+    width: 80%;
     margin-bottom: 20px;
   }
 
@@ -113,4 +111,34 @@
   .p-datatable-responsive .p-datatable-tbody > tr > td:before {
     font-weight: bold;
   }
+}
+
+/* New styles for table headers */
+.p-datatable .p-datatable-thead > tr > th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f8f9fa;
+  padding: 0.5rem;
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Ensure the table takes full width */
+.p-datatable-wrapper {
+  width: 100%;
+}
+
+.p-datatable {
+  width: 100%;
+}
+
+.p-datatable-table {
+  width: 100%;
 }
