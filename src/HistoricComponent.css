@@ -1,0 +1,71 @@
+.historic-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-card {
+  max-width: 30%;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.filter-card .p-card-body {
+  padding: 1.5rem;
+}
+
+.filter-card .p-buttonset {
+  display: flex;
+}
+
+.filter-card .p-buttonset .p-button {
+  flex: 1;
+  max-width: 100px;
+  margin: 10px auto;
+}
+
+.filter-card .p-calendar,
+.filter-card .p-dropdown {
+  width: 100%;
+}
+
+.filter-card .p-field {
+  margin-bottom: 0;
+}
+
+.filter-card .p-grid .p-grid {
+  margin: 0;
+}
+
+.data-card .p-card-body {
+  padding: 0;
+}
+
+.p-field {
+  margin-bottom: 1rem;
+}
+
+.p-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.p-datatable-responsive .p-datatable-tbody > tr > td {
+  word-break: break-word;
+}
+
+@media screen and (max-width: 768px) {
+  .filter-card .p-grid > div {
+    margin-bottom: 1rem;
+  }
+}
+
+@media screen and (max-width: 40em) {
+  .p-datatable-responsive .p-datatable-tbody > tr > td:before {
+    font-weight: bold;
+  }
+}

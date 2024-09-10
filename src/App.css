@@ -1,6 +1,14 @@
-body{
-  background-color: whitesmoke;
-  color: #040C39;
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --background-color: #f5f5f5;
+  --text-color: #2c3e50;
+  --accent-color: #e74c3c;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .App {
@@ -12,162 +20,39 @@ body{
   min-height: 100vh;
 }
 
-/* drag and drop page */
-
-.data-table {
-  margin: 2% 10%;
+/* Global styles for buttons, inputs, etc. */
+.btn-classic, .p-button {
+  border: none;
+  border-radius: 4px;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-.input-text{
-  width: 400px; 
-  height: 40px;
-  text-align: center;
+.btn-classic:hover, .p-button:hover {
+  transform: translateY(-2px);
 }
 
-
-.btn-classic{
-  width: 400px;
-  padding: 4px;
-  margin: 3px;
-  border-radius: 8px;
-  display: inline-block;
-  background-color: #39DDE2;
-  margin:auto;
-  padding: 15px;
-  font-size: 1.2em;
-  color: #040C39;
+.btn-classic:active, .p-button:active {
+  transform: translateY(0);
 }
 
-.btn-classic:hover{
-  background-color: #040C39;
-  color: #F6E8EA;
+.input-text, .p-dropdown {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
 }
 
-.p-button-rounded:hover{
-  background-color: #040C39;
+.input-text:focus, .p-dropdown:focus {
+  border-color: var(--primary-color);
+  outline: none;
 }
 
-
-.drag-drop {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10em auto;
-  height: 50px;
-  width: 300px;
-  border: 3px dotted black;
-}
-
-/*log in page*/
-
-.pick-user {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 200px auto;
-  width: 500px;
-  padding: 20px; 
-  box-shadow: 1px 1px 10px rgba(0,0,0,0.1);
-  background-color: #2B88E6;
-  border-radius: 10px;
-}
-
-.login{
-  display: flex;
-  flex-direction: column;
-  width: 400px;
-  margin: 100px auto;
-}
-
-.item-login{
-  margin: 5px;
-}
-
-.name-select{
-  margin-top: 30px;
-  margin-bottom: 20px;
-  width: 300px;
-}
-
-/*menu*/
-
-.menu{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  width: 85%;
-  margin: auto;
-  background-color: #39DDE2;
-  border-radius: 10px;
-  color: #040C39;
-}
-
-.menu-wrapper{
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  justify-content: left;
-  max-width: 200px;
-}
-
-.tipo-container{
-  display: flex;
-  flex-direction: column;
-  margin: 40px 20px;
-  font-size: 1em;
-}
-
-
-.historic-table{
-  max-width: 80%;
-  margin: auto;
-}
-
-.generate-pdf{
-  margin: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.card-total{
-  max-width: 300px;
-  max-height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px auto;
-}
-
-.calendar-view{
-  margin: 20px auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  gap:20px;
-  min-width: 200px;
-  align-items: center;
-}
-
-
-.remove-btn {
-  width: 24px;           
-  height: 24px;          
-  background-color: red;     
-  cursor: pointer;   
-  margin-left: 5px;  
-}
-
-
-.cart-items{
-  margin:5px;
-  align-items: center;
-}
-
+/* You can keep other global styles or component-specific styles here */
+/* ... */
 
 .App-link {
   color: #61dafb;

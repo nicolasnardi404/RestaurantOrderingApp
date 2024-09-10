@@ -8,5 +8,9 @@ export const ITALIAN_LOCALE_CONFIG = {
     monthNamesShort: ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'],
     today: 'Oggi',
     clear: 'Cancella',
-  };
-  
+    chooseDate: 'Scegli data', // Add this line
+    // Add these lines for completeness
+    choose: 'Scegli',
+    dateFormat: 'dd/mm/yy',
+    weekHeader: 'Sm'
+};
