@@ -19,7 +19,7 @@ function MenuPage() {
   const [dateSelected, setDateSelected] = useState(false);
   const [cart, setCart] = useState({});
   const [error, setError] = useState('');
-  const [selectedMealTypes, setSelectedMealTypes] = useState([]);
+  const [combinationStatus, setCombinationStatus] = useState('');
   const userName = localStorage.getItem('nome');
   const idUser = localStorage.getItem('idUser');
   const navigate = useNavigate();
@@ -32,9 +32,7 @@ function MenuPage() {
         .then(response => response.json())
         .then(data => {
           setDishes(data);
-          // Extract unique meal types from the data
-          const uniqueMealTypes = [...new Set(data.map(dish => dish.tipo_piatto))];
-          
+          // Remove the line that extracts unique meal types
         })
         .catch(error => console.error('Error fetching dishes:', error));
     }
@@ -42,39 +40,53 @@ function MenuPage() {
 
   useEffect(() => {
     updateError();
-  }, [selectedMealTypes, cart]);
+  }, [cart]);
 
   const handleDayChange = (event) => {
     const selectedDate = event.value;
     setSelectedDay(selectedDate);
     setCart({});
-    setSelectedMealTypes([]);
     setError('');
     setDateSelected(true);
   };
-
 
   const formatDateForComparison = (date) => {
     return date instanceof Date ? date.toLocaleDateString('it-IT') : new Date(date).toLocaleDateString('it-IT');
   };
 
-  const handleDropdownChange = (type, selectedDish) => {
+  const handleDropdownChange = (type, value) => {
     setCart(prevCart => {
-      const newCart = { ...prevCart };
-      if (selectedDish) {
-        newCart[type] = selectedDish;
-      } else {
-        delete newCart[type];
-      }
+      const newCart = { ...prevCart, [type]: value };
+      checkCombination(newCart);
       return newCart;
     });
+  };
+
+  const checkCombination = (currentCart) => {
+    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico } = currentCart;
+    
+    if (PiattoUnico) {
+      setCombinationStatus('Valid combination: Piatto unico');
+    } else if (Primo && Secondo && Contorno) {
+      setCombinationStatus('Valid combination: Primo + Secondo + Contorno');
+    } else {
+      let missingItems = [];
+      if (!Primo) missingItems.push('Primo');
+      if (!Secondo) missingItems.push('Secondo');
+      if (!Contorno) missingItems.push('Contorno');
+      
+      if (missingItems.length === 3) {
+        setCombinationStatus('Please select dishes to create a valid combination');
+      } else {
+        setCombinationStatus(`Add ${missingItems.join(' or ')} to complete the combination`);
+      }
+    }
   };
 
   const handleDateChange = () => {
     setDateSelected(false);
     setSelectedDay(null);
     setCart({});
-    setSelectedMealTypes([]);
     setError('');
   };
 
@@ -107,25 +119,6 @@ function MenuPage() {
       });
   };
 
-  const handleCheckboxChange = (mealType) => {
-    setSelectedMealTypes(prevSelected => {
-      const newSelected = prevSelected.includes(mealType)
-        ? prevSelected.filter(type => type !== mealType)
-        : [...prevSelected, mealType];
-      
-      // If unchecked, remove the dish from the cart
-      if (!newSelected.includes(mealType)) {
-        setCart(prevCart => {
-          const newCart = { ...prevCart };
-          delete newCart[mealType];
-          return newCart;
-        });
-      }
-      
-      return newSelected;
-    });
-  };
-
   const getFilteredDishes = (mealType) => {
     return dishes.filter(dish => dish.tipo_piatto === mealType);
   };
@@ -146,11 +139,6 @@ function MenuPage() {
       combination.every(type => selectedTypes.includes(type))
     );
 
-    if (isValidCombination) {
-      setError('');
-    } else {
-      setError('Please select a valid combination of dishes.');
-    }
   };
 
   useEffect(() => {
@@ -182,30 +170,21 @@ function MenuPage() {
         </div>
       )}
 
-      {/* Checkbox for each meal type */}
-      <div className="meal-type-checkboxes">
-        {[...new Set(dishes.map(dish => dish.tipo_piatto))].map(mealType => (
-          <div key={mealType}>
-            <input
-              type="checkbox"
-              checked={selectedMealTypes.includes(mealType)}
-              onChange={() => handleCheckboxChange(mealType)}
-            />
-            <label>{mealType}</label><br />
-          </div>
-        ))}
-      </div>
-
-      {/* Display dropdowns based on selected checkboxes */}
-      {selectedMealTypes.map(mealType => (
+      {/* Remove the checkbox section and replace with this: */}
+      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
         <DishDropdown
           key={mealType}
           type={mealType}
           initialValue={cart[mealType]}
-          options={getFilteredDishes(mealType)} // Use filtered dishes here
+          options={getFilteredDishes(mealType)}
           onValueChange={handleDropdownChange}
         />
       ))}
+
+      {/* Display combination status */}
+      <div className="combination-status">
+        {combinationStatus}
+      </div>
 
       {/* Error or validation message */}
       {error && <p className="error">{error}</p>}
