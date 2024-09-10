@@ -27,7 +27,7 @@ function MenuPage() {
   useEffect(() => {
     if (selectedDay) {
       const formDateForServer = formatDateforServer(selectedDay);
-      fetch(`http://localhost:8080/api/piatto/data/${formDateForServer}`)
+      fetch(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`)
         .then(response => response.json())
         .then(data => {
           setDishes(data);
@@ -58,10 +58,15 @@ function MenuPage() {
   };
 
   const handleDropdownChange = (type, selectedDish) => {
-    setCart(prevCart => ({
-      ...prevCart,
-      [type]: selectedDish,
-    }));
+    setCart(prevCart => {
+      const newCart = { ...prevCart };
+      if (selectedDish) {
+        newCart[type] = selectedDish;
+      } else {
+        delete newCart[type];
+      }
+      return newCart;
+    });
   };
 
   const handleDateChange = () => {
@@ -77,14 +82,15 @@ function MenuPage() {
       username: userName,
       idUser: idUser,
       piatti: {
-        Primo: cart.Primo?.id || null,
-        Secondo: cart.Secondo?.id || null,
-        Contorno: cart.Contorno?.id || null,
-        PiattoUnico: cart.PiattoUnico?.id || null,
+        Primo: cart.Primo?.nome || null,
+        Secondo: cart.Secondo?.nome || null,
+        Contorno: cart.Contorno?.nome || null,
+        "Piatto unico": cart["Piatto unico"]?.nome || null,
       },
       data: formatDateforServer(selectedDay),
     };
 
+    console.log(orderData);
     fetch('http://localhost:8080/api/order', {
       method: 'POST',
       headers: {
@@ -101,11 +107,22 @@ function MenuPage() {
   };
 
   const handleCheckboxChange = (mealType) => {
-    setSelectedMealTypes(prevSelected =>
-      prevSelected.includes(mealType)
+    setSelectedMealTypes(prevSelected => {
+      const newSelected = prevSelected.includes(mealType)
         ? prevSelected.filter(type => type !== mealType)
-        : [...prevSelected, mealType]
-    );
+        : [...prevSelected, mealType];
+      
+      // If unchecked, remove the dish from the cart
+      if (!newSelected.includes(mealType)) {
+        setCart(prevCart => {
+          const newCart = { ...prevCart };
+          delete newCart[mealType];
+          return newCart;
+        });
+      }
+      
+      return newSelected;
+    });
   };
 
   const getFilteredDishes = (mealType) => {
@@ -115,34 +132,32 @@ function MenuPage() {
   const updateError = () => {
     const validCombinations = [
       ['Primo', 'Secondo', 'Contorno'],
-      ['Primo', 'PiattoUnico', 'Contorno'],
+      ['Primo', 'Piatto unico', 'Contorno'],
       ['Primo', 'Contorno'],
       ['Secondo', 'Contorno'],
-      ['PiattoUnico', 'Contorno'],
-      ['PiattoUnico']
+      ['Piatto unico', 'Contorno'],
+      ['Piatto unico']
     ];
 
-    const selectedSet = new Set(selectedMealTypes);
-
-    const matchingCombinations = validCombinations.filter(combination =>
-      combination.every(type => selectedSet.has(type))
+    const selectedTypes = Object.keys(cart).filter(type => cart[type] !== null);
+    const isValidCombination = validCombinations.some(combination => 
+      combination.length === selectedTypes.length && 
+      combination.every(type => selectedTypes.includes(type))
     );
 
-    if (matchingCombinations.length > 0) {
-      const bestMatch = matchingCombinations[0];
-      const missingItems = bestMatch.filter(type => !selectedSet.has(type));
-      setError(missingItems.length > 0 
-        ? `You still need to select: ${[...new Set(missingItems)].join(', ')}.` 
-        : ''
-      );
+    if (isValidCombination) {
+      setError('');
     } else {
-      const allPossibleItems = validCombinations.flat();
-      const missingItems = allPossibleItems.filter(type => !selectedSet.has(type));
-      setError(missingItems.length > 0 
-        ? `Please select at least one dish for: ${[...new Set(missingItems)].join(', ')}.` 
-        : ''
-      );
+      setError('Please select a valid combination of dishes.');
     }
+  };
+
+  useEffect(() => {
+    updateError();
+  }, [cart]);
+
+  const isAnyDishSelected = () => {
+    return Object.values(cart).some(dish => dish && dish.nome);
   };
 
   return (
@@ -198,8 +213,13 @@ function MenuPage() {
         label="Submit Order" 
         onClick={handleSubmit} 
         className="mt-3" 
-        disabled={!!error} // Disable if there is any error
+        disabled={error !== '' || !isAnyDishSelected()}
       />
+      
+      {/* For debugging */}
+      {/* <p>Error: {error}</p>
+      <p>Cart: {JSON.stringify(cart)}</p>
+      <p>Is any dish selected: {isAnyDishSelected() ? 'Yes' : 'No'}</p> */}
     </div>
   );
 }
@@ -216,6 +236,9 @@ const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
         optionLabel="nome" 
         placeholder={`Select a ${type} dish`}
         showClear
+        emptyFilterMessage="No dishes available"
+        emptyMessage="No dishes available"
+        onClear={() => onValueChange(type, null)}
       />
     </div>
   );

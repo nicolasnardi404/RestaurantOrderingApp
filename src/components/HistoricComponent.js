@@ -27,7 +27,7 @@ export default function HistoricComponent() {
   // Define the columns array
   const columns = [
     { field: 'username', header: 'Nome' },
-    { field: 'reservation_date', header: 'Giorno dell Ordine' },
+    { field:'reservation_date', header: 'Giorno dell Ordine' },
     { field: 'tipo_piatti', header: 'Ordine' }
   ];
 
@@ -112,6 +112,8 @@ export default function HistoricComponent() {
 
     // Filter by date if day calendar is shown
     if (showDayCalendar && date) {
+      console.log(formatDateFromCalendar(date))
+      console.log(filteredData)
       filteredData = filteredData.filter(item => item.reservation_date === formatDateFromCalendar(date));
     }
 
@@ -129,6 +131,8 @@ export default function HistoricComponent() {
     if (username) {
       filteredData = filteredData.filter(item => item.username === username);
     }
+
+    setData(filteredData);
   }
 
   function formatDateForMonth(dateString) {
@@ -191,7 +195,7 @@ export default function HistoricComponent() {
     if (!showDayCalendar) {
       // Switching to day view, reset month filter
       setSelectedMonth(new Date());
-      handleDayChange({value:selectedDate})
+      handleDayChange({value:selectedDate});
       setAllowPDF(false);
     } else {
       // Switching to month view, reset day filter and apply month filter
@@ -205,7 +209,7 @@ export default function HistoricComponent() {
     <div>
       <div className="calendar-view">
         {/* Conditionally render the calendars */}
-        {showDayCalendar ? (
+        {showDayCalendar? (
           <Calendar
             id="daySelect"
             value={selectedDate}
@@ -226,7 +230,7 @@ export default function HistoricComponent() {
 
         {/* Toggle Button to switch between calendars */}
         <Button onClick={handleToggleCalendar}>
-          {showDayCalendar ? 'Switch to Month View' : 'Switch to Day View'}
+          {showDayCalendar? 'Switch to Month View' : 'Switch to Day View'}
         </Button>
 
         {/* Dropdown for username selection */}
@@ -240,7 +244,7 @@ export default function HistoricComponent() {
 
       </div>
 
-      {isLoading ? (
+      {isLoading? (
         <p>Loading data...</p>
       ) : (
         <>
