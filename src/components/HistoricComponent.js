@@ -6,6 +6,7 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
@@ -76,10 +77,12 @@ const HistoricComponent = () => {
   const formatDateForDisplay = (value) => {
     if (!value) return '';
     const date = new Date(value);
-    return date.toLocaleDateString('it-IT', { 
+    return date.toLocaleString('it-IT', { 
       year: 'numeric', 
       month: '2-digit', 
-      day: '2-digit' 
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -90,27 +93,53 @@ const HistoricComponent = () => {
     }
 
     const doc = new jsPDF();
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(18);
-    doc.text('Monthly Order Report', 20, 20);
 
-    doc.setFont('helvetica', 'normal');
+    // Add logo (replace with your actual logo)
+    // doc.addImage(logoUrl, 'PNG', 14, 10, 50, 25);
+
+    // Set font
+    doc.setFont('helvetica');
+
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Monthly Order Report', 14, 30);
+
+    // Add report info
     doc.setFontSize(12);
-    doc.text(`User: ${selectedUsername}`, 20, 30);
-    doc.text(`Month: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 20, 40);
-    doc.text(`Total Orders: ${totalOrders}`, 20, 50);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`User: ${selectedUsername}`, 14, 45);
+    doc.text(`Month: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 14, 52);
+    doc.text(`Total Orders: ${totalOrders}`, 14, 59);
 
-    doc.setFontSize(10);
-    let yPos = 70;
-    filteredData.forEach((order, index) => {
-      doc.text(`${index + 1}. Date: ${formatDateForDisplay(order.reservation_date)}`, 20, yPos);
-      yPos += 10;
-      if (yPos > 280) {
-        doc.addPage();
-        yPos = 20;
-      }
+    // Add table
+    doc.autoTable({
+      startY: 70,
+      head: [['Date', 'Type of Dishes']],
+      body: filteredData.map(order => [
+        formatDateForDisplay(order.reservation_date),
+        order.tipo_piatti
+      ]),
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
     });
 
+    // Add footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(150);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Save the PDF
     doc.save(`${selectedUsername}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_orders.pdf`);
   };
 
@@ -181,21 +210,29 @@ const HistoricComponent = () => {
               header="Data Prenotazione" 
               body={(rowData) => formatDateForDisplay(rowData.reservation_date)}
               sortable
+              style={{width:'30%'}}
             />
             <Column field="tipo_piatti" header="Tipo di Piatti" sortable style={{width:'40%'}}/>
           </DataTable>
         </Card>
-        <Card className="total-orders-card">
+      </div>
+
+      <Card className="total-pdf-card">
+        <div className="total-orders-section">
           <h3>Total Orders</h3>
           <p className="total-orders">{totalOrders}</p>
+        </div>
+        <div className="pdf-button-section">
           <Button 
             label="Generate PDF" 
             icon="pi pi-file-pdf" 
             onClick={generatePDF} 
             disabled={!(selectedMonth && selectedUsername)}
+            className="p-button-lg btn"
           />
-        </Card>
-      </div>
+        </div>
+        <p>La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente</p>
+      </Card>
     </div>
   );
 };

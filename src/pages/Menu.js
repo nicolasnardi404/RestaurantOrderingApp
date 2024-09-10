@@ -5,7 +5,7 @@ import UserMenu from '../components/UserMenu';
 
 export default function Menu() {
   return (
-    <div className="App">
+    <div>
       <UserMenu />
       <DisplayMenu />
     </div>

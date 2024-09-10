@@ -5,6 +5,7 @@
   import Menu from "./pages/Menu";
   import Historic from "./pages/Historic"
   import './App.css'
+  import OpenOrders from "./pages/OpenOrders";
   // import PrenotazionePerPersona from "./pages/PrenotazionePerPersona"
   
   import MyApp from "./_app";
@@ -19,6 +20,7 @@
           <Route path="/historic" element={<Historic />} />
           {/* <Route path="/prenotazione-per-persona" element={<PrenotazionePerPersona />}/> */}
           <Route path="/test" element={<MyApp />} />
+          <Route path="/open-orders" element={<OpenOrders />} />
         </Routes>
       </BrowserRouter>
     );

@@ -7,6 +7,7 @@ import { locale, addLocale } from 'primereact/api';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
+import '../App.css';
 // Set locale for Calendar
 
 
@@ -161,7 +162,7 @@ function MenuPage() {
   };
 
   return (
-    <div>
+    <div className='container-menu'>
       <h1>Welcome, {userName}</h1>
       
       {!dateSelected ? (

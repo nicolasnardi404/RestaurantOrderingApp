@@ -1,0 +1,41 @@
+.user-menu-wrapper {
+  position: relative;
+}
+
+.user-menu-wrapper .p-button {
+  background-color: transparent;
+  border: none;
+  color: var(--text-color);
+  font-weight: bold;
+}
+
+.user-menu-wrapper .p-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.user-menu-wrapper .p-menu {
+  width: 200px;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-menu-wrapper .p-menuitem-link {
+  padding: 0.75rem 1rem;
+}
+
+.user-menu-wrapper .p-menuitem-icon {
+  color: var(--primary-color);
+  margin-right: 0.5rem;
+}
+
+.user-menu-wrapper .p-menuitem-text {
+  color: var(--text-color);
+}
+
+.user-menu-wrapper .p-menuitem:hover {
+  background-color: var(--background-color);
+}
+
+.user-menu-wrapper .p-menuitem:hover .p-menuitem-text {
+  color: var(--primary-color);
+}
