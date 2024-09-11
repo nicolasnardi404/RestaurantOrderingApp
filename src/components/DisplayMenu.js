@@ -1,74 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
-import { useNavigate } from 'react-router-dom';
-import { locale, addLocale } from 'primereact/api';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
 import '../App.css';
-// Set locale for Calendar
-
-
-UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 function MenuPage() {
-  const [dishes, setDishes] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
-  const [dateSelected, setDateSelected] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [dishes, setDishes] = useState([]);
   const [cart, setCart] = useState({});
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
   const userName = localStorage.getItem('nome');
   const idUser = localStorage.getItem('idUser');
-  const navigate = useNavigate();
 
-  // Fetch dishes data
+  UseDataLocal(ITALIAN_LOCALE_CONFIG);
+
   useEffect(() => {
     if (selectedDay) {
-      const formDateForServer = formatDateforServer(selectedDay);
-      fetch(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`)
-        .then(response => response.json())
-        .then(data => {
-          setDishes(data);
-          // Remove the line that extracts unique meal types
-        })
-        .catch(error => console.error('Error fetching dishes:', error));
+      fetchDishes();
+      setCart({}); // Clear selections when date changes
+      setCombinationStatus('');
     }
   }, [selectedDay]);
 
-  useEffect(() => {
-    updateError();
-  }, [cart]);
-
-  const handleDayChange = (event) => {
-    const selectedDate = event.value;
-    setSelectedDay(selectedDate);
-    setCart({});
-    setError('');
-    setDateSelected(true);
+  const fetchDishes = async () => {
+    const formDateForServer = formatDateforServer(selectedDay);
+    try {
+      const response = await fetch(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`);
+      const data = await response.json();
+      setDishes(data);
+      setError('');
+    } catch (error) {
+      console.error('Error fetching dishes:', error);
+      setError('Failed to fetch dishes. Please try again.');
+    }
   };
 
-  const formatDateForComparison = (date) => {
-    return date instanceof Date ? date.toLocaleDateString('it-IT') : new Date(date).toLocaleDateString('it-IT');
+  const getFilteredDishes = (mealType) => {
+    return dishes.filter(dish => dish.tipo_piatto === mealType);
   };
 
-  const handleDropdownChange = (type, value) => {
+  const handleDropdownChange = (mealType, selectedDish) => {
     setCart(prevCart => {
-      const newCart = { ...prevCart, [type]: value };
+      let newCart;
+      if (selectedDish) {
+        // Add or update the dish
+        newCart = { ...prevCart, [mealType]: selectedDish };
+      } else {
+        // Remove the dish if it's deselected
+        newCart = { ...prevCart };
+        delete newCart[mealType];
+      }
       checkCombination(newCart);
       return newCart;
     });
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico } = currentCart;
+    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico } = currentCart;    
     
-    if (PiattoUnico) {
-      setCombinationStatus('Valid combination: Piatto unico');
-    } else if (Primo && Secondo && Contorno) {
-      setCombinationStatus('Valid combination: Primo + Secondo + Contorno');
+    if (PiattoUnico || (Primo && Secondo && Contorno)) {
+      setCombinationStatus('');
     } else {
       let missingItems = [];
       if (!Primo) missingItems.push('Primo');
@@ -76,54 +73,14 @@ function MenuPage() {
       if (!Contorno) missingItems.push('Contorno');
       
       if (missingItems.length === 3) {
-        setCombinationStatus('Please select dishes to create a valid combination');
+        setCombinationStatus('Please select dishes to create a valid combination');   
       } else {
         setCombinationStatus(`Add ${missingItems.join(' or ')} to complete the combination`);
       }
     }
   };
 
-  const handleDateChange = () => {
-    setDateSelected(false);
-    setSelectedDay(null);
-    setCart({});
-    setError('');
-  };
-
-  const handleSubmit = () => {
-    const orderData = {
-      username: userName,
-      idUser: idUser,
-      piatti: {
-        Primo: cart.Primo?.nome || null,
-        Secondo: cart.Secondo?.nome || null,
-        Contorno: cart.Contorno?.nome || null,
-        "Piatto unico": cart["Piatto unico"]?.nome || null,
-      },
-      data: formatDateforServer(selectedDay),
-    };
-
-    console.log(orderData);
-    fetch('http://localhost:8080/api/order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderData),
-    })
-      .then(response => response.json())
-      .then(() => navigate('/success-page'))
-      .catch(error => {
-        console.error('Error submitting order:', error);
-        setError('Failed to submit your order. Please try again.');
-      });
-  };
-
-  const getFilteredDishes = (mealType) => {
-    return dishes.filter(dish => dish.tipo_piatto === mealType);
-  };
-
-  const updateError = () => {
+  const isValidCombination = () => {
     const validCombinations = [
       ['Primo', 'Secondo', 'Contorno'],
       ['Primo', 'Piatto unico', 'Contorno'],
@@ -134,94 +91,95 @@ function MenuPage() {
     ];
 
     const selectedTypes = Object.keys(cart).filter(type => cart[type] !== null);
-    const isValidCombination = validCombinations.some(combination => 
+    return validCombinations.some(combination => 
       combination.length === selectedTypes.length && 
       combination.every(type => selectedTypes.includes(type))
     );
-
   };
 
-  useEffect(() => {
-    updateError();
-  }, [cart]);
+  const renderOrderMenu = () => (
+    <div className="order-menu">
+      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
+        <div key={mealType} className="menu-category">
+          <h3>{mealType}</h3>
+          <Dropdown
+            value={cart[mealType]}
+            options={getFilteredDishes(mealType)}
+            onChange={(e) => handleDropdownChange(mealType, e.value)}
+            optionLabel="nome"
+            placeholder={`Select ${mealType}`}
+            className="w-full md:w-14rem"
+            showClear
+          />
+        </div>
+      ))}
+    </div>
+  );
 
-  const isAnyDishSelected = () => {
-    return Object.values(cart).some(dish => dish && dish.nome);
+  const renderFullMenuList = () => (
+    <div className="full-menu-list">
+      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
+        <div key={mealType} className="menu-category">
+          <h3>{mealType}</h3>
+          <ul>
+            {getFilteredDishes(mealType).map(dish => (
+              <li key={dish.id}>{dish.nome}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+
+  const handleSubmit = () => {
+    if (isValidCombination()) {
+      // Implement your order submission logic here
+      console.log('Order submitted:', cart);
+    } else {
+      setError('Invalid combination. Please select a valid combination of dishes.');
+    }
   };
 
   return (
     <div className='container-menu'>
       <h1>Welcome, {userName}</h1>
+      <div className="date-selection">
+        <Calendar 
+          value={selectedDay} 
+          onChange={(e) => setSelectedDay(e.value)} 
+          dateFormat="dd/mm/yy"
+          showIcon
+          placeholder="Select a date"
+        />
+      </div>
       
-      {!dateSelected ? (
-        <div>
-          <label htmlFor="daySelect">Choose a day:</label>
-          <Calendar
-            id="daySelect"
-            value={selectedDay}
-            onChange={handleDayChange}
-            dateFormat="dd/mm/yy"
+      {selectedDay && (
+        <>
+          <div className="menu-button-container">
+            <Button label="View Full Menu" onClick={() => setShowMenu(true)} className="menu-button" />
+          </div>
+          {renderOrderMenu()}
+          {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
+          {error && <div className="error-message">{error}</div>}
+          <Button 
+            label="Submit Order" 
+            onClick={handleSubmit} 
+            disabled={!isValidCombination()} 
+            className="submit-button"
           />
-        </div>
-      ) : (
-        <div>
-          <p>Selected date: {formatDateForComparison(selectedDay)}</p>
-          <Button label="Change Date" onClick={handleDateChange} />
-        </div>
+        </>
       )}
 
-      {/* Remove the checkbox section and replace with this: */}
-      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
-        <DishDropdown
-          key={mealType}
-          type={mealType}
-          initialValue={cart[mealType]}
-          options={getFilteredDishes(mealType)}
-          onValueChange={handleDropdownChange}
-        />
-      ))}
-
-      {/* Display combination status */}
-      <div className="combination-status">
-        {combinationStatus}
-      </div>
-
-      {/* Error or validation message */}
-      {error && <p className="error">{error}</p>}
-
-      <Button 
-        label="Submit Order" 
-        onClick={handleSubmit} 
-        className="mt-3" 
-        disabled={error !== '' || !isAnyDishSelected()}
-      />
-      
-      {/* For debugging */}
-      {/* <p>Error: {error}</p>
-      <p>Cart: {JSON.stringify(cart)}</p>
-      <p>Is any dish selected: {isAnyDishSelected() ? 'Yes' : 'No'}</p> */}
+      <Dialog 
+        header={`Menu for ${selectedDay ? selectedDay.toLocaleDateString('it-IT') : ''}`}
+        visible={showMenu} 
+        style={{width: '80vw'}} 
+        onHide={() => setShowMenu(false)}
+      >
+        {renderFullMenuList()}
+      </Dialog>
     </div>
   );
 }
-
-const DishDropdown = ({ type, initialValue, options, onValueChange }) => {
-  return (
-    <div className="tipo-container">
-      <h2>{type.charAt(0).toUpperCase() + type.slice(1)}</h2>
-      <Dropdown
-        className="drop-menu"
-        value={initialValue}
-        options={options}
-        onChange={(e) => onValueChange(type, e.value)}
-        optionLabel="nome" 
-        placeholder={`Select a ${type} dish`}
-        showClear
-        emptyFilterMessage="No dishes available"
-        emptyMessage="No dishes available"
-        onClear={() => onValueChange(type, null)}
-      />
-    </div>
-  );
-};
 
 export default MenuPage;
