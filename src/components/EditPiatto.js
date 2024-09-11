@@ -67,7 +67,7 @@ function ManagePiatti() {
       const piattoToSave = {
         nome: editingPiatto.nome_piatto, // Changed to nome_piatto
         data: editingPiatto.data,
-        idTipoPiatto: editingPiatto.id_piatto,
+        idTipoPiatto: editingPiatto.idTipoPiatto,
         disponibile: editingPiatto.sempreDisponibile
       };
       console.log(piattoToSave)
@@ -82,7 +82,7 @@ function ManagePiatti() {
           body: JSON.stringify(piattoToSave),
         });
       } else {
-        response = await fetch(`http://localhost:8080/api/piatto/update/${editPiatto.id_piatto}`, {
+        response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id_piatto}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
