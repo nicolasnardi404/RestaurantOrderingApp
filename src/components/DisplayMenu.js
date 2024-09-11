@@ -145,7 +145,7 @@ function MenuPage() {
 
       try {
         console.log(orderData)
-        const response = await fetch('http://your-api-endpoint/orders', {
+        const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

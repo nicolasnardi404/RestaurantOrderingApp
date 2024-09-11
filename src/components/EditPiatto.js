@@ -11,14 +11,15 @@ import { Toast } from 'primereact/toast';
 function ManagePiatti() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
   const [editingPiatto, setEditingPiatto] = useState(null);
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [isNewPiatto, setIsNewPiatto] = useState(false);
   const toast = useRef(null);
 
   const tipoPiattoOptions = [
-    { label: 'Primo', value: 1 },
-    { label: 'Secondo', value: 2 },
-    { label: 'Contorno', value: 3 },
-    { label: 'Piatto unico', value: 4 }
+    { label: 'Primo', value: 'Primo' },
+    { label: 'Secondo', value: 'Secondo' },
+    { label: 'Contorno', value: 'Contorno' },
+    { label: 'Piatto unico', value: 'Piatto unico' }
   ];
 
   useEffect(() => {
@@ -42,36 +43,60 @@ function ManagePiatti() {
   const editPiatto = (piatto) => {
     setEditingPiatto({
       ...piatto,
-      idTipoPiatto: tipoPiattoOptions.find(option => option.label === piatto.tipo_piatto)?.value
+      // nome_tipo is already in the piatto object, so we don't need to modify it
     });
-    setShowEditDialog(true);
+    setIsNewPiatto(false);
+    setShowDialog(true);
+  };
+
+  const addNewPiatto = () => {
+    setEditingPiatto({
+      nome: '',
+      data: new Date().toISOString().split('T')[0],
+      idTipoPiatto: 1,
+      disponibile: 1
+    });
+    setIsNewPiatto(true);
+    setShowDialog(true);
   };
 
   const savePiatto = async () => {
     try {
-      const piattoToUpdate = {
+      const piattoToSave = {
         nome: editingPiatto.nome,
         data: editingPiatto.data,
         idTipoPiatto: editingPiatto.idTipoPiatto,
-        disponibile: editingPiatto.disponibile === 1
+        sempreDisponibile: editingPiatto.sempreDisponibile === 1
       };
-      console.log(piattoToUpdate)
-      const response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(piattoToUpdate),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update piatto');
+      
+      let response;
+      if (isNewPiatto) {
+        response = await fetch('http://localhost:8080/api/piatto/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(piattoToSave),
+        });
+      } else {
+        response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(piattoToSave),
+        });
       }
-      setShowEditDialog(false);
+
+      if (!response.ok) {
+        throw new Error(isNewPiatto ? 'Failed to create piatto' : 'Failed to update piatto');
+      }
+      setShowDialog(false);
       fetchWeeklyPiatti();
-      showToast('success', 'Success', 'Piatto updated successfully');
+      showToast('success', 'Success', isNewPiatto ? 'Piatto created successfully' : 'Piatto updated successfully');
     } catch (error) {
-      console.error('Error updating piatto:', error);
-      showToast('error', 'Error', 'Failed to update piatto');
+      console.error('Error saving piatto:', error);
+      showToast('error', 'Error', 'Failed to save piatto');
     }
   };
 
@@ -112,36 +137,45 @@ function ManagePiatti() {
       <h1>Manage Weekly Piatti</h1>
       <DataTable value={weeklyPiatti} paginator rows={10}>
         <Column field="id" header="ID" />
-        <Column field="nome" header="Nome" />
-        <Column field="tipo_piatto" header="Tipo Piatto" />
+        <Column field="nome_piatto" header="Nome" />
+        <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="data" header="Data" />
-        <Column field="disponibile" header="Disponibile" body={(rowData) => rowData.disponibile ? 'Yes' : 'No'} />
+        <Column field="dayOfWeek" header="Day of Week" />
+        <Column field="sempreDisponibile" header="Disponibile" body={(rowData) => rowData.sempreDisponibile ? 'Yes' : 'No'} />
         <Column body={actionTemplate} header="Actions" />
       </DataTable>
 
-      <Dialog header="Edit Piatto" visible={showEditDialog} style={{ width: '50vw' }} modal onHide={() => setShowEditDialog(false)}>
+      <Dialog header={isNewPiatto ? "Add New Piatto" : "Edit Piatto"} visible={showDialog} style={{ width: '50vw' }} modal onHide={() => setShowDialog(false)}>
         {editingPiatto && (
           <div>
             <div className="p-field">
               <label htmlFor="nome">Nome</label>
-              <InputText id="nome" value={editingPiatto.nome} onChange={(e) => setEditingPiatto({ ...editingPiatto, nome: e.target.value })} />
+              <InputText id="nome" value={editingPiatto.nome_piatto} onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_piatto: e.target.value })} />
             </div>
             <div className="p-field">
-              <label htmlFor="idTipoPiatto">Tipo Piatto</label>
-              <Dropdown id="idTipoPiatto" value={editingPiatto.idTipoPiatto} options={tipoPiattoOptions} onChange={(e) => setEditingPiatto({ ...editingPiatto, idTipoPiatto: e.value })} placeholder="Select a type" optionLabel="label" />
+              <label htmlFor="nome_tipo">Tipo Piatto</label>
+              <Dropdown 
+                id="nome_tipo" 
+                value={editingPiatto.nome_tipo} 
+                options={tipoPiattoOptions} 
+                onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_tipo: e.value })} 
+                placeholder="Select a type" 
+                optionLabel="label" 
+              />
             </div>
             <div className="p-field">
               <label htmlFor="data">Data</label>
               <Calendar id="data" value={new Date(editingPiatto.data)} onChange={(e) => setEditingPiatto({ ...editingPiatto, data: e.value.toISOString().split('T')[0] })} dateFormat="yy-mm-dd" />
             </div>
             <div className="p-field">
-              <label htmlFor="disponibile">Disponibile</label>
-              <Dropdown id="disponibile" value={editingPiatto.disponibile} options={[{ label: 'Yes', value: 1 }, { label: 'No', value: 0 }]} onChange={(e) => setEditingPiatto({ ...editingPiatto, disponibile: e.value })} optionLabel="label" />
+              <label htmlFor="sempreDisponibile">Disponibile</label>
+              <Dropdown id="sempreDisponibile" value={editingPiatto.sempreDisponibile} options={[{ label: 'Yes', value: 1 }, { label: 'No', value: 0 }]} onChange={(e) => setEditingPiatto({ ...editingPiatto, sempreDisponibile: e.value })} optionLabel="label" />
             </div>
             <Button label="Save" icon="pi pi-check" onClick={savePiatto} />
           </div>
         )}
       </Dialog>
+      <Button label="Add New Piatto" icon="pi pi-plus" onClick={addNewPiatto} className="p-mb-3" />
     </div>
   );
 }
