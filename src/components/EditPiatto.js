@@ -45,6 +45,7 @@ function ManagePiatti() {
       ...piatto,
       // All fields are already in the piatto object, so we don't need to modify anything
     });
+    console.log(piatto)
     setIsNewPiatto(false);
     setShowDialog(true);
   };
@@ -66,10 +67,10 @@ function ManagePiatti() {
       const piattoToSave = {
         nome: editingPiatto.nome_piatto, // Changed to nome_piatto
         data: editingPiatto.data,
-        idTipoPiatto: editingPiatto.idTipoPiatto,
+        idTipoPiatto: editingPiatto.id_piatto,
         disponibile: editingPiatto.sempreDisponibile
       };
-      
+      console.log(piattoToSave)
       let response;
       if (isNewPiatto) {
         console.log(piattoToSave)
@@ -81,9 +82,7 @@ function ManagePiatti() {
           body: JSON.stringify(piattoToSave),
         });
       } else {
-        console.log(piattoToSave)
-        console.log(editingPiatto.id)
-        response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id}`, {
+        response = await fetch(`http://localhost:8080/api/piatto/update/${editPiatto.id_piatto}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -107,8 +106,10 @@ function ManagePiatti() {
   const deletePiatto = async (id) => {
     if (window.confirm('Are you sure you want to delete this piatto?')) {
       try {
+        console.log(id)
         const response = await fetch(`http://localhost:8080/api/piatto/delete/${id}`, {
           method: 'DELETE',
+
         });
         if (!response.ok) {
           throw new Error('Failed to delete piatto');
@@ -130,7 +131,7 @@ function ManagePiatti() {
     return (
       <>
         <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editPiatto(rowData)} />
-        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => deletePiatto(rowData.id)} />
+        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => deletePiatto(rowData.id_piatto)} />
       </>
     );
   };
@@ -140,7 +141,7 @@ function ManagePiatti() {
       <Toast ref={toast} />
       <h1>Manage Weekly Piatti</h1>
       <DataTable value={weeklyPiatti} paginator rows={10}>
-        <Column field="id" header="ID" />
+        <Column field="id_piatto" header="ID" />
         <Column field="nome_piatto" header="Nome Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="data" header="Data" />
