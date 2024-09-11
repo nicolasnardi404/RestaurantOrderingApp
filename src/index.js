@@ -9,6 +9,7 @@
   // import PrenotazionePerPersona from "./pages/PrenotazionePerPersona"
   
   import MyApp from "./_app";
+import CRUDPiatti from "./pages/CRUDPiatti";
 
   export default function App() {
     return (
@@ -20,6 +21,7 @@
           <Route path="/historic" element={<Historic />} />
           {/* <Route path="/prenotazione-per-persona" element={<PrenotazionePerPersona />}/> */}
           <Route path="/test" element={<MyApp />} />
+          <Route path="/managepiatti" element={<CRUDPiatti/>} />
           <Route path="/open-orders" element={<OpenOrders />} />
         </Routes>
       </BrowserRouter>

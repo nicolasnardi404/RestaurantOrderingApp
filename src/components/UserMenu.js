@@ -26,6 +26,11 @@ export default function UserMenu() {
       command: () => navigate('/open-orders')
     },
     {
+      label: 'Edit Piatti',
+      icon: 'pi pi-list',
+      command: () => navigate('/managepiatti')
+    },
+    {
       separator: true
     },
     {

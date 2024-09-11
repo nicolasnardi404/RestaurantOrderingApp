@@ -131,10 +131,38 @@ function MenuPage() {
     </div>
   );
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (isValidCombination()) {
-      // Implement your order submission logic here
-      console.log('Order submitted:', cart);
+      const idUser = localStorage.getItem('id');
+      const dataPrenotazione = formatDateforServer(selectedDay);
+      const idPiatto = Object.values(cart).map(dish => dish.id);
+
+      const orderData = {
+        idUser: parseInt(idUser),
+        dataPrenotazione: `${dataPrenotazione}`,
+        idPiatto: idPiatto,
+      };
+
+      try {
+        console.log(orderData)
+        const response = await fetch('http://your-api-endpoint/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData),
+        });
+
+        if (response.ok) {
+          console.log('Order submitted successfully');
+          // You might want to clear the cart or show a success message here
+        } else {
+          throw new Error('Failed to submit order');
+        }
+      } catch (error) {
+        console.error('Error submitting order:', error);
+        setError('Failed to submit order. Please try again.');
+      }
     } else {
       setError('Invalid combination. Please select a valid combination of dishes.');
     }

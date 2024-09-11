@@ -24,6 +24,7 @@ export default function SimpleLogin() {
           id: value.id
         }));
         setUsers(transformedUsers);
+
       })
       .catch(error => {
         console.error('There was a problem with the fetch operation: ', error);
