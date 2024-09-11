@@ -43,7 +43,7 @@ function ManagePiatti() {
   const editPiatto = (piatto) => {
     setEditingPiatto({
       ...piatto,
-      // nome_tipo is already in the piatto object, so we don't need to modify it
+      // All fields are already in the piatto object, so we don't need to modify anything
     });
     setIsNewPiatto(false);
     setShowDialog(true);
@@ -51,9 +51,10 @@ function ManagePiatti() {
 
   const addNewPiatto = () => {
     setEditingPiatto({
-      nome: '',
+      nome_piatto: '', // Changed to nome_piatto for the dish name
       data: new Date().toISOString().split('T')[0],
       idTipoPiatto: 1,
+      nome_tipo: 'Primo', // Default tipo piatto
       disponibile: 1
     });
     setIsNewPiatto(true);
@@ -63,14 +64,15 @@ function ManagePiatti() {
   const savePiatto = async () => {
     try {
       const piattoToSave = {
-        nome: editingPiatto.nome,
+        nome: editingPiatto.nome_piatto, // Changed to nome_piatto
         data: editingPiatto.data,
         idTipoPiatto: editingPiatto.idTipoPiatto,
-        sempreDisponibile: editingPiatto.sempreDisponibile === 1
+        disponibile: editingPiatto.sempreDisponibile
       };
       
       let response;
       if (isNewPiatto) {
+        console.log(piattoToSave)
         response = await fetch('http://localhost:8080/api/piatto/create', {
           method: 'POST',
           headers: {
@@ -79,6 +81,8 @@ function ManagePiatti() {
           body: JSON.stringify(piattoToSave),
         });
       } else {
+        console.log(piattoToSave)
+        console.log(editingPiatto.id)
         response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id}`, {
           method: 'PUT',
           headers: {
@@ -137,7 +141,7 @@ function ManagePiatti() {
       <h1>Manage Weekly Piatti</h1>
       <DataTable value={weeklyPiatti} paginator rows={10}>
         <Column field="id" header="ID" />
-        <Column field="nome_piatto" header="Nome" />
+        <Column field="nome_piatto" header="Nome Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="data" header="Data" />
         <Column field="dayOfWeek" header="Day of Week" />
@@ -149,8 +153,8 @@ function ManagePiatti() {
         {editingPiatto && (
           <div>
             <div className="p-field">
-              <label htmlFor="nome">Nome</label>
-              <InputText id="nome" value={editingPiatto.nome_piatto} onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_piatto: e.target.value })} />
+              <label htmlFor="nome_piatto">Nome Piatto</label>
+              <InputText id="nome_piatto" value={editingPiatto.nome_piatto} onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_piatto: e.target.value })} />
             </div>
             <div className="p-field">
               <label htmlFor="nome_tipo">Tipo Piatto</label>
@@ -158,7 +162,7 @@ function ManagePiatti() {
                 id="nome_tipo" 
                 value={editingPiatto.nome_tipo} 
                 options={tipoPiattoOptions} 
-                onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_tipo: e.value })} 
+                onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_tipo: e.value, idTipoPiatto: tipoPiattoOptions.findIndex(option => option.value === e.value) + 1 })} 
                 placeholder="Select a type" 
                 optionLabel="label" 
               />
