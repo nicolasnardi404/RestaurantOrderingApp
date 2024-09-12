@@ -49,23 +49,28 @@ const HistoricComponent = () => {
   const fetchData = async () => {
     let url;
     if (viewMode === 'month' && selectedMonth) {
-      url = `http://localhost:8080/api/ordine/readByMese/${formatDateforServer(selectedMonth).slice(0, 7)}`;
+      const monthString = formatDateforServer(selectedMonth).slice(0, 7);
+      url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
     } else if (viewMode === 'day' && selectedDate) {
-      url = `http://localhost:8080/api/ordine/ordineByDay/${formatDateforServer(selectedDate)}`;
+      const dateString = formatDateforServer(selectedDate);
+      url = `http://localhost:8080/api/ordine/ordineByDay/${dateString}`;
     } else {
-      return;
+      return; // Don't fetch if no date is selected
     }
 
     try {
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
       const fetchedData = await response.json();
-      console.log(fetchData)
       setData(fetchedData);
 
       const uniqueUsernames = [...new Set(fetchedData.map(item => item.username))];
       setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Handle error (e.g., show an error message to the user)
     }
   };
 
@@ -211,22 +216,22 @@ const HistoricComponent = () => {
             </div>
           </div>
           <div className="p-field">
+            <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
+            <Calendar 
+              id="datePicker"
+              value={viewMode === 'month' ? selectedMonth : selectedDate} 
+              onChange={(e) => viewMode === 'month' ? setSelectedMonth(e.value) : setSelectedDate(e.value)} 
+              view={viewMode === 'month' ? "month" : "date"}
+              dateFormat={viewMode === 'month' ? "mm/yy" : "dd/mm/yy"}
+              showIcon
+            />
+          </div>
+          <div className="p-field">
             <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
             <InputSwitch
               id="totalPerDaySwitch"
               checked={showTotalPerDay}
               onChange={(e) => setShowTotalPerDay(e.value)}
-            />
-          </div>
-          <div className="p-field">
-            <label htmlFor="datePicker">Seleziona Mese</label>
-            <Calendar 
-              id="datePicker"
-              value={selectedMonth} 
-              onChange={(e) => setSelectedMonth(e.value)} 
-              view="month" 
-              dateFormat="mm/yy" 
-              showIcon
             />
           </div>
           {!showTotalPerDay && (
