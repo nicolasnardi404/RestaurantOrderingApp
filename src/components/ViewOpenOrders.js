@@ -19,7 +19,7 @@ const ViewOpenOrders = () => {
       setLoading(true);
       // Assuming you have a user ID stored in localStorage or in a context
       const userId = localStorage.getItem('userId');
-      const response = await axios.get(`http://localhost:8080/ordine/ordineByUserId/${userId}`);
+      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByUserId/${userId}`);
       const filteredOrders = filterOpenOrders(response.data);
       setOrders(filteredOrders);
     } catch (error) {
@@ -34,7 +34,7 @@ const ViewOpenOrders = () => {
     const today10AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0);
     
     return allOrders.filter(order => {
-      const orderDate = new Date(order.reservation_date);
+      const orderDate = new Date(order.datePiatti);
       return orderDate > now || (orderDate.toDateString() === now.toDateString() && now < today10AM);
     });
   };
@@ -74,8 +74,8 @@ const ViewOpenOrders = () => {
     <div className="view-open-orders">
       <Card title="Your Open Orders">
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
-          <Column field="id" header="Order ID" />
-          <Column field="reservation_date" header="Reservation Date" body={(rowData) => formatDate(rowData.reservation_date)} />
+          <Column field="idPrenotazione" header="Order ID" />
+          <Column field="datePiatti" header="Reservation Date" body={(rowData) => formatDate(rowData.datePiatti)} />
           <Column field="tipo_piatti" header="Dish Type" />
           <Column body={actionTemplate} header="Actions" style={{width: '100px'}} />
         </DataTable>

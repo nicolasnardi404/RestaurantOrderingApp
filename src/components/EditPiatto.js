@@ -45,7 +45,6 @@ function ManagePiatti() {
       ...piatto,
       // All fields are already in the piatto object, so we don't need to modify anything
     });
-    console.log(piatto)
     setIsNewPiatto(false);
     setShowDialog(true);
   };
@@ -70,7 +69,8 @@ function ManagePiatti() {
         idTipoPiatto: editingPiatto.idTipoPiatto,
         disponibile: editingPiatto.sempreDisponibile
       };
-      console.log(piattoToSave)
+      console.log(piattoToSave);
+      
       let response;
       if (isNewPiatto) {
         console.log(piattoToSave)
@@ -82,6 +82,8 @@ function ManagePiatti() {
           body: JSON.stringify(piattoToSave),
         });
       } else {
+        console.log(piattoToSave)
+        console.log(editingPiatto.id_piatto)
         response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id_piatto}`, {
           method: 'PUT',
           headers: {
@@ -106,10 +108,8 @@ function ManagePiatti() {
   const deletePiatto = async (id) => {
     if (window.confirm('Are you sure you want to delete this piatto?')) {
       try {
-        console.log(id)
         const response = await fetch(`http://localhost:8080/api/piatto/delete/${id}`, {
           method: 'DELETE',
-
         });
         if (!response.ok) {
           throw new Error('Failed to delete piatto');
