@@ -147,10 +147,9 @@ function MenuPage() {
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
       };
-
+      console.log("hey" + JSON.stringify(orderData))
       try {
-        console.log(orderData)
-        const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
+          const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

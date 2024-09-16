@@ -6,6 +6,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { MultiSelect } from 'primereact/multiselect';
 import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
 import axios from 'axios';
 import '../ViewOpenOrders.css';
 
@@ -16,6 +17,8 @@ const ViewOpenOrders = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [availableDishes, setAvailableDishes] = useState([]);
   const [error, setError] = useState('');
+  const [combinationStatus, setCombinationStatus] = useState('');
+  const [availableDishesForOrder, setAvailableDishesForOrder] = useState({});
 
   useEffect(() => {
     fetchOrders();
@@ -78,14 +81,132 @@ const ViewOpenOrders = () => {
     );
   };
 
-  const handleEditOrder = (order) => {
+  const fetchDishesForOrder = async (date) => {
+    try {
+      const formattedDate = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      console.log('Fetching dishes for date:', formattedDate);
+      const response = await axios.get(`http://localhost:8080/api/piatto/readByData/${formattedDate}`);
+      console.log('Fetched dishes for date:', response.data);
+      return Array.isArray(response.data) ? response.data : [];
+    } catch (error) {
+      console.error('Error fetching dishes for date:', error);
+      setError('Failed to fetch dishes for the order date. Some features may be limited.');
+      return [];
+    }
+  };
+
+  const handleEditOrder = async (order) => {
     console.log('Editing order:', order);
-    setEditingOrder({
+    const selectedDishes = order.idPiatti.split(', ').map(id => parseInt(id));
+    console.log('Selected dishes:', selectedDishes);
+    const orderDate = new Date(order.datePiatti.split(', ')[0]);
+    console.log('Order date:', orderDate);
+    
+    const dishesForOrder = await fetchDishesForOrder(orderDate);
+    console.log('Dishes for order:', dishesForOrder);
+    
+    if (!Array.isArray(dishesForOrder)) {
+      console.error('Dishes for order is not an array:', dishesForOrder);
+      setError('Failed to fetch dishes for the order date. Please try again.');
+      return;
+    }
+
+    const dishesById = dishesForOrder.reduce((acc, dish) => {
+      acc[dish.id] = dish;
+      return acc;
+    }, {});
+
+    const editingOrderData = {
       ...order,
-      selectedDishes: order.idPiatti.split(', ').map(id => parseInt(id)),
-      reservationDate: new Date(order.datePiatti.split(', ')[0])
-    });
+      selectedDishes: {
+        Primo: selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Primo') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Primo')] : null,
+        Secondo: selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Secondo') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Secondo')] : null,
+        Contorno: selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Contorno') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Contorno')] : null,
+        'Piatto unico': selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Piatto unico') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Piatto unico')] : null,
+      },
+      reservationDate: orderDate,
+      availableDishes: dishesForOrder
+    };
+
+    console.log('Initial selected dishes:', JSON.stringify({
+      Primo: editingOrderData.selectedDishes.Primo?.nome || 'None',
+      Secondo: editingOrderData.selectedDishes.Secondo?.nome || 'None',
+      Contorno: editingOrderData.selectedDishes.Contorno?.nome || 'None',
+      'Piatto unico': editingOrderData.selectedDishes['Piatto unico']?.nome || 'None'
+    }, null, 2));
+
+    console.log('Available dishes:', JSON.stringify(editingOrderData.availableDishes.map(dish => ({
+      id: dish.id,
+      nome: dish.nome,
+      tipo_piatto: dish.tipo_piatto
+    })), null, 2));
+
+    console.log('Editing order data:', editingOrderData);
+    setEditingOrder(editingOrderData);
+    checkCombination(editingOrderData.selectedDishes);
     setShowEditDialog(true);
+  };
+
+  const handleDropdownChange = (mealType, selectedDish) => {
+    console.log(`Dropdown change for ${mealType}:`, selectedDish ? selectedDish.nome : 'None');
+    setEditingOrder(prevOrder => {
+      const newSelectedDishes = { ...prevOrder.selectedDishes, [mealType]: selectedDish || null };
+      
+      console.log('Current selected dishes:', JSON.stringify({
+        Primo: newSelectedDishes.Primo?.id || 'None',
+        Secondo: newSelectedDishes.Secondo?.id || 'None',
+        Contorno: newSelectedDishes.Contorno?.id || 'None',
+        'Piatto unico': newSelectedDishes['Piatto unico']?.id || 'None'
+      }, null, 2));
+      
+      checkCombination(newSelectedDishes);
+      return { ...prevOrder, selectedDishes: newSelectedDishes };
+    });
+  };
+
+  const isValidCombination = (selectedDishes) => {
+    const validCombinations = [
+      ['Primo', 'Secondo', 'Contorno'],
+      ['Primo', 'Piatto unico', 'Contorno'],
+      ['Primo', 'Contorno'],
+      ['Secondo', 'Contorno'],
+      ['Piatto unico', 'Contorno'],
+      ['Piatto unico']
+    ];
+
+    const selectedTypes = Object.keys(selectedDishes).filter(type => 
+      selectedDishes[type] !== null && selectedDishes[type] !== undefined
+    );
+
+    console.log('Selected types:', selectedTypes);
+
+    const isValid = validCombinations.some(combination => {
+      const matchesLength = combination.length === selectedTypes.length;
+      const includesAll = combination.every(type => selectedTypes.includes(type));
+      console.log(`Checking combination: ${combination}, Length match: ${matchesLength}, Includes all: ${includesAll}`);
+      return matchesLength && includesAll;
+    });
+
+    console.log('Is valid combination:', isValid);
+    return isValid;
+  };
+
+  const checkCombination = (currentSelection) => {
+    if (isValidCombination(currentSelection)) {
+      setCombinationStatus('');
+    } else {
+      const selectedTypes = Object.keys(currentSelection).filter(type => currentSelection[type] !== null);
+      let missingItems = [];
+      if (!selectedTypes.includes('Primo') && !selectedTypes.includes('Piatto unico')) missingItems.push('Primo or Piatto unico');
+      if (!selectedTypes.includes('Secondo') && !selectedTypes.includes('Piatto unico')) missingItems.push('Secondo or Piatto unico');
+      if (!selectedTypes.includes('Contorno') && !selectedTypes.includes('Piatto unico')) missingItems.push('Contorno');
+      
+      if (missingItems.length === 0) {
+        setCombinationStatus('Invalid combination. Please adjust your selection.');
+      } else {
+        setCombinationStatus(`Add ${missingItems.join(' or ')} to complete a valid combination`);
+      }
+    }
   };
 
   const handleCancelOrder = async (idPrenotazione) => {
@@ -103,23 +224,35 @@ const ViewOpenOrders = () => {
   };
 
   const handleUpdateOrder = async () => {
-    try {
-      console.log('Updating order:', editingOrder);
-      const updateData = {
-        idPiatti: editingOrder.selectedDishes,
-        dataPrenotazione: formatDate(editingOrder.reservationDate)
-      };
-      console.log('Update data:', updateData);
-      
-      const response = await axios.put(`http://localhost:8080/api/ordine/update/${editingOrder.idPrenotazione}`, updateData);
-      console.log('Update response:', response.data);
-      
-      setShowEditDialog(false);
-      await fetchOrders(); // Refresh the orders after update
-      alert('Order updated successfully');
-    } catch (error) {
-      console.error('Error updating order:', error);
-      setError('Failed to update order. Please try again.');
+    if (isValidCombination(editingOrder.selectedDishes)) {
+      try {
+        console.log('Updating order:', editingOrder);
+        
+        // Filter out null or undefined dishes and get their IDs
+        const selectedDishIds = Object.values(editingOrder.selectedDishes)
+          .filter(dish => dish !== null && dish !== undefined)
+          .map(dish => dish.id);
+
+        const updateData = {
+          idUser: parseInt(localStorage.getItem('id')), // Ensure this is the correct way to get the user ID
+          dataPrenotazione: editingOrder.reservationDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
+          idPiatto: selectedDishIds
+        };
+
+        console.log('Update data:', JSON.stringify(updateData, null, 2));
+
+        const response = await axios.put(`http://localhost:8080/api/ordine/update/${editingOrder.idPrenotazione}`, updateData);
+        console.log('Update response:', response.data);
+        
+        setShowEditDialog(false);
+        await fetchOrders(); // Refresh the orders after update
+        alert('Order updated successfully');
+      } catch (error) {
+        console.error('Error updating order:', error);
+        setError('Failed to update order. Please try again.');
+      }
+    } else {
+      setError('Invalid combination. Please select a valid combination of dishes.');
     }
   };
 
@@ -145,28 +278,31 @@ const ViewOpenOrders = () => {
         {editingOrder && (
           <div>
             <div className="p-field">
-              <label htmlFor="dishes">Dishes</label>
-              <MultiSelect
-                id="dishes"
-                value={editingOrder.selectedDishes}
-                options={availableDishes}
-                onChange={(e) => setEditingOrder({...editingOrder, selectedDishes: e.value})}
-                optionLabel="nome"
-                optionValue="id"
-                placeholder="Select dishes"
-              />
+              <label>Reservation Date:</label>
+              <span>{formatDate(editingOrder.reservationDate)}</span>
             </div>
-            <div className="p-field">
-              <label htmlFor="reservationDate">Reservation Date</label>
-              <Calendar
-                id="reservationDate"
-                value={editingOrder.reservationDate}
-                onChange={(e) => setEditingOrder({...editingOrder, reservationDate: e.value})}
-                dateFormat="dd/mm/yy"
-                showIcon
-              />
-            </div>
-            <Button label="Update Order" onClick={handleUpdateOrder} />
+            {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
+              <div key={mealType} className="p-field">
+                <label htmlFor={mealType}>{mealType}</label>
+                <Dropdown
+                  id={mealType}
+                  value={editingOrder.selectedDishes[mealType]}
+                  options={editingOrder.availableDishes.filter(dish => dish.tipo_piatto === mealType)}
+                  onChange={(e) => handleDropdownChange(mealType, e.value)}
+                  optionLabel="nome"
+                  placeholder={`Select ${mealType}`}
+                  className="w-full md:w-14rem"
+                  showClear
+                />
+              </div>
+            ))}
+            {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
+            {error && <div className="error-message">{error}</div>}
+            <Button 
+              label="Update Order" 
+              onClick={handleUpdateOrder} 
+              disabled={!isValidCombination(editingOrder.selectedDishes)} 
+            />
           </div>
         )}
       </Dialog>
