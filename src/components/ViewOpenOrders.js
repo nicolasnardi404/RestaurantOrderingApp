@@ -119,13 +119,15 @@ const ViewOpenOrders = () => {
     const editingOrderData = {
       ...order,
       selectedDishes: {
-        Primo: selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Primo') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Primo')] : null,
-        Secondo: selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Secondo') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Secondo')] : null,
-        Contorno: selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Contorno') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Contorno')] : null,
-        'Piatto unico': selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Piatto unico') ? dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Piatto unico')] : null,
+        Primo: dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Primo')] || null,
+        Secondo: dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Secondo')] || null,
+        Contorno: dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Contorno')] || null,
+        'Piatto unico': dishesById[selectedDishes.find(id => dishesById[id]?.tipo_piatto === 'Piatto unico')] || null,
       },
       reservationDate: orderDate,
-      availableDishes: dishesForOrder
+      availableDishes: dishesForOrder,
+      idOrdine: order.idOrdine,
+      idPrenotazione: order.idPrenotazione // Ensure this is included
     };
 
     console.log('Initial selected dishes:', JSON.stringify({
@@ -233,10 +235,14 @@ const ViewOpenOrders = () => {
           .filter(dish => dish !== null && dish !== undefined)
           .map(dish => dish.id);
 
+        // Get all idOrdine values
+        const idOrdineArray = editingOrder.idOrdine.split(', ').map(id => parseInt(id));
+
         const updateData = {
-          idUser: parseInt(localStorage.getItem('id')), // Ensure this is the correct way to get the user ID
+          idPrenotazione: editingOrder.idPrenotazione, // Use idPrenotazione instead of idUser
           dataPrenotazione: editingOrder.reservationDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
-          idPiatto: selectedDishIds
+          idPiatto: selectedDishIds,
+          idOrdine: idOrdineArray
         };
 
         console.log('Update data:', JSON.stringify(updateData, null, 2));
