@@ -34,6 +34,14 @@ export default function UserMenu() {
       separator: true
     },
     {
+      label: 'All Orders of the Day',
+      icon: 'pi pi-power-off',
+      command: () => {
+        // Add logout logic here
+        navigate('/day-order');
+      }
+    },
+    {
       label: 'Logout',
       icon: 'pi pi-power-off',
       command: () => {
