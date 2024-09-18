@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
-import '../App.css';
+import '../styles/DisplayMenu.css';
 
 function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(null);

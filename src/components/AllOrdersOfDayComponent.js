@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar } from 'primereact/calendar';
 import { Card } from 'primereact/card';
 import axios from 'axios';
-import '../AllOrderOfDayComponent.css';
+import '../styles/AllOrderOfDayComponent.css';
 
 const AllOrderOfDayComponent = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());

@@ -7,6 +7,8 @@ import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
+import '../styles/EditPiatto.css';
+
 
 function ManagePiatti() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
@@ -129,15 +131,21 @@ function ManagePiatti() {
 
   const actionTemplate = (rowData) => {
     return (
-      <>
-        <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editPiatto(rowData)} />
-        <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => deletePiatto(rowData.id_piatto)} />
-      </>
+      <div className="action-buttons">
+        <Button 
+          icon="pi pi-pencil" 
+          onClick={() => editPiatto(rowData)}
+        />
+        <Button 
+          icon="pi pi-trash" 
+          onClick={() => deletePiatto(rowData.id_piatto)}
+        />
+      </div>
     );
   };
 
   return (
-    <div>
+    <div className="manage-piatti">
       <Toast ref={toast} />
       <h1>Manage Weekly Piatti</h1>
       <DataTable value={weeklyPiatti} paginator rows={10}>
@@ -147,7 +155,7 @@ function ManagePiatti() {
         <Column field="data" header="Data" />
         <Column field="dayOfWeek" header="Day of Week" />
         <Column field="sempreDisponibile" header="Disponibile" body={(rowData) => rowData.sempreDisponibile ? 'Yes' : 'No'} />
-        <Column body={actionTemplate} header="Actions" />
+        <Column body={actionTemplate} header="Actions" style={{width: '150px'}} />
       </DataTable>
 
       <Dialog header={isNewPiatto ? "Add New Piatto" : "Edit Piatto"} visible={showDialog} style={{ width: '50vw' }} modal onHide={() => setShowDialog(false)}>
@@ -180,7 +188,7 @@ function ManagePiatti() {
           </div>
         )}
       </Dialog>
-      <Button label="Add New Piatto" icon="pi pi-plus" onClick={addNewPiatto} className="p-mb-3" />
+      <Button label="Add New Piatto" icon="pi pi-plus" onClick={addNewPiatto} className="p-button-primary add-piatto-button" />
     </div>
   );
 }

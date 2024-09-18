@@ -8,7 +8,8 @@ import { MultiSelect } from 'primereact/multiselect';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import axios from 'axios';
-import '../ViewOpenOrders.css';
+import '../styles/ViewOpenOrders.css';
+import 'primeicons/primeicons.css';
 
 const ViewOpenOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -100,12 +101,12 @@ const ViewOpenOrders = () => {
       <>
         <Button 
           icon="pi pi-pencil" 
-          className="p-button-rounded p-button-success mr-2" 
           onClick={() => handleEditOrder(rowData)}
         />
+
         <Button 
           icon="pi pi-times" 
-          className="p-button-rounded p-button-danger" 
+
           onClick={() => handleCancelOrder(rowData.idPrenotazione)}
         />
       </>

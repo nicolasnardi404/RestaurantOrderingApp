@@ -1,0 +1,87 @@
+.manage-piatti {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.manage-piatti h1 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.p-datatable {
+  margin-top: 20px;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.p-button-rounded {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+.p-button-success {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.p-button-danger {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+.p-button-rounded:focus {
+  box-shadow: none !important;
+}
+
+.p-dialog .p-dialog-header {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 20px;
+}
+
+.p-field {
+  margin-bottom: 15px;
+}
+
+.p-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.p-inputtext,
+.p-dropdown,
+.p-calendar {
+  width: 100%;
+}
+
+.add-piatto-button {
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .manage-piatti {
+    padding: 10px;
+  }
+
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    padding: 0.5rem;
+  }
+
+  .p-button-rounded {
+    width: 2rem !important;
+    height: 2rem !important;
+  }
+}
