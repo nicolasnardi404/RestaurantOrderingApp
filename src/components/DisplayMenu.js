@@ -4,9 +4,11 @@ import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
+import { useAuth } from '../context/AuthContext';
 import '../styles/DisplayMenu.css';
 
 function MenuPage() {
@@ -16,18 +18,17 @@ function MenuPage() {
   const [cart, setCart] = useState({});
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
-  const userName = localStorage.getItem('nome');
-  const idUser = localStorage.getItem('idUser');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { user, getToken } = useAuth();
 
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
   useEffect(() => {
     if (selectedDay) {
       fetchDishes();
-      setCart({}); // Clear selections when date changes
+      setCart({});
       setCombinationStatus('');
     }
   }, [selectedDay]);
@@ -35,9 +36,13 @@ function MenuPage() {
   const fetchDishes = async () => {
     const formDateForServer = formatDateforServer(selectedDay);
     try {
-      const response = await fetch(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`);
-      const data = await response.json();
-      setDishes(data);
+      const token = getToken();
+      const response = await axios.get(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setDishes(response.data);
       setError('');
     } catch (error) {
       console.error('Error fetching dishes:', error);
@@ -53,10 +58,8 @@ function MenuPage() {
     setCart(prevCart => {
       let newCart;
       if (selectedDish) {
-        // Add or update the dish
         newCart = { ...prevCart, [mealType]: selectedDish };
       } else {
-        // Remove the dish if it's deselected
         newCart = { ...prevCart };
         delete newCart[mealType];
       }
@@ -138,26 +141,25 @@ function MenuPage() {
   const handleSubmit = async () => {
     if (isValidCombination()) {
       setIsSubmitting(true);
-      const idUser = localStorage.getItem('id');
       const dataPrenotazione = formatDateforServer(selectedDay);
       const idPiatto = Object.values(cart).map(dish => dish.id);
 
       const orderData = {
-        idUser: parseInt(idUser),
+        idUser: user.userId,
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
       };
-      console.log("hey" + JSON.stringify(orderData))
+      console.log("Submitting order:", JSON.stringify(orderData));
       try {
-          const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
-          method: 'POST',
+        const token = getToken();
+        const response = await axios.post('http://localhost:8080/api/prenotazione/createWithOrdine', orderData, {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(orderData),
         });
 
-        if (response.ok) {
+        if (response.status === 200 || response.status === 201) {
           console.log('Order submitted successfully');
           setShowSuccessModal(true);
         } else {
@@ -206,7 +208,7 @@ function MenuPage() {
 
   return (
     <div className='container-menu'>
-      <h1>Welcome, {userName}</h1>
+      <h1>Welcome, {user.nome}</h1>
       <div className="date-selection">
         <Calendar 
           value={selectedDay} 

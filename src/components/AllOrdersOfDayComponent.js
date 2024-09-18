@@ -8,12 +8,14 @@ import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import '../styles/AllOrderOfDayComponent.css';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
 
 const AllOrderOfDayComponent = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { getToken } = useAuth(); // Use the useAuth hook to get the getToken function
 
   useEffect(() => {
     fetchDailyOrders(selectedDate);
@@ -24,8 +26,12 @@ const AllOrderOfDayComponent = () => {
     setLoading(true);
     try {
       const dateString = formatDateForServer(date);
-      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`);
-      console.log('Daily orders:', response.data);
+      const token = getToken(); // Get the token
+      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`, {
+        headers: {
+          Authorization: `Bearer ${token}` // Add the token to the request headers
+        }
+      });
       setDailyOrders(response.data);
     } catch (error) {
       console.error('Error fetching daily orders:', error);
@@ -39,7 +45,12 @@ const AllOrderOfDayComponent = () => {
     setLoading(true);
     try {
       const dateString = formatDateForServer(date);
-      const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`);
+      const token = getToken(); // Get the token
+      const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
+        headers: {
+          Authorization: `Bearer ${token}` // Add the token to the request headers
+        }
+      });
       console.log('Daily summary:', response.data);
       setDailySummary(response.data);
     } catch (error) {

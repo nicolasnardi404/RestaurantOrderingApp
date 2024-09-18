@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
@@ -7,8 +7,9 @@ import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { Toast } from 'primereact/toast';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import '../styles/EditPiatto.css';
-
 
 function ManagePiatti() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
@@ -16,6 +17,8 @@ function ManagePiatti() {
   const [showDialog, setShowDialog] = useState(false);
   const [isNewPiatto, setIsNewPiatto] = useState(false);
   const toast = useRef(null);
+  const { getToken } = useAuth();
+  const token = getToken();
 
   const tipoPiattoOptions = [
     { label: 'Primo', value: 'Primo' },
@@ -24,18 +27,19 @@ function ManagePiatti() {
     { label: 'Piatto unico', value: 'Piatto unico' }
   ];
 
+  const api = useCallback(axios.create({
+    baseURL: 'http://localhost:8080/api',
+    headers: { Authorization: `Bearer ${token}` }
+  }), [token]);
+
   useEffect(() => {
     fetchWeeklyPiatti();
-  }, []);
+  }, [api]);
 
   const fetchWeeklyPiatti = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/piatto/piattoSettimana');
-      if (!response.ok) {
-        throw new Error('Failed to fetch weekly piatti');
-      }
-      const data = await response.json();
-      setWeeklyPiatti(data);
+      const response = await api.get('/piatto/piattoSettimana');
+      setWeeklyPiatti(response.data);
     } catch (error) {
       console.error('Error fetching weekly piatti:', error);
       showToast('error', 'Error', 'Failed to fetch weekly piatti');
@@ -45,7 +49,6 @@ function ManagePiatti() {
   const editPiatto = (piatto) => {
     setEditingPiatto({
       ...piatto,
-      // All fields are already in the piatto object, so we don't need to modify anything
     });
     setIsNewPiatto(false);
     setShowDialog(true);
@@ -53,10 +56,10 @@ function ManagePiatti() {
 
   const addNewPiatto = () => {
     setEditingPiatto({
-      nome_piatto: '', // Changed to nome_piatto for the dish name
+      nome_piatto: '',
       data: new Date().toISOString().split('T')[0],
       idTipoPiatto: 1,
-      nome_tipo: 'Primo', // Default tipo piatto
+      nome_tipo: 'Primo',
       disponibile: 1
     });
     setIsNewPiatto(true);
@@ -66,38 +69,30 @@ function ManagePiatti() {
   const savePiatto = async () => {
     try {
       const piattoToSave = {
-        nome: editingPiatto.nome_piatto, // Changed to nome_piatto
+        nome: editingPiatto.nome_piatto,
         data: editingPiatto.data,
         idTipoPiatto: editingPiatto.idTipoPiatto,
         disponibile: editingPiatto.sempreDisponibile
       };
-      console.log(piattoToSave);
+      
       
       let response;
       if (isNewPiatto) {
-        console.log(piattoToSave)
-        response = await fetch('http://localhost:8080/api/piatto/create', {
-          method: 'POST',
+        response = await axios.post('http://localhost:8080/api/piatto/create', piattoToSave, {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(piattoToSave),
         });
       } else {
-        console.log(piattoToSave)
-        console.log(editingPiatto.id_piatto)
-        response = await fetch(`http://localhost:8080/api/piatto/update/${editingPiatto.id_piatto}`, {
-          method: 'PUT',
+        response = await axios.put(`http://localhost:8080/api/piatto/update/${editingPiatto.id_piatto}`, piattoToSave, {
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(piattoToSave),
         });
       }
 
-      if (!response.ok) {
-        throw new Error(isNewPiatto ? 'Failed to create piatto' : 'Failed to update piatto');
-      }
       setShowDialog(false);
       fetchWeeklyPiatti();
       showToast('success', 'Success', isNewPiatto ? 'Piatto created successfully' : 'Piatto updated successfully');
@@ -110,12 +105,10 @@ function ManagePiatti() {
   const deletePiatto = async (id) => {
     if (window.confirm('Are you sure you want to delete this piatto?')) {
       try {
-        const response = await fetch(`http://localhost:8080/api/piatto/delete/${id}`, {
-          method: 'DELETE',
+
+        await axios.delete(`http://localhost:8080/api/piatto/delete/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        if (!response.ok) {
-          throw new Error('Failed to delete piatto');
-        }
         fetchWeeklyPiatti();
         showToast('success', 'Success', 'Piatto deleted successfully');
       } catch (error) {

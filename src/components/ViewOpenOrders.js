@@ -4,10 +4,9 @@ import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
-import { MultiSelect } from 'primereact/multiselect';
-import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import '../styles/ViewOpenOrders.css';
 import 'primeicons/primeicons.css';
 
@@ -19,7 +18,7 @@ const ViewOpenOrders = () => {
   const [availableDishes, setAvailableDishes] = useState([]);
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
-  const [availableDishesForOrder, setAvailableDishesForOrder] = useState({});
+  const { user, getToken } = useAuth();
 
   useEffect(() => {
     fetchOrders();
@@ -29,9 +28,11 @@ const ViewOpenOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const userId = localStorage.getItem('id');
-      console.log('Fetching orders for user ID:', userId);
-      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByUserId/${userId}`);
+      const token = getToken();
+      console.log('Fetching orders for user ID:', user.userId);
+      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByUserId/${user.userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       console.log('Fetched orders:', response.data);
       setOrders(response.data);
       setError('');
@@ -45,7 +46,10 @@ const ViewOpenOrders = () => {
 
   const fetchAvailableDishes = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/piatto/read');
+      const token = getToken();
+      const response = await axios.get('http://localhost:8080/api/piatto/read', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       console.log('Fetched available dishes:', response.data);
       setAvailableDishes(response.data);
     } catch (error) {
@@ -103,10 +107,8 @@ const ViewOpenOrders = () => {
           icon="pi pi-pencil" 
           onClick={() => handleEditOrder(rowData)}
         />
-
         <Button 
           icon="pi pi-times" 
-
           onClick={() => handleCancelOrder(rowData.idPrenotazione)}
         />
       </>
@@ -117,7 +119,10 @@ const ViewOpenOrders = () => {
     try {
       const formattedDate = date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
       console.log('Fetching dishes for date:', formattedDate);
-      const response = await axios.get(`http://localhost:8080/api/piatto/readByData/${formattedDate}`);
+      const token = getToken();
+      const response = await axios.get(`http://localhost:8080/api/piatto/readByData/${formattedDate}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       console.log('Fetched dishes for date:', response.data);
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
@@ -170,19 +175,6 @@ const ViewOpenOrders = () => {
       idPrenotazione: order.idPrenotazione // Ensure this is included
     };
 
-    console.log('Initial selected dishes:', JSON.stringify({
-      Primo: editingOrderData.selectedDishes.Primo?.nome || 'None',
-      Secondo: editingOrderData.selectedDishes.Secondo?.nome || 'None',
-      Contorno: editingOrderData.selectedDishes.Contorno?.nome || 'None',
-      'Piatto unico': editingOrderData.selectedDishes['Piatto unico']?.nome || 'None'
-    }, null, 2));
-
-    console.log('Available dishes:', JSON.stringify(editingOrderData.availableDishes.map(dish => ({
-      id: dish.id,
-      nome: dish.nome,
-      tipo_piatto: dish.tipo_piatto
-    })), null, 2));
-
     console.log('Editing order data:', editingOrderData);
     setEditingOrder(editingOrderData);
     checkCombination(editingOrderData.selectedDishes);
@@ -193,14 +185,6 @@ const ViewOpenOrders = () => {
     console.log(`Dropdown change for ${mealType}:`, selectedDish ? selectedDish.nome : 'None');
     setEditingOrder(prevOrder => {
       const newSelectedDishes = { ...prevOrder.selectedDishes, [mealType]: selectedDish || null };
-      
-      console.log('Current selected dishes:', JSON.stringify({
-        Primo: newSelectedDishes.Primo?.id || 'None',
-        Secondo: newSelectedDishes.Secondo?.id || 'None',
-        Contorno: newSelectedDishes.Contorno?.id || 'None',
-        'Piatto unico': newSelectedDishes['Piatto unico']?.id || 'None'
-      }, null, 2));
-      
       checkCombination(newSelectedDishes);
       return { ...prevOrder, selectedDishes: newSelectedDishes };
     });
@@ -255,7 +239,10 @@ const ViewOpenOrders = () => {
     if (window.confirm('Are you sure you want to cancel this order?')) {
       try {
         console.log('Cancelling order:', idPrenotazione);
-        await axios.delete(`http://localhost:8080/api/prenotazione/delete/${idPrenotazione}`);
+        const token = getToken();
+        await axios.delete(`http://localhost:8080/api/prenotazione/delete/${idPrenotazione}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setOrders(prevOrders => prevOrders.filter(order => order.idPrenotazione !== idPrenotazione));
         alert('Order cancelled successfully');
       } catch (error) {
@@ -279,7 +266,7 @@ const ViewOpenOrders = () => {
         const idOrdineArray = editingOrder.idOrdine.split(', ').map(id => parseInt(id));
 
         const updateData = {
-          idPrenotazione: editingOrder.idPrenotazione, // Use idPrenotazione instead of idUser
+          idPrenotazione: editingOrder.idPrenotazione,
           dataPrenotazione: editingOrder.reservationDate.toISOString().split('T')[0], // Format: YYYY-MM-DD
           idPiatto: selectedDishIds,
           idOrdine: idOrdineArray
@@ -287,7 +274,13 @@ const ViewOpenOrders = () => {
 
         console.log('Update data:', JSON.stringify(updateData, null, 2));
 
-        const response = await axios.put(`http://localhost:8080/api/ordine/update/${editingOrder.idPrenotazione}`, updateData);
+        const token = getToken();
+        const response = await axios.put(`http://localhost:8080/api/ordine/update/${editingOrder.idPrenotazione}`, updateData, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        });
         console.log('Update response:', response.data);
         
         setShowEditDialog(false);

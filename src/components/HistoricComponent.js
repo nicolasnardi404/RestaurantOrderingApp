@@ -6,11 +6,13 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputSwitch } from 'primereact/inputswitch';
+import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
+import { useAuth } from '../context/AuthContext';
 import '../styles/HistoricComponent.css';
 
 // Set locale for Calendar
@@ -27,6 +29,7 @@ const HistoricComponent = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [showTotalPerDay, setShowTotalPerDay] = useState(false);
   const [totalPerDayData, setTotalPerDayData] = useState([]);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     fetchData();
@@ -59,14 +62,13 @@ const HistoricComponent = () => {
     }
 
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const fetchedData = await response.json();
-      setData(fetchedData);
+      const token = getToken();
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setData(response.data);
 
-      const uniqueUsernames = [...new Set(fetchedData.map(item => item.username))];
+      const uniqueUsernames = [...new Set(response.data.map(item => item.username))];
       setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -189,11 +191,6 @@ const HistoricComponent = () => {
     // Save the PDF
     doc.save(`${selectedUsername}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_orders.pdf`);
   };
-
-  // Add this console log to check the data
-  console.log('showTotalPerDay:', showTotalPerDay);
-  console.log('totalPerDayData:', totalPerDayData);
-  console.log('filteredData:', filteredData);
 
   return (
     <div className="historic-container">
