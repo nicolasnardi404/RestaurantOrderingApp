@@ -21,3 +21,14 @@
   margin-bottom: 10px;
   font-size: 16px;
 }
+
+.pdf-button-section {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  font-size: 1.2em;
+  padding: 0.5em 1em;
+}

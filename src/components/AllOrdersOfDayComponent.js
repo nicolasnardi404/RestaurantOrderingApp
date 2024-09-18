@@ -3,7 +3,10 @@ import { Calendar } from 'primereact/calendar';
 import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
 import axios from 'axios';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import '../styles/AllOrderOfDayComponent.css';
 
 const AllOrderOfDayComponent = () => {
@@ -55,6 +58,69 @@ const AllOrderOfDayComponent = () => {
     return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
   };
 
+  const formatDateForDisplay = (date) => {
+    return date.toLocaleDateString('it-IT', { 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    });
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(20);
+    doc.setTextColor(40, 40, 40);
+    doc.text('Daily Order Report', 14, 20);
+
+    // Add report info
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Date: ${formatDateForDisplay(selectedDate)}`, 14, 30);
+    doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
+
+    // Add summary table
+    doc.autoTable({
+      startY: 45,
+      head: [['Dish Name', 'Quantity']],
+      body: dailySummary.map(item => [item.nome, item.quantita]),
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+    });
+
+    // Add detailed orders table
+    const detailsY = doc.lastAutoTable.finalY + 15;
+    doc.text('Detailed Orders', 14, detailsY);
+    doc.autoTable({
+      startY: detailsY + 5,
+      head: [['User', 'Dishes Ordered']],
+      body: dailyOrders.map(order => [order.username, order.piatti]),
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+    });
+
+    // Add footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(150);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
+        { align: 'center' }
+      );
+    }
+
+    // Save the PDF with the date in the filename
+    const fileName = `DailyOrderReport_${formatDateForServer(selectedDate)}.pdf`;
+    doc.save(fileName);
+  };
+
   return (
     <div className="all-order-of-day">
       <h2>Daily Order Summary</h2>
@@ -92,6 +158,14 @@ const AllOrderOfDayComponent = () => {
           <Column field="piatti" header="Dishes Ordered" sortable />
         </DataTable>
       </Card>
+      <div className="pdf-button-section">
+        <Button 
+          label="Generate PDF" 
+          icon="pi pi-file-pdf" 
+          onClick={generatePDF} 
+          className="p-button-lg btn"
+        />
+      </div>
     </div>
   );
 };
