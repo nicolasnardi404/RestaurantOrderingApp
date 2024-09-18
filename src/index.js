@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import Menu from "./pages/Menu";
@@ -14,20 +15,22 @@ import AllOrderOfDay from "./pages/AllOrderOfDay";
 
   export default function App() {
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LogIn />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/historic" element={<Historic />} />
-          <Route path="/register" element={<RegisterPage />} />
-          {/* <Route path="/prenotazione-per-persona" element={<PrenotazionePerPersona />}/> */}
-          <Route path="/test" element={<MyApp />} />
-          <Route path="/managepiatti" element={<CRUDPiatti/>} />
-          <Route path="/open-orders" element={<OpenOrders />} />
-          <Route path="/day-order" element={<AllOrderOfDay />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LogIn />} />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/historic" element={<Historic />} />
+            <Route path="/register" element={<RegisterPage />} />
+            {/* <Route path="/prenotazione-per-persona" element={<PrenotazionePerPersona />}/> */}
+            <Route path="/test" element={<MyApp />} />
+            <Route path="/managepiatti" element={<CRUDPiatti/>} />
+            <Route path="/open-orders" element={<OpenOrders />} />
+            <Route path="/day-order" element={<AllOrderOfDay />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     );
   }
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/logoNetSurf.png';
 import "../styles/LoginStyle.css";
 
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,8 +22,9 @@ const LoginPage = () => {
       });
 
       const token = response.data.token;
+      console.log(response.data);
 
-      localStorage.setItem('token', token);
+      login(token); // This will handle token decoding and storage
 
       navigate('/menu');
     } catch (error) {
