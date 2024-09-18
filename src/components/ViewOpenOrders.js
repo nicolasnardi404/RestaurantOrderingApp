@@ -55,13 +55,44 @@ const ViewOpenOrders = () => {
 
   const formatDate = (value) => {
     if (!value) return '';
-    return new Date(value).toLocaleString('it-IT', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    // If value is already a Date object
+    if (value instanceof Date) {
+      return value.toLocaleString('it-IT', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+    
+    // If value is a string
+    if (typeof value === 'string') {
+      const dates = value.split(', ');
+      return dates.map(date => new Date(date).toLocaleString('it-IT', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })).join(', ');
+    }
+    
+    // If value is an array
+    if (Array.isArray(value)) {
+      return value.map(date => new Date(date).toLocaleString('it-IT', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })).join(', ');
+    }
+    
+    // If value is of unexpected type, return it as is
+    console.warn('Unexpected date format:', value);
+    return String(value);
   };
 
   const actionTemplate = (rowData) => {
@@ -97,9 +128,17 @@ const ViewOpenOrders = () => {
 
   const handleEditOrder = async (order) => {
     console.log('Editing order:', order);
-    const selectedDishes = order.idPiatti.split(', ').map(id => parseInt(id));
+    const selectedDishes = order.idPiatti ? order.idPiatti.split(', ').map(id => parseInt(id)) : [];
     console.log('Selected dishes:', selectedDishes);
-    const orderDate = new Date(order.datePiatti.split(', ')[0]);
+    
+    let orderDate;
+    if (order.datePiatti && order.datePiatti.includes(',')) {
+      orderDate = new Date(order.datePiatti.split(', ')[0]);
+    } else if (order.datePiatti) {
+      orderDate = new Date(order.datePiatti);
+    } else {
+      orderDate = new Date(); // Default to current date if datePiatti is undefined
+    }
     console.log('Order date:', orderDate);
     
     const dishesForOrder = await fetchDishesForOrder(orderDate);
@@ -126,7 +165,7 @@ const ViewOpenOrders = () => {
       },
       reservationDate: orderDate,
       availableDishes: dishesForOrder,
-      idOrdine: order.idOrdine,
+      idOrdine: order.idOrdine || '',
       idPrenotazione: order.idPrenotazione // Ensure this is included
     };
 
@@ -268,7 +307,16 @@ const ViewOpenOrders = () => {
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
           <Column field="idPrenotazione" header="Order ID" />
-          <Column field="datePiatti" header="Reservation Date" body={(rowData) => formatDate(rowData.datePiatti.split(', ')[0])} />
+          <Column 
+            field="datePiatti" 
+            header="Reservation Date" 
+            body={(rowData) => {
+              if (rowData.datePiatti) {
+                return formatDate(rowData.datePiatti);
+              }
+              return 'N/A'; // or any default value you prefer
+            }} 
+          />
           <Column field="piatti" header="Dishes" />
           <Column field="tipo_piatti" header="Dish Types" />
           <Column body={actionTemplate} header="Actions" style={{width: '150px'}} />
