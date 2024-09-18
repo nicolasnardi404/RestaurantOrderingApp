@@ -3,6 +3,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import { useNavigate } from 'react-router-dom';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
@@ -17,17 +18,7 @@ function MenuPage() {
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
   const userName = localStorage.getItem('nome');
-
-  // Decodifica o token e obtém o idUser
-  const token = localStorage.getItem('token'); // Assumindo que o token está armazenado no localStorage
-  const [idUser, setIdUser] = useState(null);
-
-  useEffect(() => {
-    if (token) {
-      const decodedToken = jwtDecode(token); // Decodifica o token JWT
-      setIdUser(decodedToken.data.userId); // Agora você pode acessar os dados do token, como `decodedToken.data.userId`
-    } 
-  }, [token]);
+  const idUser = localStorage.getItem('idUser');
 
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -144,6 +135,7 @@ function MenuPage() {
 
   const handleSubmit = async () => {
     if (isValidCombination()) {
+      const idUser = localStorage.getItem('id');
       const dataPrenotazione = formatDateforServer(selectedDay);
       const idPiatto = Object.values(cart).map(dish => dish.id);
 
@@ -152,10 +144,9 @@ function MenuPage() {
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
       };
-
+      console.log("hey" + JSON.stringify(orderData))
       try {
-        console.log(orderData)
-        const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
+          const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -165,18 +156,50 @@ function MenuPage() {
 
         if (response.ok) {
           console.log('Order submitted successfully');
-          // Você pode querer limpar o carrinho ou mostrar uma mensagem de sucesso aqui
+          // You might want to clear the cart or show a success message here
         } else {
           throw new Error('Failed to submit order');
         }
       } catch (error) {
         console.error('Error submitting order:', error);
         setError('Failed to submit order. Please try again.');
+      } finally {
+        setIsSubmitting(false);
       }
     } else {
       setError('Invalid combination. Please select a valid combination of dishes.');
     }
   };
+
+  const handleGoToOpenOrders = () => {
+    setShowSuccessModal(false);
+    navigate('/open-orders');
+  };
+
+  const handleBackToMenu = () => {
+    setShowSuccessModal(false);
+    setSelectedDay(null);
+    setCart({});
+    setCombinationStatus('');
+    setError('');
+  };
+
+  const renderSuccessModal = () => (
+    <Dialog
+      visible={showSuccessModal}
+      onHide={() => setShowSuccessModal(false)}
+      header="Ordine Confermato"
+      modal
+      footer={
+        <div>
+          <Button label="Vai agli Ordini Aperti" onClick={handleGoToOpenOrders} className="p-button-primary" />
+          <Button label="Torna al Menu" onClick={handleBackToMenu} className="p-button-secondary" />
+        </div>
+      }
+    >
+      <p>Il tuo ordine è stato inviato con successo!</p>
+    </Dialog>
+  );
 
   return (
     <div className='container-menu'>
@@ -199,10 +222,10 @@ function MenuPage() {
           {renderOrderMenu()}
           {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
           {error && <div className="error-message">{error}</div>}
-          <Button
-            label="Submit Order"
-            onClick={handleSubmit}
-            disabled={!isValidCombination()}
+          <Button 
+            label="Submit Order" 
+            onClick={handleSubmit} 
+            disabled={!isValidCombination()} 
             className="submit-button"
           />
         </>
@@ -216,6 +239,8 @@ function MenuPage() {
       >
         {renderFullMenuList()}
       </Dialog>
+
+      {renderSuccessModal()}
     </div>
   );
 }

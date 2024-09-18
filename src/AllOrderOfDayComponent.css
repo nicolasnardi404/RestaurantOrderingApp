@@ -1,0 +1,23 @@
+.all-order-of-day {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.date-selector {
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  margin-top: 20px;
+}
+
+.summary-card ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.summary-card li {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
