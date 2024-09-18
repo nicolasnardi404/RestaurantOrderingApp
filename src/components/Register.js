@@ -1,32 +1,34 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Logo from '../assets/logoNetSurf.png';
-import "../styles/LoginStyle.css";
+import "../styles/RegisterStyle.css";
 
-const LoginPage = () => {
+const RegisterPage = () => {
+  const [nome, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const idRuolo = 1;
+  const attivo = true;
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
+      const response = await axios.post("http://localhost:8080/api/user/create", {
+        nome,
         email,
-        password
+        password,
+        idRuolo,
+        attivo
       });
 
-      const token = response.data.token;
-
-      localStorage.setItem('token', token);
-
-      navigate('/menu');
+      console.log(response.data);
+      navigate('/');
     } catch (error) {
-      setErrorMessage("Login failed. Please check your credentials.");
-      console.error("There was an error logging in!", error);
+      setErrorMessage("Registration failed. Please try again.");
+      console.error("Error during registration:", error);
     }
   };
 
@@ -34,12 +36,22 @@ const LoginPage = () => {
     <div className="container">
       <header>
         <img src={Logo} alt="Logo" className="logo" />
-        <Link to="/register">
-          <button className="register-btn">Register</button>
-        </Link>
+        <a href="/login">
+          <button className="login-btn-header">Accedi</button>
+        </a>
       </header>
-      <div className="login-box">
-        <form onSubmit={handleLogin}>
+      <div className="register-box">
+        <form onSubmit={handleRegister}>
+          <label htmlFor="name">Nome:</label>
+          <input 
+            type="text" 
+            id="name" 
+            name="nome" 
+            value={nome} 
+            onChange={(e) => setName(e.target.value)} 
+            required 
+          />
+          
           <label htmlFor="email">Email:</label>
           <input 
             type="email" 
@@ -55,22 +67,18 @@ const LoginPage = () => {
             type="password" 
             id="password" 
             name="password" 
-            value={password}
+            value={password} 
             onChange={(e) => setPassword(e.target.value)} 
             required 
           />
-          
+
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          <Link to="/register">
-            <p className="register-msg">Bisogna ancora fare il registro</p>
-          </Link>
-          
-          <button type="submit" className="login-btn">Accedi</button>
+          <button type="submit" className="register-btn">Registrati</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
