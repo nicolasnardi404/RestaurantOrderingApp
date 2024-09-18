@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Menu } from 'primereact/menu';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Import useAuth
 import '../styles/UserMenu.css';
 
 export default function UserMenu() {
@@ -9,6 +10,8 @@ export default function UserMenu() {
   const navigate = useNavigate();
   const menu = useRef(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const { user, logout } = useAuth(); 
+
 
   useEffect(() => {
     const handleResize = () => {
@@ -19,41 +22,54 @@ export default function UserMenu() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const items = [
-    {
-      label: 'Historic',
-      icon: 'pi pi-calendar',
-      command: () => navigate('/historic')
-    },
-    {
-      label: 'Make an Order',
-      icon: 'pi pi-shopping-cart',
-      command: () => navigate('/menu')
-    },
-    {
-      label: 'View Open Orders',
-      icon: 'pi pi-list',
-      command: () => navigate('/open-orders')
-    },
-    {
-      label: 'Edit Piatti',
-      icon: 'pi pi-pencil',
-      command: () => navigate('/managepiatti')
-    },
-    {
-      label: 'All Orders of the Day',
-      icon: 'pi pi-book',
-      command: () => navigate('/day-order')
-    },
-    {
-      label: 'Logout',
-      icon: 'pi pi-power-off',
-      command: () => {
-        // Add logout logic here
-        navigate('/login');
+  const handleLogout = () => {
+    logout(); // Call the logout function from AuthContext
+    navigate('/login'); // Redirect to login page after logout
+  };
+
+  const getMenuItems = () => {
+    const commonItems = [
+      {
+        label: 'Make an Order',
+        icon: 'pi pi-shopping-cart',
+        command: () => navigate('/menu')
+      },
+      {
+        label: 'View Open Orders',
+        icon: 'pi pi-list',
+        command: () => navigate('/open-orders')
+      },
+      {
+        label: 'All Orders of the Day',
+        icon: 'pi pi-book',
+        command: () => navigate('/day-order')
+      },
+      {
+        label: 'Logout',
+        icon: 'pi pi-power-off',
+        command: handleLogout // Use the new handleLogout function
       }
-    }
-  ];
+    ];
+
+    const amministratoreItems = [
+      {
+        label: 'Historic',
+        icon: 'pi pi-calendar',
+        command: () => navigate('/historic')
+      },
+      {
+        label: 'Edit Piatti',
+        icon: 'pi pi-pencil',
+        command: () => navigate('/managepiatti')
+      }
+    ];
+    // Check if user exists and has a ruolo property before accessing it
+    return user && user.ruolo === 'Amministratore' 
+      ? [...amministratoreItems, ...commonItems] 
+      : commonItems;
+  };
+
+  const items = getMenuItems();
 
   const toggleMenuLeft = (event) => {
     menu.current.toggle(event);
@@ -91,6 +107,9 @@ export default function UserMenu() {
       ))}
     </div>
   );
+
+  // Only render the menu if the user is logged in and user object exists
+  if (!user) return null;
 
   return (
     <div className="user-menu-container">
