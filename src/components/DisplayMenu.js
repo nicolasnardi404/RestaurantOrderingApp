@@ -3,6 +3,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import { useNavigate } from 'react-router-dom';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
@@ -17,6 +18,9 @@ function MenuPage() {
   const [combinationStatus, setCombinationStatus] = useState('');
   const userName = localStorage.getItem('nome');
   const idUser = localStorage.getItem('idUser');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -133,6 +137,7 @@ function MenuPage() {
 
   const handleSubmit = async () => {
     if (isValidCombination()) {
+      setIsSubmitting(true);
       const idUser = localStorage.getItem('id');
       const dataPrenotazione = formatDateforServer(selectedDay);
       const idPiatto = Object.values(cart).map(dish => dish.id);
@@ -142,10 +147,9 @@ function MenuPage() {
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
       };
-
+      console.log("hey" + JSON.stringify(orderData))
       try {
-        console.log(orderData)
-        const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
+          const response = await fetch('http://localhost:8080/api/prenotazione/createWithOrdine', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -155,18 +159,50 @@ function MenuPage() {
 
         if (response.ok) {
           console.log('Order submitted successfully');
-          // You might want to clear the cart or show a success message here
+          setShowSuccessModal(true);
         } else {
           throw new Error('Failed to submit order');
         }
       } catch (error) {
         console.error('Error submitting order:', error);
         setError('Failed to submit order. Please try again.');
+      } finally {
+        setIsSubmitting(false);
       }
     } else {
       setError('Invalid combination. Please select a valid combination of dishes.');
     }
   };
+
+  const handleGoToOpenOrders = () => {
+    setShowSuccessModal(false);
+    navigate('/open-orders');
+  };
+
+  const handleBackToMenu = () => {
+    setShowSuccessModal(false);
+    setSelectedDay(null);
+    setCart({});
+    setCombinationStatus('');
+    setError('');
+  };
+
+  const renderSuccessModal = () => (
+    <Dialog
+      visible={showSuccessModal}
+      onHide={() => setShowSuccessModal(false)}
+      header="Ordine Confermato"
+      modal
+      footer={
+        <div>
+          <Button label="Vai agli Ordini Aperti" onClick={handleGoToOpenOrders} className="p-button-primary" />
+          <Button label="Torna al Menu" onClick={handleBackToMenu} className="p-button-secondary" />
+        </div>
+      }
+    >
+      <p>Il tuo ordine è stato inviato con successo!</p>
+    </Dialog>
+  );
 
   return (
     <div className='container-menu'>
@@ -192,7 +228,7 @@ function MenuPage() {
           <Button 
             label="Submit Order" 
             onClick={handleSubmit} 
-            disabled={!isValidCombination()} 
+            disabled={!isValidCombination() || isSubmitting} 
             className="submit-button"
           />
         </>
@@ -206,6 +242,8 @@ function MenuPage() {
       >
         {renderFullMenuList()}
       </Dialog>
+
+      {renderSuccessModal()}
     </div>
   );
 }

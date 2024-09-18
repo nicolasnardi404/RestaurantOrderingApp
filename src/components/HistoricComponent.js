@@ -164,7 +164,7 @@ const HistoricComponent = () => {
         head: [['Date', 'Type of Dishes']],
         body: filteredData.map(order => [
           formatDateForDisplay(order.reservation_date),
-          order.tipo_piatti
+          order.piatti
         ]),
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [66, 139, 202], textColor: 255 },
@@ -289,7 +289,7 @@ const HistoricComponent = () => {
                 sortable
               />
               <Column 
-                field="tipo_piatti" 
+                field="piatti" 
                 header="Tipo di Piatti" 
                 sortable 
               />
