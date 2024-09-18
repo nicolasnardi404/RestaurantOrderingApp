@@ -1,0 +1,46 @@
+.historic-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.filter-card,
+.data-card {
+  flex: 1;
+  margin: 0 10px;
+}
+
+.total-pdf-card {
+  margin-top: 20px;
+}
+
+.total-orders-section {
+  margin-bottom: 20px;
+}
+
+.total-orders {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.pdf-button-section {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .card-row {
+    flex-direction: column;
+  }
+
+  .filter-card,
+  .data-card {
+    margin: 10px 0;
+  }
+}

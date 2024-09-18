@@ -11,7 +11,7 @@ import 'jspdf-autotable';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
-import '../HistoricComponent.css';
+import '../styles/HistoricComponent.css';
 
 // Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
