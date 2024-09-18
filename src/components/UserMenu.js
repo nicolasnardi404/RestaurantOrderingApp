@@ -1,13 +1,23 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Menu } from 'primereact/menu';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
-import '../UserMenu.css';
+import '../styles/UserMenu.css';
 
 export default function UserMenu() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const navigate = useNavigate();
   const menu = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const items = [
     {
@@ -27,19 +37,13 @@ export default function UserMenu() {
     },
     {
       label: 'Edit Piatti',
-      icon: 'pi pi-list',
+      icon: 'pi pi-pencil',
       command: () => navigate('/managepiatti')
     },
     {
-      separator: true
-    },
-    {
       label: 'All Orders of the Day',
-      icon: 'pi pi-power-off',
-      command: () => {
-        // Add logout logic here
-        navigate('/day-order');
-      }
+      icon: 'pi pi-book',
+      command: () => navigate('/day-order')
     },
     {
       label: 'Logout',
@@ -55,12 +59,11 @@ export default function UserMenu() {
     menu.current.toggle(event);
   };
 
-  return (
+  const renderMobileMenu = () => (
     <div className="user-menu-wrapper">
       <Button 
         label="Menu" 
         icon="pi pi-bars" 
-        className="p-button-text" 
         onClick={toggleMenuLeft} 
         aria-controls="popup_menu_left" 
         aria-haspopup 
@@ -72,6 +75,26 @@ export default function UserMenu() {
         id="popup_menu_left" 
         popupAlignment="left"
       />
+    </div>
+  );
+
+  const renderDesktopMenu = () => (
+    <div className="user-menu-desktop">
+      {items.map((item, index) => (
+        <Button
+          key={index}
+          label={item.label}
+          icon={item.icon}
+          onClick={item.command}
+          className="p-button-text"
+        />
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="user-menu-container">
+      {isMobile ? renderMobileMenu() : renderDesktopMenu()}
     </div>
   );
 }

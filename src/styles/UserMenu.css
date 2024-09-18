@@ -1,0 +1,50 @@
+.user-menu-container {
+  padding: 10px;
+}
+
+.user-menu-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.user-menu-desktop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.user-menu-desktop .p-button {
+  margin: 5px;
+}
+
+@media (max-width: 767px) {
+  .user-menu-desktop {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .user-menu-wrapper {
+    display: none;
+  }
+}
+
+/* Additional styles for better appearance */
+.p-button {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.p-button:hover {
+  background-color: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+}
+
+.p-button-text {
+  color: var(--text-color);
+}
+
+.p-button-text:hover {
+  background-color: var(--surface-hover);
+}
