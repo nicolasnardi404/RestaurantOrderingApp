@@ -3,7 +3,7 @@ export default function PrenotazionePerPersonaComponent({idUser}) {
     const navigate = useNavigate();
   
     useEffect(() => {
-      fetch('http://localhost:8080/api/api/prenotazione/${idUser}')
+      fetch('http://localhost:8080/api/prenotazione/readById/${idUser}')
         .then(response => response.json())
         .then(data => setData(data));
     }, []);

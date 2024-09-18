@@ -4,6 +4,7 @@ import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; // Certifique-se de importar o jwt-decode
 import '../ViewOpenOrders.css';
 
 const ViewOpenOrders = () => {
@@ -17,26 +18,24 @@ const ViewOpenOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      // Assuming you have a user ID stored in localStorage or in a context
-      const userId = localStorage.getItem('userId');
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.data.userId;
+
       const response = await axios.get(`http://localhost:8080/api/ordine/ordineByUserId/${userId}`);
-      const filteredOrders = filterOpenOrders(response.data);
-      setOrders(filteredOrders);
+      console.log(response.data); // Verifique os dados retornados aqui
+      setOrders(response.data); // Certifique-se de que estamos definindo corretamente os pedidos no estado
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const filterOpenOrders = (allOrders) => {
-    const now = new Date();
-    const today10AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 10, 0, 0);
-    
-    return allOrders.filter(order => {
-      const orderDate = new Date(order.datePiatti);
-      return orderDate > now || (orderDate.toDateString() === now.toDateString() && now < today10AM);
-    });
   };
 
   const formatDate = (value) => {
@@ -54,7 +53,7 @@ const ViewOpenOrders = () => {
       <Button 
         icon="pi pi-times" 
         className="p-button-rounded p-button-danger" 
-        onClick={() => handleCancelOrder(rowData.id)}
+        onClick={() => handleCancelOrder(rowData.idOrdine)}
       />
     );
   };
@@ -62,7 +61,7 @@ const ViewOpenOrders = () => {
   const handleCancelOrder = async (orderId) => {
     if (window.confirm('Are you sure you want to cancel this order?')) {
       try {
-        await axios.delete(`http://localhost:8080/ordine/delete/${orderId}`);
+        await axios.delete(`http://localhost:8080/api/ordine/delete/${orderId}`);
         fetchOrders(); // Refresh the orders list
       } catch (error) {
         console.error('Error cancelling order:', error);
@@ -75,9 +74,9 @@ const ViewOpenOrders = () => {
       <Card title="Your Open Orders">
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
           <Column field="idPrenotazione" header="Order ID" />
-          <Column field="datePiatti" header="Reservation Date" body={(rowData) => formatDate(rowData.datePiatti)} />
+          <Column field="piatti" header="Dish Name" />
           <Column field="tipo_piatti" header="Dish Type" />
-          <Column body={actionTemplate} header="Actions" style={{width: '100px'}} />
+          <Column body={actionTemplate} header="Actions" style={{ width: '100px' }} />
         </DataTable>
       </Card>
     </div>

@@ -38,7 +38,8 @@ export default function UserMenu() {
       icon: 'pi pi-power-off',
       command: () => {
         // Add logout logic here
-        navigate('/login');
+        localStorage.removeItem('token');
+        navigate('/');
       }
     }
   ];
