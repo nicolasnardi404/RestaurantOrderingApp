@@ -10,6 +10,8 @@ import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import '../styles/EditPiatto.css';
+import Delete from '../assets/icons8-delete-25.png';
+import Edit from '../assets/icons8-edit-24.png';
 
 function ManagePiatti() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
@@ -74,8 +76,8 @@ function ManagePiatti() {
         idTipoPiatto: editingPiatto.idTipoPiatto,
         disponibile: editingPiatto.sempreDisponibile
       };
-      
-      
+
+
       let response;
       if (isNewPiatto) {
         response = await axios.post('http://localhost:8080/api/piatto/create', piattoToSave, {
@@ -125,14 +127,18 @@ function ManagePiatti() {
   const actionTemplate = (rowData) => {
     return (
       <div className="action-buttons">
-        <Button 
-          icon="pi pi-pencil" 
+        <button
+          className="btn-edit"
           onClick={() => editPiatto(rowData)}
-        />
-        <Button 
-          icon="pi pi-trash" 
+        >
+          <img src={Edit} alt="Edit" className="action-icon" />
+        </button>
+        <button
+          className="btn-delete"
           onClick={() => deletePiatto(rowData.id_piatto)}
-        />
+        >
+          <img src={Delete} alt="Delete" className="action-icon" />
+        </button>
       </div>
     );
   };
@@ -148,7 +154,7 @@ function ManagePiatti() {
         <Column field="data" header="Data" />
         <Column field="dayOfWeek" header="Day of Week" />
         <Column field="sempreDisponibile" header="Disponibile" body={(rowData) => rowData.sempreDisponibile ? 'Yes' : 'No'} />
-        <Column body={actionTemplate} header="Actions" style={{width: '150px'}} />
+        <Column body={actionTemplate} header="Actions" style={{ width: '150px' }} />
       </DataTable>
 
       <Dialog header={isNewPiatto ? "Add New Piatto" : "Edit Piatto"} visible={showDialog} style={{ width: '50vw' }} modal onHide={() => setShowDialog(false)}>
@@ -160,13 +166,13 @@ function ManagePiatti() {
             </div>
             <div className="p-field">
               <label htmlFor="nome_tipo">Tipo Piatto</label>
-              <Dropdown 
-                id="nome_tipo" 
-                value={editingPiatto.nome_tipo} 
-                options={tipoPiattoOptions} 
-                onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_tipo: e.value, idTipoPiatto: tipoPiattoOptions.findIndex(option => option.value === e.value) + 1 })} 
-                placeholder="Select a type" 
-                optionLabel="label" 
+              <Dropdown
+                id="nome_tipo"
+                value={editingPiatto.nome_tipo}
+                options={tipoPiattoOptions}
+                onChange={(e) => setEditingPiatto({ ...editingPiatto, nome_tipo: e.value, idTipoPiatto: tipoPiattoOptions.findIndex(option => option.value === e.value) + 1 })}
+                placeholder="Select a type"
+                optionLabel="label"
               />
             </div>
             <div className="p-field">

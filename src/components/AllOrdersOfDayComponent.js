@@ -16,10 +16,14 @@ const AllOrderOfDayComponent = () => {
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
   const { getToken } = useAuth(); // Use the useAuth hook to get the getToken function
+  const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     fetchDailyOrders(selectedDate);
     fetchDailySummary(selectedDate);
+    // Retrieve user role from localStorage
+    const role = localStorage.getItem('ruolo') || '';
+    setUserRole(role);
   }, [selectedDate]);
 
   const fetchDailyOrders = async (date) => {
@@ -70,10 +74,10 @@ const AllOrderOfDayComponent = () => {
   };
 
   const formatDateForDisplay = (date) => {
-    return date.toLocaleDateString('it-IT', { 
-      year: 'numeric', 
-      month: '2-digit', 
-      day: '2-digit' 
+    return date.toLocaleDateString('it-IT', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
     });
   };
 
@@ -96,18 +100,6 @@ const AllOrderOfDayComponent = () => {
       startY: 45,
       head: [['Dish Name', 'Quantity']],
       body: dailySummary.map(item => [item.nome, item.quantita]),
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-    });
-
-    // Add detailed orders table
-    const detailsY = doc.lastAutoTable.finalY + 15;
-    doc.text('Detailed Orders', 14, detailsY);
-    doc.autoTable({
-      startY: detailsY + 5,
-      head: [['User', 'Dishes Ordered']],
-      body: dailyOrders.map(order => [order.username, order.piatti]),
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [66, 139, 202], textColor: 255 },
       alternateRowStyles: { fillColor: [245, 245, 245] },
@@ -136,31 +128,33 @@ const AllOrderOfDayComponent = () => {
     <div className="all-order-of-day">
       <h2>Daily Order Summary</h2>
       <div className="date-selector">
-        <Calendar 
-          value={selectedDate} 
-          onChange={handleDateChange} 
+        <Calendar
+          value={selectedDate}
+          onChange={handleDateChange}
           dateFormat="dd/mm/yy"
           showIcon
         />
       </div>
-      <Card title={`Summary for ${selectedDate.toLocaleDateString()}`} className="summary-card">
-        <DataTable 
-          value={dailySummary} 
-          paginator 
-          rows={10} 
-          loading={loading}
-          emptyMessage="No orders for this day."
-          className="p-datatable-responsive"
-        >
-          <Column field="nome" header="Dish Name" sortable />
-          <Column field="quantita" header="Quantity" sortable />
-        </DataTable>
-      </Card>
+      {userRole === 'Amministratore' && (
+        <Card title={`Summary for ${selectedDate.toLocaleDateString()}`} className="summary-card">
+          <DataTable
+            value={dailySummary}
+            paginator
+            rows={10}
+            loading={loading}
+            emptyMessage="No orders for this day."
+            className="p-datatable-responsive"
+          >
+            <Column field="nome" header="Dish Name" sortable />
+            <Column field="quantita" header="Quantity" sortable />
+          </DataTable>
+        </Card>
+      )}
       <Card title={`Detailed Orders for ${selectedDate.toLocaleDateString()}`} className="details-card">
-        <DataTable 
-          value={dailyOrders} 
-          paginator 
-          rows={10} 
+        <DataTable
+          value={dailyOrders}
+          paginator
+          rows={10}
           loading={loading}
           emptyMessage="No orders for this day."
           className="p-datatable-responsive"
@@ -169,14 +163,16 @@ const AllOrderOfDayComponent = () => {
           <Column field="piatti" header="Dishes Ordered" sortable />
         </DataTable>
       </Card>
-      <div className="pdf-button-section">
-        <Button 
-          label="Generate PDF" 
-          icon="pi pi-file-pdf" 
-          onClick={generatePDF} 
-          className="p-button-lg btn"
-        />
-      </div>
+      {userRole === 'Amministratore' && (
+        <div className="pdf-button-section">
+          <Button
+            label="Generate PDF"
+            icon="pi pi-file-pdf"
+            onClick={generatePDF}
+            className="p-button-lg btn"
+          />
+        </div>
+      )}
     </div>
   );
 };

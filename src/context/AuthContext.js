@@ -5,30 +5,41 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        setUser({
+          userId: decodedToken.data.userId,
+          nome: decodedToken.data.nome,
+          ruolo: decodedToken.data.ruolo
+        });
+      } catch (error) {
+        console.error("Invalid token", error);
+        setUser(null);
+      }
+    }
+    setLoading(false); // Finaliza o estado de carregamento
+  }, []);
+
+  const login = (token) => {
+    try {
       const decodedToken = jwtDecode(token);
       setUser({
         userId: decodedToken.data.userId,
         nome: decodedToken.data.nome,
         ruolo: decodedToken.data.ruolo
       });
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', decodedToken.data.userId);
+      localStorage.setItem('nome', decodedToken.data.nome);
+      localStorage.setItem('ruolo', decodedToken.data.ruolo);
+    } catch (error) {
+      console.error("Failed to decode token", error);
     }
-  }, []);
-
-  const login = (token) => {
-    localStorage.setItem('token', token);
-    const decodedToken = jwtDecode(token);
-    setUser({
-      userId: decodedToken.data.userId,
-      nome: decodedToken.data.nome,
-      ruolo: decodedToken.data.ruolo
-    });
-    localStorage.setItem('userId', decodedToken.data.userId);
-    localStorage.setItem('nome', decodedToken.data.nome);
-    localStorage.setItem('ruolo', decodedToken.data.ruolo);
   };
 
   const logout = () => {
@@ -39,7 +50,12 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  // Reintroduzindo o método getToken
   const getToken = () => localStorage.getItem('token');
+
+  if (loading) {
+    return <div>Loading...</div>; // Renderiza enquanto o estado está sendo carregado
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, getToken }}>

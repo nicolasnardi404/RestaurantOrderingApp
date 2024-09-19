@@ -13,12 +13,12 @@
   margin-top: 20px;
 }
 
-.p-datatable .p-datatable-thead > tr > th {
+.p-datatable .p-datatable-thead>tr>th {
   background-color: var(--primary-color);
   color: white;
 }
 
-.p-datatable .p-datatable-tbody > tr:nth-child(even) {
+.p-datatable .p-datatable-tbody>tr:nth-child(even) {
   background-color: #f8f9fa;
 }
 
@@ -70,13 +70,69 @@
   margin-top: 20px;
 }
 
+/* Estilizar os ícones */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.action-icon {
+  width: 20px;
+  /* Tamanho do ícone */
+  height: 20px;
+}
+
+.btn-edit,
+.btn-delete {
+  background-color: transparent;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botão de Editar (Verde forte) */
+.btn-edit {
+  background-color: #28a745;
+  /* Verde forte */
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.btn-edit:hover {
+  background-color: #218838;
+  /* Verde mais escuro no hover */
+}
+
+/* Botão de Excluir (Vermelho forte) */
+.btn-delete {
+  background-color: #d6192c;
+  /* Vermelho forte */
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+  /* Vermelho mais escuro no hover */
+}
+
+/* Ajustes de imagem */
+.action-icon {
+  width: 20px;
+  height: 20px;
+}
+
 @media (max-width: 768px) {
   .manage-piatti {
     padding: 10px;
   }
 
-  .p-datatable .p-datatable-thead > tr > th,
-  .p-datatable .p-datatable-tbody > tr > td {
+  .p-datatable .p-datatable-thead>tr>th,
+  .p-datatable .p-datatable-tbody>tr>td {
     padding: 0.5rem;
   }
 

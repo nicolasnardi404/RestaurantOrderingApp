@@ -10,7 +10,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.ruolo)) {
-    return <Navigate to="/forbidden" replace />; // Ensure you have a forbidden page if needed
+    return <Navigate to="/forbidden" replace />;
   }
 
   return <Outlet />;

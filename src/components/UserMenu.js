@@ -1,17 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu } from 'primereact/menu';
-import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+import Logo from '../assets/logoNetSurf.png';
 import '../styles/UserMenu.css';
 
 export default function UserMenu() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const navigate = useNavigate();
-  const menu = useRef(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const { user, logout } = useAuth(); 
-
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -23,97 +20,77 @@ export default function UserMenu() {
   }, []);
 
   const handleLogout = () => {
-    logout(); // Call the logout function from AuthContext
-    navigate('/login'); // Redirect to login page after logout
+    logout();
+    navigate('/login');
   };
 
   const getMenuItems = () => {
     const commonItems = [
-      {
-        label: 'Make an Order',
-        icon: 'pi pi-shopping-cart',
-        command: () => navigate('/menu')
-      },
-      {
-        label: 'View Open Orders',
-        icon: 'pi pi-list',
-        command: () => navigate('/open-orders')
-      },
-      {
-        label: 'All Orders of the Day',
-        icon: 'pi pi-book',
-        command: () => navigate('/day-order')
-      },
-      {
-        label: 'Logout',
-        icon: 'pi pi-power-off',
-        command: handleLogout // Use the new handleLogout function
-      }
+      { label: 'Make an Order', icon: 'shopping-cart', path: '/menu' },
+      { label: 'View Open Orders', icon: 'list', path: '/open-orders' },
+      { label: 'All Orders of the Day', icon: 'book', path: '/day-order' },
+      { label: 'Logout', icon: 'power-off', action: handleLogout }
     ];
 
     const amministratoreItems = [
-      {
-        label: 'Historic',
-        icon: 'pi pi-calendar',
-        command: () => navigate('/historic')
-      },
-      {
-        label: 'Edit Piatti',
-        icon: 'pi pi-pencil',
-        command: () => navigate('/managepiatti')
-      }
+      { label: 'Historic', icon: 'calendar', path: '/historic' },
+      { label: 'Edit Piatti', icon: 'pencil', path: '/managepiatti' }
     ];
-    // Check if user exists and has a ruolo property before accessing it
-    return user && user.ruolo === 'Amministratore' 
-      ? [...amministratoreItems, ...commonItems] 
+
+    return user && user.ruolo === 'Amministratore'
+      ? [...amministratoreItems, ...commonItems]
       : commonItems;
   };
 
   const items = getMenuItems();
 
-  const toggleMenuLeft = (event) => {
-    menu.current.toggle(event);
-  };
-
   const renderMobileMenu = () => (
     <div className="user-menu-wrapper">
-      <Button 
-        label="Menu" 
-        icon="pi pi-bars" 
-        onClick={toggleMenuLeft} 
-        aria-controls="popup_menu_left" 
-        aria-haspopup 
-      />
-      <Menu 
-        model={items} 
-        popup 
-        ref={menu}
-        id="popup_menu_left" 
-        popupAlignment="left"
-      />
+      <button className="menu-toggle" onClick={() => setVisibleLeft(!visibleLeft)}>
+        <i className="pi pi-bars"></i> Menu
+      </button>
+      {visibleLeft && (
+        <div className="mobile-menu">
+          {items.map((item, index) => (
+            <button
+              key={index}
+              onClick={item.action || (() => navigate(item.path))}
+              className="menu-item"
+            >
+              <i className={`pi pi-${item.icon}`}></i> {item.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 
   const renderDesktopMenu = () => (
     <div className="user-menu-desktop">
       {items.map((item, index) => (
-        <Button
+        <button
           key={index}
-          label={item.label}
-          icon={item.icon}
-          onClick={item.command}
-          className="p-button-text"
-        />
+          onClick={item.action || (() => navigate(item.path))}
+          className="menu-item"
+        >
+          <i className={`pi pi-${item.icon}`}></i> {item.label}
+        </button>
       ))}
     </div>
   );
 
-  // Only render the menu if the user is logged in and user object exists
   if (!user) return null;
 
   return (
-    <div className="user-menu-container">
-      {isMobile ? renderMobileMenu() : renderDesktopMenu()}
-    </div>
+    <header className="user-menu-header">
+      <div className="logo-container">
+        <a href="/menu">
+          <img src={Logo} alt="Logo" className="logo" />
+        </a>
+      </div>
+      <div className="menu-container">
+        {isMobile ? renderMobileMenu() : renderDesktopMenu()}
+      </div>
+    </header>
   );
 }

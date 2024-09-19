@@ -15,11 +15,13 @@ function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [dishes, setDishes] = useState([]);
+  const [sempreDisponibileDishes, setSempreDisponibileDishes] = useState([]);
   const [cart, setCart] = useState({});
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [weeklyMenu, setWeeklyMenu] = useState([]);
   const navigate = useNavigate();
   const { user, getToken } = useAuth();
 
@@ -35,14 +37,23 @@ function MenuPage() {
 
   const fetchDishes = async () => {
     const formDateForServer = formatDateforServer(selectedDay);
+    console.log('Fetching dishes for date:', formDateForServer);
+
     try {
       const token = getToken();
       const response = await axios.get(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setDishes(response.data);
+
+      console.log('Response data:', response.data);
+
+      // Preencha dishes com todos os pratos retornados pela API
+      const allDishes = response.data;
+
+      setDishes(allDishes);
+      setSempreDisponibileDishes(allDishes.filter((dish) => dish.sempreDisponibile === 1));
       setError('');
     } catch (error) {
       console.error('Error fetching dishes:', error);
@@ -50,12 +61,29 @@ function MenuPage() {
     }
   };
 
+  const fetchWeeklyMenu = async () => {
+    try {
+      const token = getToken();
+      const response = await axios.get('http://localhost:8080/api/piatto/piattoSettimana', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log('Weekly menu response data:', response.data);
+      setWeeklyMenu(response.data);
+    } catch (error) {
+      console.error('Error fetching weekly menu:', error);
+      setError('Failed to fetch weekly menu. Please try again.');
+    }
+  };
+
   const getFilteredDishes = (mealType) => {
-    return dishes.filter(dish => dish.tipo_piatto === mealType);
+    return dishes.filter((dish) => dish.tipo_piatto === mealType);
   };
 
   const handleDropdownChange = (mealType, selectedDish) => {
-    setCart(prevCart => {
+    setCart((prevCart) => {
       let newCart;
       if (selectedDish) {
         newCart = { ...prevCart, [mealType]: selectedDish };
@@ -69,8 +97,8 @@ function MenuPage() {
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico } = currentCart;    
-    
+    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico } = currentCart;
+
     if (PiattoUnico || (Primo && Secondo && Contorno)) {
       setCombinationStatus('');
     } else {
@@ -78,9 +106,9 @@ function MenuPage() {
       if (!Primo) missingItems.push('Primo');
       if (!Secondo) missingItems.push('Secondo');
       if (!Contorno) missingItems.push('Contorno');
-      
+
       if (missingItems.length === 3) {
-        setCombinationStatus('Please select dishes to create a valid combination');   
+        setCombinationStatus('Please select dishes to create a valid combination');
       } else {
         setCombinationStatus(`Add ${missingItems.join(' or ')} to complete the combination`);
       }
@@ -94,19 +122,20 @@ function MenuPage() {
       ['Primo', 'Contorno'],
       ['Secondo', 'Contorno'],
       ['Piatto unico', 'Contorno'],
-      ['Piatto unico']
+      ['Piatto unico'],
     ];
 
-    const selectedTypes = Object.keys(cart).filter(type => cart[type] !== null);
-    return validCombinations.some(combination => 
-      combination.length === selectedTypes.length && 
-      combination.every(type => selectedTypes.includes(type))
+    const selectedTypes = Object.keys(cart).filter((type) => cart[type] !== null);
+    return validCombinations.some(
+      (combination) =>
+        combination.length === selectedTypes.length &&
+        combination.every((type) => selectedTypes.includes(type))
     );
   };
 
   const renderOrderMenu = () => (
     <div className="order-menu">
-      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
+      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map((mealType) => (
         <div key={mealType} className="menu-category">
           <h3>{mealType}</h3>
           <Dropdown
@@ -123,41 +152,156 @@ function MenuPage() {
     </div>
   );
 
-  const renderFullMenuList = () => (
-    <div className="full-menu-list">
-      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map(mealType => (
-        <div key={mealType} className="menu-category">
-          <h3>{mealType}</h3>
-          <ul>
-            {getFilteredDishes(mealType).map(dish => (
-              <li key={dish.id}>{dish.nome}</li>
+  const renderFullMenuList = () => {
+    const daysOfWeek = [
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
+    ];
+
+    const getDishesByDay = (day) => {
+      return weeklyMenu.filter((dish) => dish.dayOfWeek === day);
+    };
+
+    const getSempreDisponibileDishesByType = (mealType) => {
+      return weeklyMenu.filter(
+        (dish) => dish.nome_tipo === mealType && dish.sempreDisponibile === 1
+      );
+    };
+
+    const getSempreDisponibilePiattoUnico = () => {
+      return weeklyMenu.filter(
+        (dish) => dish.nome_tipo === 'Piatto unico' && dish.sempreDisponibile === 1
+      );
+    };
+
+    return (
+      <div className="full-menu-list">
+        <h2>Weekly Menu</h2>
+        <table className="styled-table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Primo</th>
+              <th>Secondo</th>
+              <th>Contorno</th>
+            </tr>
+          </thead>
+          <tbody>
+            {daysOfWeek.map((day) => {
+              const dishesForDay = getDishesByDay(day);
+              return (
+                <tr key={day}>
+                  <td>{day}</td>
+                  <td>{dishesForDay.filter(dish => dish.nome_tipo === 'Primo').map(dish => dish.nome_piatto).join(', ')}</td>
+                  <td>{dishesForDay.filter(dish => dish.nome_tipo === 'Secondo').map(dish => dish.nome_piatto).join(', ')}</td>
+                  <td>{dishesForDay.filter(dish => dish.nome_tipo === 'Contorno').map(dish => dish.nome_piatto).join(', ')}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        <h2>Sempre Disponibile</h2>
+        <table className="styled-table">
+          <thead>
+            <tr>
+              <th>Primo</th>
+              <th>Secondo</th>
+              <th>Contorno</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{getSempreDisponibileDishesByType('Primo').map(dish => dish.nome_piatto).join(', ')}</td>
+              <td>{getSempreDisponibileDishesByType('Secondo').map(dish => dish.nome_piatto).join(', ')}</td>
+              <td>{getSempreDisponibileDishesByType('Contorno').map(dish => dish.nome_piatto).join(', ')}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>Piatto Unico Sempre Disponibile</h2>
+        <table className="styled-table">
+          <thead>
+            <tr>
+              <th>Piatto Unico</th>
+            </tr>
+          </thead>
+          <tbody>
+            {getSempreDisponibilePiattoUnico().map((dish) => (
+              <tr key={dish.id}>
+                <td>{dish.nome_piatto}</td>
+              </tr>
             ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  );
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   const handleSubmit = async () => {
+    const dataPrenotazione = formatDateforServer(selectedDay);
+
+    // Função para verificar se já existe uma prenotazione para o dia selecionado
+    const checkExistingReservation = async () => {
+      try {
+        const token = getToken();
+        const response = await axios.post(
+          'http://localhost:8080/api/prenotazione/readByIdAndData',
+          {
+            idUser: user.userId,
+            dataPrenotazione: `${dataPrenotazione}`,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Se a resposta retornar alguma prenotazione, significa que já existe uma reserva
+        if (response.data == false) {
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('Error checking existing reservation:', error);
+        setError('Errore durante la verifica della prenotazione esistente. Riprova.');
+        return true; // Considera como existente em caso de erro
+      }
+    };
+
+    // Verifique se o usuário já tem uma reserva para o dia
+    const hasExistingReservation = await checkExistingReservation();
+
+    if (hasExistingReservation) {
+      setError('Hai già una prenotazione per questo giorno');
+      return; // Impede que o pedido seja enviado
+    }
+
+    // Verifique se a combinação de pratos é válida
     if (isValidCombination()) {
       setIsSubmitting(true);
-      const dataPrenotazione = formatDateforServer(selectedDay);
-      const idPiatto = Object.values(cart).map(dish => dish.id);
+      const idPiatto = Object.values(cart).map((dish) => dish.id);
 
       const orderData = {
         idUser: user.userId,
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
       };
-      console.log("Submitting order:", JSON.stringify(orderData));
+
+      console.log('Submitting order:', JSON.stringify(orderData));
       try {
         const token = getToken();
-        const response = await axios.post('http://localhost:8080/api/prenotazione/createWithOrdine', orderData, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-        });
+        const response = await axios.post(
+          'http://localhost:8080/api/prenotazione/createWithOrdine',
+          orderData,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (response.status === 200 || response.status === 201) {
           console.log('Order submitted successfully');
@@ -167,12 +311,12 @@ function MenuPage() {
         }
       } catch (error) {
         console.error('Error submitting order:', error);
-        setError('Failed to submit order. Please try again.');
+        setError('Errore durante l\'invio dell\'ordine. Riprova.');
       } finally {
         setIsSubmitting(false);
       }
     } else {
-      setError('Invalid combination. Please select a valid combination of dishes.');
+      setError('Combinazione non valida. Seleziona una combinazione valida di piatti.');
     }
   };
 
@@ -187,6 +331,11 @@ function MenuPage() {
     setCart({});
     setCombinationStatus('');
     setError('');
+  };
+
+  const handleViewFullMenu = async () => {
+    await fetchWeeklyMenu();
+    setShowMenu(true);
   };
 
   const renderSuccessModal = () => (
@@ -208,38 +357,38 @@ function MenuPage() {
 
   return (
     <div className='container-menu'>
-      <h1>Welcome, {user.nome}</h1>
+      <h1>Menu</h1>
       <div className="date-selection">
-        <Calendar 
-          value={selectedDay} 
-          onChange={(e) => setSelectedDay(e.value)} 
+        <Calendar
+          value={selectedDay}
+          onChange={(e) => setSelectedDay(e.value)}
           dateFormat="dd/mm/yy"
           showIcon
           placeholder="Select a date"
         />
       </div>
-      
+
+      <div className="menu-button-container">
+        <Button label="View Full Menu" onClick={handleViewFullMenu} className="menu-button" />
+      </div>
+
       {selectedDay && (
         <>
-          <div className="menu-button-container">
-            <Button label="View Full Menu" onClick={() => setShowMenu(true)} className="menu-button" />
-          </div>
           {renderOrderMenu()}
           {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
           {error && <div className="error-message">{error}</div>}
-          <Button 
-            label="Submit Order" 
-            onClick={handleSubmit} 
-            disabled={!isValidCombination() || isSubmitting} 
+          <Button
+            label="Submit Order"
+            onClick={handleSubmit}
+            disabled={!isValidCombination() || isSubmitting}
             className="submit-button"
           />
         </>
       )}
 
-      <Dialog 
-        header={`Menu for ${selectedDay ? selectedDay.toLocaleDateString('it-IT') : ''}`}
-        visible={showMenu} 
-        style={{width: '80vw'}} 
+      <Dialog
+        visible={showMenu}
+        style={{ width: '80vw' }}
         onHide={() => setShowMenu(false)}
       >
         {renderFullMenuList()}

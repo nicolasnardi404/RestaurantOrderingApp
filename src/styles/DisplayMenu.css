@@ -1,7 +1,87 @@
-.container-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
+/* Contêiner principal do menu de pedidos */
+.order-menu {
+  display: flex;
+  flex-wrap: wrap; /* Permite que os itens que não cabem na linha atual vão para a linha seguinte */
+  gap: 20px; /* Espaçamento entre os itens */
+  margin-bottom: 20px; /* Espaçamento inferior para separar do próximo elemento */
+}
+
+/* Categorias do menu */
+.menu-category {
+  flex: 1 1 200px; /* Flexível para permitir um tamanho mínimo e ocupar espaço disponível */
+  min-width: 200px; /* Largura mínima para cada categoria */
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espaçamento entre o título e o dropdown */
+}
+
+/* Ajuste para os dropdowns */
+.menu-category .p-dropdown {
+  width: 100%; /* Faz com que o dropdown ocupe a largura completa do contêiner */
+}
+
+/* Botão do menu */
+.menu-button {
+  margin-bottom: 20px; /* Espaçamento inferior para separar do próximo elemento */
+}
+
+/* Status de combinação */
+.combination-status {
+  color: orange;
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+/* Botão de envio */
+.submit-button {
+  margin-top: 20px; /* Espaçamento superior para separar do conteúdo acima */
+}
+
+/* Estilo de erro */
+.error-message {
+  color: red;
+  margin: 20px 0;
+  font-weight: bold;
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 18px;
+  text-align: left;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.styled-table thead tr {
+  background-color: #343a40;
+  color: #ffffff;
+  text-align: left;
+  font-weight: bold;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:hover {
+  background-color: #e9ecef;
+  cursor: pointer;
+}
+
+.styled-table tbody tr:last-of-type {
+  border-bottom: 2px solid #343a40;
+}

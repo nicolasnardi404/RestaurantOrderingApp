@@ -9,6 +9,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ViewOpenOrders.css';
 import 'primeicons/primeicons.css';
+import Delete from '../assets/icons8-delete-25.png';
+import Edit from '../assets/icons8-edit-24.png';
 
 const ViewOpenOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -60,18 +62,16 @@ const ViewOpenOrders = () => {
 
   const formatDate = (value) => {
     if (!value) return '';
-    
+
     // If value is already a Date object
     if (value instanceof Date) {
       return value.toLocaleString('it-IT', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
       });
     }
-    
+
     // If value is a string
     if (typeof value === 'string') {
       const dates = value.split(', ');
@@ -79,22 +79,18 @@ const ViewOpenOrders = () => {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
       })).join(', ');
     }
-    
+
     // If value is an array
     if (Array.isArray(value)) {
       return value.map(date => new Date(date).toLocaleString('it-IT', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
       })).join(', ');
     }
-    
+
     // If value is of unexpected type, return it as is
     console.warn('Unexpected date format:', value);
     return String(value);
@@ -102,16 +98,20 @@ const ViewOpenOrders = () => {
 
   const actionTemplate = (rowData) => {
     return (
-      <>
-        <Button 
-          icon="pi pi-pencil" 
+      <div className="action-buttons">
+        <button
+          className="btn-edit"
           onClick={() => handleEditOrder(rowData)}
-        />
-        <Button 
-          icon="pi pi-times" 
+        >
+          <img src={Edit} alt="Edit" className="action-icon" />
+        </button>
+        <button
+          className="btn-delete"
           onClick={() => handleCancelOrder(rowData.idPrenotazione)}
-        />
-      </>
+        >
+          <img src={Delete} alt="Delete" className="action-icon" />
+        </button>
+      </div>
     );
   };
 
@@ -136,7 +136,7 @@ const ViewOpenOrders = () => {
     console.log('Editing order:', order);
     const selectedDishes = order.idPiatti ? order.idPiatti.split(', ').map(id => parseInt(id)) : [];
     console.log('Selected dishes:', selectedDishes);
-    
+
     let orderDate;
     if (order.datePiatti && order.datePiatti.includes(',')) {
       orderDate = new Date(order.datePiatti.split(', ')[0]);
@@ -146,10 +146,10 @@ const ViewOpenOrders = () => {
       orderDate = new Date(); // Default to current date if datePiatti is undefined
     }
     console.log('Order date:', orderDate);
-    
+
     const dishesForOrder = await fetchDishesForOrder(orderDate);
     console.log('Dishes for order:', dishesForOrder);
-    
+
     if (!Array.isArray(dishesForOrder)) {
       console.error('Dishes for order is not an array:', dishesForOrder);
       setError('Failed to fetch dishes for the order date. Please try again.');
@@ -200,7 +200,7 @@ const ViewOpenOrders = () => {
       ['Piatto unico']
     ];
 
-    const selectedTypes = Object.keys(selectedDishes).filter(type => 
+    const selectedTypes = Object.keys(selectedDishes).filter(type =>
       selectedDishes[type] !== null && selectedDishes[type] !== undefined
     );
 
@@ -226,7 +226,7 @@ const ViewOpenOrders = () => {
       if (!selectedTypes.includes('Primo') && !selectedTypes.includes('Piatto unico')) missingItems.push('Primo or Piatto unico');
       if (!selectedTypes.includes('Secondo') && !selectedTypes.includes('Piatto unico')) missingItems.push('Secondo or Piatto unico');
       if (!selectedTypes.includes('Contorno') && !selectedTypes.includes('Piatto unico')) missingItems.push('Contorno');
-      
+
       if (missingItems.length === 0) {
         setCombinationStatus('Invalid combination. Please adjust your selection.');
       } else {
@@ -256,7 +256,7 @@ const ViewOpenOrders = () => {
     if (isValidCombination(editingOrder.selectedDishes)) {
       try {
         console.log('Updating order:', editingOrder);
-        
+
         // Filter out null or undefined dishes and get their IDs
         const selectedDishIds = Object.values(editingOrder.selectedDishes)
           .filter(dish => dish !== null && dish !== undefined)
@@ -282,7 +282,7 @@ const ViewOpenOrders = () => {
           }
         });
         console.log('Update response:', response.data);
-        
+
         setShowEditDialog(false);
         await fetchOrders(); // Refresh the orders after update
         alert('Order updated successfully');
@@ -301,26 +301,26 @@ const ViewOpenOrders = () => {
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
           <Column field="idPrenotazione" header="Order ID" />
-          <Column 
-            field="datePiatti" 
-            header="Reservation Date" 
+          <Column
+            field="datePiatti"
+            header="Reservation Date"
             body={(rowData) => {
               if (rowData.datePiatti) {
                 return formatDate(rowData.datePiatti);
               }
               return 'N/A'; // or any default value you prefer
-            }} 
+            }}
           />
           <Column field="piatti" header="Dishes" />
           <Column field="tipo_piatti" header="Dish Types" />
-          <Column body={actionTemplate} header="Actions" style={{width: '150px'}} />
+          <Column body={actionTemplate} header="Actions" style={{ width: '150px' }} />
         </DataTable>
       </Card>
 
-      <Dialog 
-        header="Edit Order" 
-        visible={showEditDialog} 
-        style={{ width: '50vw' }} 
+      <Dialog
+        header="Edit Order"
+        visible={showEditDialog}
+        style={{ width: '50vw' }}
         onHide={() => setShowEditDialog(false)}
       >
         {editingOrder && (
@@ -346,10 +346,10 @@ const ViewOpenOrders = () => {
             ))}
             {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
             {error && <div className="error-message">{error}</div>}
-            <Button 
-              label="Update Order" 
-              onClick={handleUpdateOrder} 
-              disabled={!isValidCombination(editingOrder.selectedDishes)} 
+            <Button
+              label="Update Order"
+              onClick={handleUpdateOrder}
+              disabled={!isValidCombination(editingOrder.selectedDishes)}
             />
           </div>
         )}
