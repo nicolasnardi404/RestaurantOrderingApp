@@ -18,19 +18,20 @@ const AllOrderOfDayComponent = () => {
   const [globalFilter, setGlobalFilter] = useState(null);
   const { getToken } = useAuth();
   const [userRole, setUserRole] = useState("");
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
-    fetchDailyOrders(new Date()); // Pass today's date
+    fetchDailyOrders(currentDate);
     fetchDailySummary();
     // Retrieve user role from localStorage
     const role = localStorage.getItem("ruolo") || "";
     setUserRole(role);
-  }, []);
+  }, [currentDate]);
 
-  const fetchDailyOrders = async () => {
+  const fetchDailyOrders = async (date) => {
     setLoading(true);
     try {
-      const dateString = formatDateForServer(new Date()); // Provide a default value
+      const dateString = formatDateForServer(date); // Provide a default value
       const token = getToken();
       const response = await axios.get(
         `http://localhost:8080/api/ordine/ordineByDay/${dateString}`,
@@ -74,6 +75,14 @@ const AllOrderOfDayComponent = () => {
   const generatePDF = () => {
     const doc = new jsPDF();
 
+    // Format the date as day/month/year
+    const today = new Date();
+    const formattedDate = `${today.getDate().toString().padStart(2, "0")}/${(
+      today.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}/${today.getFullYear()}`;
+
     // Add title
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
@@ -82,7 +91,7 @@ const AllOrderOfDayComponent = () => {
     // Add report info
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.text(`Date: ${formattedDate}`, 14, 30);
     doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
     // Add summary table
@@ -110,15 +119,39 @@ const AllOrderOfDayComponent = () => {
     }
 
     // Save the PDF
-    const fileName = `DailyOrderReport_${
-      new Date().toISOString().split("T")[0]
-    }.pdf`;
+    const fileName = `DailyOrderReport_${formattedDate.replace(
+      /\//g,
+      "-"
+    )}.pdf`;
     doc.save(fileName);
   };
+
+  const formatDisplayDate = (date) => {
+    return `${date.getDate().toString().padStart(2, "0")}/${(
+      date.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}/${date.getFullYear()}`;
+  };
+
+  const header = (
+    <div className="table-header">
+      <h5 className="mx-0 my-1">Today's Orders</h5>
+      <span className="p-input-icon-left">
+        <i className="pi pi-search" />
+        <InputText
+          type="search"
+          onInput={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search orders..."
+        />
+      </span>
+    </div>
+  );
 
   return (
     <div className="all-order-of-day">
       <h2>Daily Order Summary</h2>
+      <h3>{formatDisplayDate(currentDate)}</h3>
       {userRole === "Amministratore" && (
         <Card title="All Orders" className="summary-card">
           <DataTable
