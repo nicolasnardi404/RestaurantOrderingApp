@@ -375,7 +375,7 @@ const ViewOpenOrders = () => {
 
         const token = getToken();
         const response = await axios.put(
-          `http://localhost:8080/api/ordine/update/${editingOrder.idPrenotazione}`,
+          `http://localhost:8080/api/ordine/update`,
           updateData,
           {
             headers: {
