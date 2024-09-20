@@ -8,6 +8,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { InputSwitch } from "primereact/inputswitch";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
@@ -20,6 +21,7 @@ function ManagePiatti() {
   const [showDialog, setShowDialog] = useState(false);
   const [isNewPiatto, setIsNewPiatto] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
+  const [disponibileFilter, setDisponibileFilter] = useState(0); // Start with showing unavailable (0)
   const toast = useRef(null);
   const { getToken } = useAuth();
   const token = getToken();
@@ -41,21 +43,29 @@ function ManagePiatti() {
 
   useEffect(() => {
     fetchWeeklyPiatti();
-  }, [api]);
+  }, []);
 
   const fetchWeeklyPiatti = async () => {
     try {
       const response = await api.get("/piatto/piattoSettimana");
-      setWeeklyPiatti(response.data);
+      console.log("API response:", response.data);
+      if (Array.isArray(response.data)) {
+        setWeeklyPiatti(response.data);
+      } else {
+        console.error("API did not return an array:", response.data);
+        setWeeklyPiatti([]);
+      }
     } catch (error) {
       console.error("Error fetching weekly piatti:", error);
       showToast("error", "Error", "Failed to fetch weekly piatti");
+      setWeeklyPiatti([]);
     }
   };
 
   const editPiatto = (piatto) => {
     setEditingPiatto({
       ...piatto,
+      sempreDisponibile: piatto.sempreDisponibile === 1,
     });
     setIsNewPiatto(false);
     setShowDialog(true);
@@ -67,7 +77,7 @@ function ManagePiatti() {
       data: new Date().toISOString().split("T")[0],
       idTipoPiatto: 1,
       nome_tipo: "Primo",
-      disponibile: 1,
+      sempreDisponibile: false,
     });
     setIsNewPiatto(true);
     setShowDialog(true);
@@ -79,7 +89,7 @@ function ManagePiatti() {
         nome: editingPiatto.nome_piatto,
         data: editingPiatto.data,
         idTipoPiatto: editingPiatto.idTipoPiatto,
-        disponibile: editingPiatto.sempreDisponibile,
+        disponibile: editingPiatto.sempreDisponibile ? 1 : 0,
       };
 
       let response;
@@ -167,16 +177,41 @@ function ManagePiatti() {
 
   const header = (
     <div className="table-header">
-      <span className="p-input-icon-left">
-        <i />
-        <InputText
-          type="search"
-          onInput={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search by name..."
-        />
-      </span>
+      <div className="filter-container">
+        <span className="p-input-icon-left">
+          <i />
+          <InputText
+            type="search"
+            onInput={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Search by name..."
+          />
+        </span>
+        <div className="disponibile-filter">
+          <label htmlFor="disponibileFilter">Show available: </label>
+          <InputSwitch
+            id="disponibileFilter"
+            checked={disponibileFilter === 1}
+            onChange={(e) => setDisponibileFilter(e.value ? 1 : 0)}
+          />
+        </div>
+      </div>
     </div>
   );
+
+  const disponibileBodyTemplate = (rowData) => {
+    return <span>{rowData.sempreDisponibile === 1 ? "Yes" : "No"}</span>;
+  };
+
+  const filteredPiatti = React.useMemo(() => {
+    console.log("Current weeklyPiatti:", weeklyPiatti);
+    if (!Array.isArray(weeklyPiatti)) {
+      console.error("weeklyPiatti is not an array:", weeklyPiatti);
+      return [];
+    }
+    return weeklyPiatti.filter(
+      (piatto) => piatto.sempreDisponibile === disponibileFilter
+    );
+  }, [weeklyPiatti, disponibileFilter]);
 
   return (
     <div className="manage-piatti">
@@ -184,7 +219,7 @@ function ManagePiatti() {
       <ConfirmDialog />
       <h1>Manage Weekly Piatti</h1>
       <DataTable
-        value={weeklyPiatti}
+        value={filteredPiatti}
         paginator
         rows={10}
         globalFilter={globalFilter}
@@ -198,7 +233,7 @@ function ManagePiatti() {
         <Column
           field="sempreDisponibile"
           header="Disponibile"
-          body={(rowData) => (rowData.sempreDisponibile ? "Yes" : "No")}
+          body={disponibileBodyTemplate}
         />
         <Column
           body={actionTemplate}
@@ -264,20 +299,15 @@ function ManagePiatti() {
             </div>
             <div className="p-field">
               <label htmlFor="sempreDisponibile">Disponibile</label>
-              <Dropdown
+              <InputSwitch
                 id="sempreDisponibile"
-                value={editingPiatto.sempreDisponibile}
-                options={[
-                  { label: "Yes", value: 1 },
-                  { label: "No", value: 0 },
-                ]}
+                checked={editingPiatto.sempreDisponibile}
                 onChange={(e) =>
                   setEditingPiatto({
                     ...editingPiatto,
                     sempreDisponibile: e.value,
                   })
                 }
-                optionLabel="label"
               />
             </div>
             <Button label="Save" icon="pi pi-check" onClick={savePiatto} />
