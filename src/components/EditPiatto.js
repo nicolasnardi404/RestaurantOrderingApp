@@ -19,6 +19,7 @@ function ManagePiatti() {
   const [editingPiatto, setEditingPiatto] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [isNewPiatto, setIsNewPiatto] = useState(false);
+  const [globalFilter, setGlobalFilter] = useState(null);
   const toast = useRef(null);
   const { getToken } = useAuth();
   const token = getToken();
@@ -164,13 +165,31 @@ function ManagePiatti() {
     );
   };
 
+  const header = (
+    <div className="table-header">
+      <span className="p-input-icon-left">
+        <i />
+        <InputText
+          type="search"
+          onInput={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search by name..."
+        />
+      </span>
+    </div>
+  );
+
   return (
     <div className="manage-piatti">
       <Toast ref={toast} />
-      <ConfirmDialog />{" "}
-      {/* Add this line to include the ConfirmDialog component */}
+      <ConfirmDialog />
       <h1>Manage Weekly Piatti</h1>
-      <DataTable value={weeklyPiatti} paginator rows={10}>
+      <DataTable
+        value={weeklyPiatti}
+        paginator
+        rows={10}
+        globalFilter={globalFilter}
+        header={header}
+      >
         <Column field="id_piatto" header="ID" />
         <Column field="nome_piatto" header="Nome Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
