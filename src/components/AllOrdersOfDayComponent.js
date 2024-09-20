@@ -1,84 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar } from 'primereact/calendar';
-import { Card } from 'primereact/card';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
-import axios from 'axios';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import '../styles/AllOrderOfDayComponent.css';
-import { useAuth } from '../context/AuthContext'; // Import useAuth
+import React, { useState, useEffect } from "react";
+import { Card } from "primereact/card";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import "../styles/AllOrderOfDayComponent.css";
+import { useAuth } from "../context/AuthContext";
+import formatDateForServer from "../util/formatDateForServer";
 
 const AllOrderOfDayComponent = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { getToken } = useAuth(); // Use the useAuth hook to get the getToken function
-  const [userRole, setUserRole] = useState('');
+  const [globalFilter, setGlobalFilter] = useState(null);
+  const { getToken } = useAuth();
+  const [userRole, setUserRole] = useState("");
 
   useEffect(() => {
-    fetchDailyOrders(selectedDate);
-    fetchDailySummary(selectedDate);
+    fetchDailyOrders(new Date()); // Pass today's date
+    fetchDailySummary();
     // Retrieve user role from localStorage
-    const role = localStorage.getItem('ruolo') || '';
+    const role = localStorage.getItem("ruolo") || "";
     setUserRole(role);
-  }, [selectedDate]);
+  }, []);
 
-  const fetchDailyOrders = async (date) => {
+  const fetchDailyOrders = async () => {
     setLoading(true);
     try {
-      const dateString = formatDateForServer(date);
-      const token = getToken(); // Get the token
-      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`, {
-        headers: {
-          Authorization: `Bearer ${token}` // Add the token to the request headers
+      const dateString = formatDateForServer(new Date()); // Provide a default value
+      const token = getToken();
+      const response = await axios.get(
+        `http://localhost:8080/api/ordine/ordineByDay/${dateString}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      setDailyOrders(response.data);
+      );
+      setDailyOrders(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error('Error fetching daily orders:', error);
+      console.error("Error fetching daily orders:", error);
       setDailyOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchDailySummary = async (date) => {
+  const fetchDailySummary = async () => {
     setLoading(true);
     try {
-      const dateString = formatDateForServer(date);
-      const token = getToken(); // Get the token
-      const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
-        headers: {
-          Authorization: `Bearer ${token}` // Add the token to the request headers
+      const dateString = formatDateForServer(new Date());
+      const token = getToken();
+      const response = await axios.get(
+        `http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      console.log('Daily summary:', response.data);
-      setDailySummary(response.data);
+      );
+      setDailySummary(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error('Error fetching daily summary:', error);
+      console.error("Error fetching daily summary:", error);
       setDailySummary([]);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDateChange = (e) => {
-    setSelectedDate(e.value);
-  };
-
-  const formatDateForServer = (date) => {
-    return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-  };
-
-  const formatDateForDisplay = (date) => {
-    return date.toLocaleDateString('it-IT', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
   };
 
   const generatePDF = () => {
@@ -87,19 +77,19 @@ const AllOrderOfDayComponent = () => {
     // Add title
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('Daily Order Report', 14, 20);
+    doc.text("Daily Order Report", 14, 20);
 
     // Add report info
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Date: ${formatDateForDisplay(selectedDate)}`, 14, 30);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
     doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
     // Add summary table
     doc.autoTable({
       startY: 45,
-      head: [['Dish Name', 'Quantity']],
-      body: dailySummary.map(item => [item.nome, item.quantita]),
+      head: [["Dish Name", "Quantity"]],
+      body: dailySummary.map((item) => [item.nome, item.quantita]),
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [66, 139, 202], textColor: 255 },
       alternateRowStyles: { fillColor: [245, 245, 245] },
@@ -115,34 +105,28 @@ const AllOrderOfDayComponent = () => {
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
         doc.internal.pageSize.height - 10,
-        { align: 'center' }
+        { align: "center" }
       );
     }
 
-    // Save the PDF with the date in the filename
-    const fileName = `DailyOrderReport_${formatDateForServer(selectedDate)}.pdf`;
+    // Save the PDF
+    const fileName = `DailyOrderReport_${
+      new Date().toISOString().split("T")[0]
+    }.pdf`;
     doc.save(fileName);
   };
 
   return (
     <div className="all-order-of-day">
       <h2>Daily Order Summary</h2>
-      <div className="date-selector">
-        <Calendar
-          value={selectedDate}
-          onChange={handleDateChange}
-          dateFormat="dd/mm/yy"
-          showIcon
-        />
-      </div>
-      {userRole === 'Amministratore' && (
-        <Card title={`Summary for ${selectedDate.toLocaleDateString()}`} className="summary-card">
+      {userRole === "Amministratore" && (
+        <Card title="All Orders" className="summary-card">
           <DataTable
             value={dailySummary}
             paginator
             rows={10}
             loading={loading}
-            emptyMessage="No orders for this day."
+            emptyMessage="No orders for today."
             className="p-datatable-responsive"
           >
             <Column field="nome" header="Dish Name" sortable />
@@ -150,20 +134,21 @@ const AllOrderOfDayComponent = () => {
           </DataTable>
         </Card>
       )}
-      <Card title={`Detailed Orders for ${selectedDate.toLocaleDateString()}`} className="details-card">
+      <Card title="Order by User" className="details-card">
         <DataTable
           value={dailyOrders}
           paginator
           rows={10}
           loading={loading}
-          emptyMessage="No orders for this day."
+          emptyMessage="No orders for today."
           className="p-datatable-responsive"
+          globalFilter={globalFilter}
         >
           <Column field="username" header="User" sortable />
           <Column field="piatti" header="Dishes Ordered" sortable />
         </DataTable>
       </Card>
-      {userRole === 'Amministratore' && (
+      {userRole === "Amministratore" && (
         <div className="pdf-button-section">
           <Button
             label="Generate PDF"
