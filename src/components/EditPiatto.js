@@ -8,6 +8,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { InputSwitch } from "primereact/inputswitch";
+import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
@@ -22,9 +23,11 @@ function ManagePiatti() {
   const [globalFilter, setGlobalFilter] = useState(null);
   const [disponibileFilter, setDisponibileFilter] = useState(0); // Start with showing unavailable (0)
   const [selectedDay, setSelectedDay] = useState(null); // State for selected day
-  const toast = useRef(null);
+  const toast = useRef(null); // Initialize toast reference
   const { getToken } = useAuth();
   const token = getToken();
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
 
   const tipoPiattoOptions = [
     { label: "Primo", value: "Primo" },
@@ -131,29 +134,37 @@ function ManagePiatti() {
     }
   };
 
-  const deletePiatto = async (id) => {
-    confirmDialog({
-      message: "Are you sure you want to delete this piatto?",
-      header: "Confirm Deletion",
-      icon: "pi pi-exclamation-triangle",
-      accept: async () => {
-        try {
-          await api.delete(`/piatto/delete/${id}`);
-          fetchWeeklyPiatti();
-          showToast("success", "Success", "Piatto deleted successfully");
-        } catch (error) {
-          console.error("Error deleting piatto:", error);
-          showToast("error", "Error", "Failed to delete piatto");
-        }
-      },
-      reject: () => {
-        // Optional: Add any logic for when the user rejects the deletion
-      },
-    });
+  const deletePiatto = (id) => {
+    setDeleteId(id); // Set the ID to delete
+    setConfirmDeleteVisible(true); // Show the confirmation dialog
+  };
+
+  const confirmDelete = async () => {
+    console.log("Deletion confirmed for ID:", deleteId); // Log confirmation
+    try {
+      await api.delete(`/piatto/delete/${deleteId}`);
+      fetchWeeklyPiatti();
+      setWeeklyPiatti(prevPiatti => prevPiatti.filter(piatto => piatto.id_piatto !== deleteId));
+      showToast("success", "Success", "Piatto deleted successfully");
+    } catch (error) {
+      console.error("Error deleting piatto:", error);
+      showToast("error", "Error", "Failed to delete piatto");
+    } finally {
+      setConfirmDeleteVisible(false); // Close the dialog
+    }
+  };
+
+  const rejectDelete = () => {
+    console.log("Deletion rejected for ID:", deleteId); // Log rejection
+    setConfirmDeleteVisible(false); // Close the dialog
   };
 
   const showToast = (severity, summary, detail) => {
-    toast.current.show({ severity, summary, detail });
+    if (toast.current) {
+      toast.current.show({ severity, summary, detail });
+    } else {
+      console.error("Toast component is not initialized.");
+    }
   };
 
   const actionTemplate = (rowData) => {
@@ -212,6 +223,16 @@ function ManagePiatti() {
 
   return (
     <div className="manage-piatti">
+      {/* Add the Toast component */}
+      <Toast ref={toast} />
+      <ConfirmDialog
+        visible={confirmDeleteVisible}
+        message="Are you sure you want to delete this piatto?"
+        header="Confirm Deletion"
+        accept={confirmDelete}
+        reject={rejectDelete}
+        onHide={() => setConfirmDeleteVisible(false)}
+      />
 
       <h1>Manage Weekly Piatti</h1>
       <DataTable
