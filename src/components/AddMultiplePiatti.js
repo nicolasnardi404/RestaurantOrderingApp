@@ -30,15 +30,18 @@ const AddMultiplePiatti = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            for (const piatto of piatti) {
-                const piattoToSave = {
-                    nome: piatto.nome_piatto,
-                    data: commonDate.toISOString().split("T")[0], // Use common date for all
-                    idTipoPiatto: piatto.idTipoPiatto,
-                    disponibile: 1, // Assuming you want to set it as available by default
-                };
-                await api.post("/piatto/create", piattoToSave);
-            }
+            // Construct the JSON array
+            const piattiToSave = piatti.map(piatto => ({
+                nome: piatto.nome_piatto,
+                tipo_piatto: piatto.idTipoPiatto,
+            }));
+
+            // Get the formatted date for the URL
+            const formattedDate = commonDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+            console.log("data" + formattedDate)
+            console.log(piattiToSave)
+            // Send the POST request
+            await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
 
             showToast("success", "Success", "Piatti added successfully");
             setPiatti([{ nome_piatto: '', idTipoPiatto: 1, nome_tipo: 'Primo' }]); // Reset the form
