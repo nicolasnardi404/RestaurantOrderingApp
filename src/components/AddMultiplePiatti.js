@@ -38,8 +38,6 @@ const AddMultiplePiatti = () => {
 
             // Get the formatted date for the URL
             const formattedDate = commonDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-            console.log("data" + formattedDate)
-            console.log(piattiToSave)
             // Send the POST request
             await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
 
@@ -97,6 +95,7 @@ const AddMultiplePiatti = () => {
                             </td>
                             <td>
                                 <Dropdown
+                                    className="weekday-selection"
                                     value={piatto.nome_tipo}
                                     options={tipoPiattoOptions}
                                     onChange={(e) => {

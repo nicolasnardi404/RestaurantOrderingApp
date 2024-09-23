@@ -142,6 +142,10 @@
   height: 20px;
 }
 
+.p-button-primary{
+  margin: 10px;
+}
+
 @media (max-width: 768px) {
   .manage-piatti {
     padding: 10px;
