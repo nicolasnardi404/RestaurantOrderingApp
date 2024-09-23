@@ -6,7 +6,6 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
-import { Toast } from "primereact/toast";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { InputSwitch } from "primereact/inputswitch";
 import axios from "axios";
@@ -22,6 +21,7 @@ function ManagePiatti() {
   const [isNewPiatto, setIsNewPiatto] = useState(false);
   const [globalFilter, setGlobalFilter] = useState(null);
   const [disponibileFilter, setDisponibileFilter] = useState(0); // Start with showing unavailable (0)
+  const [selectedDay, setSelectedDay] = useState(null); // State for selected day
   const toast = useRef(null);
   const { getToken } = useAuth();
   const token = getToken();
@@ -31,6 +31,14 @@ function ManagePiatti() {
     { label: "Secondo", value: "Secondo" },
     { label: "Contorno", value: "Contorno" },
     { label: "Piatto unico", value: "Piatto unico" },
+  ];
+
+  const dayOptions = [
+    { label: "Monday", value: "Monday" },
+    { label: "Tuesday", value: "Tuesday" },
+    { label: "Wednesday", value: "Wednesday" },
+    { label: "Thursday", value: "Thursday" },
+    { label: "Friday", value: "Friday" },
   ];
 
   const api = useCallback(
@@ -43,7 +51,7 @@ function ManagePiatti() {
 
   useEffect(() => {
     fetchWeeklyPiatti();
-  }, []);
+  }, [api]);
 
   const fetchWeeklyPiatti = async () => {
     try {
@@ -61,6 +69,12 @@ function ManagePiatti() {
       setWeeklyPiatti([]);
     }
   };
+
+  const filteredPiatti = weeklyPiatti.filter(piatto => {
+    const matchesDay = selectedDay ? piatto.dayOfWeek === selectedDay : true;
+    const matchesDisponibile = piatto.sempreDisponibile === disponibileFilter;
+    return matchesDay && matchesDisponibile;
+  });
 
   const editPiatto = (piatto) => {
     setEditingPiatto({
@@ -94,26 +108,11 @@ function ManagePiatti() {
 
       let response;
       if (isNewPiatto) {
-        response = await axios.post(
-          "http://localhost:8080/api/piatto/create",
-          piattoToSave,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        response = await api.post("/piatto/create", piattoToSave);
       } else {
-        response = await axios.put(
-          `http://localhost:8080/api/piatto/update/${editingPiatto.id_piatto}`,
-          piattoToSave,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        response = await api.put(
+          `/piatto/update/${editingPiatto.id_piatto}`,
+          piattoToSave
         );
       }
 
@@ -139,9 +138,7 @@ function ManagePiatti() {
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
-          await axios.delete(`http://localhost:8080/api/piatto/delete/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          await api.delete(`/piatto/delete/${id}`);
           fetchWeeklyPiatti();
           showToast("success", "Success", "Piatto deleted successfully");
         } catch (error) {
@@ -194,6 +191,17 @@ function ManagePiatti() {
             onChange={(e) => setDisponibileFilter(e.value ? 1 : 0)}
           />
         </div>
+        <div className="day-filter">
+          <label htmlFor="dayFilter">Filter by Day:</label>
+          <Dropdown
+            id="dayFilter"
+            value={selectedDay}
+            options={dayOptions}
+            onChange={(e) => setSelectedDay(e.value)}
+            placeholder="Select a day"
+            showClear
+          />
+        </div>
       </div>
     </div>
   );
@@ -202,21 +210,9 @@ function ManagePiatti() {
     return <span>{rowData.sempreDisponibile === 1 ? "Yes" : "No"}</span>;
   };
 
-  const filteredPiatti = React.useMemo(() => {
-    console.log("Current weeklyPiatti:", weeklyPiatti);
-    if (!Array.isArray(weeklyPiatti)) {
-      console.error("weeklyPiatti is not an array:", weeklyPiatti);
-      return [];
-    }
-    return weeklyPiatti.filter(
-      (piatto) => piatto.sempreDisponibile === disponibileFilter
-    );
-  }, [weeklyPiatti, disponibileFilter]);
-
   return (
     <div className="manage-piatti">
-      <Toast ref={toast} />
-      <ConfirmDialog />
+
       <h1>Manage Weekly Piatti</h1>
       <DataTable
         value={filteredPiatti}
@@ -283,6 +279,7 @@ function ManagePiatti() {
                 optionLabel="label"
               />
             </div>
+          
             <div className="p-field">
               <label htmlFor="data">Data</label>
               <Calendar
