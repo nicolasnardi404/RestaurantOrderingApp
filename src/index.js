@@ -30,11 +30,11 @@ export default function App() {
             <Route path="/menu" element={<Menu />} />
             <Route path="/open-orders" element={<OpenOrders />} />
             <Route path="/day-order" element={<AllOrderOfDay />} />
+            <Route path="/historic" element={<Historic />} />
           </Route>
 
           {/* Protected routes for Amministratore only */}
           <Route element={<ProtectedRoute allowedRoles={['Amministratore']} />}>
-            <Route path="/historic" element={<Historic />} />
             <Route path="/managepiatti" element={<CRUDPiatti />} />
           </Route>
 

@@ -8,7 +8,7 @@ const RegisterPage = () => {
   const [nome, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const idRuolo = 1;
+  const idRuolo = 2;
   const attivo = true;
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const RegisterPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/user/create", {
+      const response = await axios.post("http://localhost:8080/api/register", {
         nome,
         email,
         password,

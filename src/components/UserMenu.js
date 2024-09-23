@@ -26,14 +26,14 @@ export default function UserMenu() {
 
   const getMenuItems = () => {
     const commonItems = [
+      { label: 'Historic', icon: 'calendar', path: '/historic' },
       { label: 'Make an Order', icon: 'shopping-cart', path: '/menu' },
       { label: 'View Open Orders', icon: 'list', path: '/open-orders' },
       { label: 'All Orders of the Day', icon: 'book', path: '/day-order' },
-      { label: 'Logout', icon: 'power-off', action: handleLogout }
+      { label: 'Logout', icon: 'power-off', action: handleLogout },
     ];
 
     const amministratoreItems = [
-      { label: 'Historic', icon: 'calendar', path: '/historic' },
       { label: 'Edit Piatti', icon: 'pencil', path: '/managepiatti' }
     ];
 
