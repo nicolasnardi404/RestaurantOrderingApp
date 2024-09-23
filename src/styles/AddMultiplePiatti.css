@@ -1,0 +1,54 @@
+/* AddMultiplePiatti.css */
+
+.add-multiple-piatti {
+    max-width: 50%; /* Set a maximum width for the form */
+    margin: 20px auto; /* Center the form */
+    padding: 20px; /* Add padding */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background color */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.add-multiple-piatti h1 {
+    text-align: center; /* Center the title */
+    color: #333; /* Darker text color */
+}
+
+.p-field {
+    margin-bottom: 15px; /* Space between fields */
+}
+
+.p-table {
+    width: 100%; /* Full width for the table */
+    border-collapse: collapse; /* Collapse borders */
+    margin-bottom: 20px; /* Space below the table */
+}
+
+.p-table th, .p-table td {
+    padding: 10px; /* Padding for table cells */
+    text-align: left; /* Align text to the left */
+    border: 1px solid #ddd; /* Light border for cells */
+}
+
+.p-table th {
+    background-color: #f2f2f2; /* Light background for header */
+    color: #333; /* Darker text color for header */
+}
+
+.p-table tr:hover {
+    background-color: #f1f1f1; /* Highlight row on hover */
+}
+
+button {
+    margin-right: 10px; /* Space between buttons */
+}
+
+.custom-calendar {
+    width: 200px; /* Set a smaller width for the calendar */
+    margin-top: 10px; /* Add some space above the calendar */
+}

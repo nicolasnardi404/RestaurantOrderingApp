@@ -14,6 +14,7 @@ import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
 import Delete from "../assets/icons8-delete-25.png";
 import Edit from "../assets/icons8-edit-24.png";
+import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 
 function ManagePiatti() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
@@ -28,6 +29,7 @@ function ManagePiatti() {
   const token = getToken();
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const tipoPiattoOptions = [
     { label: "Primo", value: "Primo" },
@@ -235,6 +237,18 @@ function ManagePiatti() {
       />
 
       <h1>Manage Weekly Piatti</h1>
+      <Button
+        label="Add New Piatto"
+        icon="pi pi-plus"
+        onClick={addNewPiatto}
+        className="p-button-primary add-piatto-button"
+      />
+      <Button
+        label="Add Multiple Piatti"
+        icon="pi pi-plus"
+        onClick={() => navigate('/add-multiple-piatti')} // Navigate to the new page
+        className="p-button-secondary add-multiple-piatto-button"
+      />
       <DataTable
         value={filteredPiatti}
         paginator
@@ -332,12 +346,6 @@ function ManagePiatti() {
           </div>
         )}
       </Dialog>
-      <Button
-        label="Add New Piatto"
-        icon="pi pi-plus"
-        onClick={addNewPiatto}
-        className="p-button-primary add-piatto-button"
-      />
     </div>
   );
 }

@@ -12,8 +12,8 @@ import MyApp from "./_app";
 import CRUDPiatti from "./pages/CRUDPiatti";
 import AllOrderOfDay from "./pages/AllOrderOfDay";
 import ProtectedRoute from './components/ProtectedRoute';
-import UserMenu from './components/UserMenu'; // Make sure to import UserMenu
 import ReactDOM from 'react-dom';
+import MultiplePiatti from './pages/MultiplePiatti';
 
 export default function App() {
   return (
@@ -31,6 +31,7 @@ export default function App() {
             <Route path="/open-orders" element={<OpenOrders />} />
             <Route path="/day-order" element={<AllOrderOfDay />} />
             <Route path="/historic" element={<Historic />} />
+            <Route path="/add-multiple-piatti" element={<MultiplePiatti />} />
           </Route>
 
           {/* Protected routes for Amministratore only */}
