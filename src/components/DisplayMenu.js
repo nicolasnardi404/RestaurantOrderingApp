@@ -10,11 +10,14 @@ import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
 import { useAuth } from '../context/AuthContext';
 import '../styles/DisplayMenu.css';
+import { InputTextarea } from 'primereact/inputtextarea';
 
 function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
   const [dishes, setDishes] = useState([]);
+  const [altri, setAltri] = useState(null); // Campo para "Altri"
+  const [observazioni, setObservazioni] = useState(''); // Campo para observações
   const [sempreDisponibileDishes, setSempreDisponibileDishes] = useState([]);
   const [cart, setCart] = useState({});
   const [error, setError] = useState('');
@@ -97,17 +100,32 @@ function MenuPage() {
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico } = currentCart;
+    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico, Altri, Complement } = currentCart;
 
-    if (PiattoUnico || (Primo && Secondo && Contorno)) {
+    const selectedItems = new Set();
+    if (Primo) selectedItems.add('Primo');
+    if (Secondo) selectedItems.add('Secondo');
+    if (Contorno) selectedItems.add('Contorno');
+    if (PiattoUnico) selectedItems.add('Piatto unico');
+    if (Altri) selectedItems.add('Altri');
+    if (Complement) selectedItems.add('Complement');
+
+    const combinations = validCombinations.find(combination => {
+      return combination.every(item => selectedItems.has(item));
+    });
+
+    if (combinations) {
       setCombinationStatus('');
     } else {
+      // Identifica os itens faltantes
       let missingItems = [];
       if (!Primo) missingItems.push('Primo');
       if (!Secondo) missingItems.push('Secondo');
       if (!Contorno) missingItems.push('Contorno');
+      if (!PiattoUnico) missingItems.push('Piatto unico');
 
-      if (missingItems.length === 3) {
+      // Define a mensagem com base nos itens faltantes
+      if (missingItems.length === 4) {
         setCombinationStatus('Please select dishes to create a valid combination');
       } else {
         setCombinationStatus(`Add ${missingItems.join(' or ')} to complete the combination`);
@@ -115,27 +133,34 @@ function MenuPage() {
     }
   };
 
-  const isValidCombination = () => {
-    const validCombinations = [
-      ['Primo', 'Secondo', 'Contorno'],
-      ['Primo', 'Piatto unico', 'Contorno'],
-      ['Primo', 'Contorno'],
-      ['Secondo', 'Contorno'],
-      ['Piatto unico', 'Contorno'],
-      ['Piatto unico'],
-    ];
+  let validCombinations = [
+    ['Primo', 'Secondo', 'Contorno'],
+    ['Primo', 'Piatto unico', 'Contorno'],
+    ['Primo', 'Contorno'],
+    ['Primo', 'Contorno', 'Complement'],
+    ['Secondo', 'Contorno'],
+    ['Piatto unico', 'Contorno'],
+    ['Piatto unico'],
+  ];
 
-    const selectedTypes = Object.keys(cart).filter((type) => cart[type] !== null);
-    return validCombinations.some(
+  const isValidCombination = () => {
+    // Filtra os tipos de pratos selecionados, exceto "Altri"
+    const selectedTypes = Object.keys(cart)
+      .filter((type) => cart[type] !== null && type !== 'Altri');
+
+    // Verifica se a combinação é válida sem considerar "Altri"
+    const isValid = validCombinations.some(
       (combination) =>
         combination.length === selectedTypes.length &&
         combination.every((type) => selectedTypes.includes(type))
     );
+
+    return isValid; // Retorna se a combinação é válida
   };
 
   const renderOrderMenu = () => (
     <div className="order-menu">
-      {['Primo', 'Secondo', 'Contorno', 'Piatto unico'].map((mealType) => (
+      {['Primo', 'Secondo', 'Contorno', 'Piatto unico', 'Altri', 'Complement'].map((mealType) => (
         <div key={mealType} className="menu-category">
           <h3>{mealType}</h3>
           <Dropdown
@@ -149,6 +174,16 @@ function MenuPage() {
           />
         </div>
       ))}
+
+      <div className="observazioni">
+        <h3>Observazioni</h3>
+        <InputTextarea
+          value={observazioni}
+          onChange={(e) => setObservazioni(e.target.value)}
+          rows={3}
+          placeholder="Scrivi le tue osservazioni..."
+        />
+      </div>
     </div>
   );
 
@@ -287,7 +322,10 @@ function MenuPage() {
         idUser: user.userId,
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
+        observazioni: observazioni,
       };
+
+      console.log(orderData);
 
       console.log('Submitting order:', JSON.stringify(orderData));
       try {

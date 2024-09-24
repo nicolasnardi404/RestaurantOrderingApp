@@ -1,53 +1,71 @@
-/* Contêiner principal do menu de pedidos */
+body {
+  font-size: 0.75rem;
+}
+
 .order-menu {
   display: flex;
-  flex-wrap: wrap; /* Permite que os itens que não cabem na linha atual vão para a linha seguinte */
-  gap: 20px; /* Espaçamento entre os itens */
-  margin-bottom: 20px; /* Espaçamento inferior para separar do próximo elemento */
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding: 0 15px;
 }
 
-/* Categorias do menu */
 .menu-category {
-  flex: 1 1 200px; /* Flexível para permitir um tamanho mínimo e ocupar espaço disponível */
-  min-width: 200px; /* Largura mínima para cada categoria */
+  flex: 1 1 calc(33.33% - 15px);
+  min-width: 180px;
   display: flex;
   flex-direction: column;
-  gap: 10px; /* Espaçamento entre o título e o dropdown */
+  gap: 8px;
+  padding: 0 15px;
 }
 
-/* Ajuste para os dropdowns */
+.observazioni {
+  flex: 1 0 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.observazioni h3 {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.observazioni textarea {
+  width: 80%;
+  max-width: 500px;
+}
+
 .menu-category .p-dropdown {
-  width: 100%; /* Faz com que o dropdown ocupe a largura completa do contêiner */
+  width: 100%;
 }
 
-/* Botão do menu */
 .menu-button {
-  margin-bottom: 20px; /* Espaçamento inferior para separar do próximo elemento */
+  margin-bottom: 15px;
 }
 
-/* Status de combinação */
 .combination-status {
   color: orange;
-  margin: 20px 0;
+  margin: 15px 0;
   font-weight: bold;
 }
 
-/* Botão de envio */
 .submit-button {
-  margin-top: 20px; /* Espaçamento superior para separar do conteúdo acima */
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
-/* Estilo de erro */
 .error-message {
   color: red;
-  margin: 20px 0;
+  margin: 15px 0;
   font-weight: bold;
 }
 
 .styled-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 25px 0;
+  margin: 20px 0;
   font-size: 18px;
   text-align: left;
   background-color: #f8f9fa;
@@ -84,4 +102,16 @@
 
 .styled-table tbody tr:last-of-type {
   border-bottom: 2px solid #343a40;
+}
+
+@media (max-width: 768px) {
+  .menu-category {
+    flex: 1 1 100%;
+  }
+}
+
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }

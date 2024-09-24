@@ -73,8 +73,8 @@ const HistoricComponent = () => {
         setFilteredData(response.data.filter(item => item.username === currentUsername));
         console.log(filteredData);
         setData(filteredData);
-      } else {
-        setFilteredData(response.data)
+      }
+      if (isAdmin) {
         setData(filteredData);
         const uniqueUsernames = [...new Set(filteredData.map(item => item.username))];
         setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
