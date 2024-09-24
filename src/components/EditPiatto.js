@@ -197,7 +197,7 @@ function ManagePiatti() {
           />
         </span>
         <div className="disponibile-filter">
-          <label htmlFor="disponibileFilter">Show available: </label>
+          <label htmlFor="disponibileFilter">Sempre Disponibile: </label>
           <InputSwitch
             id="disponibileFilter"
             checked={disponibileFilter === 1}

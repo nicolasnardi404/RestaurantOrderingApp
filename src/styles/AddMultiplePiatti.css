@@ -1,7 +1,7 @@
 /* AddMultiplePiatti.css */
 
 .add-multiple-piatti {
-    max-width: 50%; /* Set a maximum width for the form */
+    max-width: 80%; /* Set a maximum width for the form */
     margin: 20px auto; /* Center the form */
     padding: 20px; /* Add padding */
     border: 1px solid #ccc; /* Add a border */
@@ -44,8 +44,14 @@
     background-color: #f1f1f1; /* Highlight row on hover */
 }
 
+.weekday-selection{
+    height: 50px;
+    align-items: center;
+    
+}
+
 button {
-    margin-right: 10px; /* Space between buttons */
+    margin: 10px; /* Space between buttons */
 }
 
 .custom-calendar {
