@@ -163,6 +163,24 @@ const AllOrderOfDayComponent = () => {
           <Column field="piatti" header="Dishes Ordered" sortable />
         </DataTable>
       </Card>
+
+      {/* New Table for tipo_quantita */}
+      {userRole === 'Amministratore' && (
+        <Card title={`Tipo Quantità for ${selectedDate.toLocaleDateString()}`} className="tipo-quantita-card">
+          <DataTable
+            value={dailySummary}
+            paginator
+            rows={10}
+            loading={loading}
+            emptyMessage="No summary data available."
+            className="p-datatable-responsive"
+          >
+            <Column field="tipo_quantita" header="Tipo Piatto" body={(rowData) => rowData.tipo_quantita.split(':')[0]} sortable />
+            <Column field="quantita" header="Quantity" sortable />
+          </DataTable>
+        </Card>
+      )}
+
       {userRole === 'Amministratore' && (
         <div className="pdf-button-section">
           <Button
