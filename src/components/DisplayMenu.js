@@ -253,7 +253,7 @@ function MenuPage() {
           </tbody>
         </table>
 
-        <h2>Piatto Unico Sempre Disponibile</h2>
+        <h2>Piatto Unico</h2>
         <table className="styled-table">
           <thead>
             <tr>

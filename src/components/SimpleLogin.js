@@ -38,7 +38,7 @@ const LoginPage = () => {
       <header>
         <img src={Logo} alt="Logo" className="logo" />
         <Link to="/register">
-          <button className="register-btn">Register</button>
+          <button className="register-btn-inLog">Register</button>
         </Link>
       </header>
       <div className="login-box">

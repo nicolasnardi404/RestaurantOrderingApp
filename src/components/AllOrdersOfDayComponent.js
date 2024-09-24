@@ -15,14 +15,13 @@ const AllOrderOfDayComponent = () => {
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { getToken } = useAuth(); // Use the useAuth hook to get the getToken function
+  const { user , getToken } = useAuth(); // Use the useAuth hook to get the getToken function
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
     fetchDailyOrders(selectedDate);
     fetchDailySummary(selectedDate);
-    // Retrieve user role from localStorage
-    const role = localStorage.getItem('ruolo') || '';
+    const role = user.ruolo;
     setUserRole(role);
   }, [selectedDate]);
 

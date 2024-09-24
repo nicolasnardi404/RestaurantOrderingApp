@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
@@ -8,50 +9,54 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = Cookies.get('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUser({
-          userId: decodedToken.data.userId,
-          nome: decodedToken.data.nome,
-          ruolo: decodedToken.data.ruolo
-        });
+        const isExpired = decodedToken.exp * 1000 < Date.now();
+        if (!isExpired) {
+          setUser({
+            userId: decodedToken.data.userId,
+            nome: decodedToken.data.nome,
+            ruolo: decodedToken.data.ruolo
+          });
+        } else {
+          console.error("Token expired");
+          setUser(null);
+        }
       } catch (error) {
         console.error("Invalid token", error);
         setUser(null);
       }
     }
-    setLoading(false); // Finaliza o estado de carregamento
+    setLoading(false);
   }, []);
 
   const login = (token) => {
     try {
       const decodedToken = jwtDecode(token);
-      setUser({
-        userId: decodedToken.data.userId,
-        nome: decodedToken.data.nome,
-        ruolo: decodedToken.data.ruolo
-      });
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', decodedToken.data.userId);
-      localStorage.setItem('nome', decodedToken.data.nome);
-      localStorage.setItem('ruolo', decodedToken.data.ruolo);
+      const isExpired = decodedToken.exp * 1000 < Date.now();
+      if (!isExpired) {
+        setUser({
+          userId: decodedToken.data.userId,
+          nome: decodedToken.data.nome,
+          ruolo: decodedToken.data.ruolo
+        });
+        Cookies.set('token', token, { expires: 7 });
+      } else {
+        console.error("Token expired");
+      }
     } catch (error) {
       console.error("Failed to decode token", error);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('nome');
-    localStorage.removeItem('ruolo');
+    Cookies.remove('token');
     setUser(null);
   };
 
-  // Reintroduzindo o método getToken
-  const getToken = () => localStorage.getItem('token');
+  const getToken = () => Cookies.get('token');
 
   if (loading) {
     return <div>Loading...</div>; // Renderiza enquanto o estado está sendo carregado

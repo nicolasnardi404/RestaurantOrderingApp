@@ -29,9 +29,9 @@ const HistoricComponent = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [showTotalPerDay, setShowTotalPerDay] = useState(false);
   const [totalPerDayData, setTotalPerDayData] = useState([]);
-  const ruolo = localStorage.getItem('ruolo');
   const [isAdmin, setAdmin] = useState(false);
-  const { getToken } = useAuth();
+  const { user, getToken } = useAuth();
+  const ruolo = user.ruolo;
 
   // Corrige para definir `isAdmin` corretamente
   useEffect(() => {
@@ -43,7 +43,7 @@ const HistoricComponent = () => {
   const fetchData = async () => {
     let url;
     const token = getToken();
-    const currentUsername = localStorage.getItem('nome');
+    const currentUsername = user.nome;
 
     if (ruolo === "Amministratore") {
       if (viewMode === 'month' && selectedMonth) {
@@ -74,7 +74,9 @@ const HistoricComponent = () => {
         console.log(filteredData);
         setData(filteredData);
       }
+
       if (isAdmin) {
+        setFilteredData(response.data)
         setData(filteredData);
         const uniqueUsernames = [...new Set(filteredData.map(item => item.username))];
         setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
