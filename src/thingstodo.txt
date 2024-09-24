@@ -1,0 +1,34 @@
+[ ] - adicionar erro para todas as páginas
+ 
+Menu 
+
+[ ] - título para explicar melhor que é o Menu
+[ ] - não é possível fazer pedidos para dias passados
+[ ] - exibir todas as combinações possíveis
+ 
+Pedido Aberto 
+
+[ ] - Tornar a primeira página e também redirecionar do logo
+[ ] - botão para ir ao Menu
+[ ] - adicionar pao e fruta no update
+ 
+Pedido do Dia
+
+[ ] - mudar PDF para todos os dados
+[ ] - corrigir tabela
+
+        Contorno 4
+
+            - Pasta 2
+
+            - Cenoura 2
+
+Editar Piatto 
+[ ] - título
+[ ] - adicionar btn para remover linha dentro da opcao de multiplo pratos
+[ ] - nao aceitar valor nulo no db do multiplo piatos
+[ ] - adicionar pao e fruta
+
+Storico per User
+[ ] - total
+ 

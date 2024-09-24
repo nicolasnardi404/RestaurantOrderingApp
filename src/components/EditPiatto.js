@@ -193,7 +193,7 @@ function ManagePiatti() {
           <InputText
             type="search"
             onInput={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Search by name..."
+            placeholder="Ricerca per Nome..."
           />
         </span>
         <div className="disponibile-filter">
@@ -205,13 +205,13 @@ function ManagePiatti() {
           />
         </div>
         <div className="day-filter">
-          <label htmlFor="dayFilter">Filter by Day:</label>
+          <label htmlFor="dayFilter">Filtrare per Giorno:</label>
           <Dropdown
             id="dayFilter"
             value={selectedDay}
             options={dayOptions}
             onChange={(e) => setSelectedDay(e.value)}
-            placeholder="Select a day"
+            placeholder="Giorno"
             showClear
           />
         </div>
@@ -236,15 +236,15 @@ function ManagePiatti() {
         onHide={() => setConfirmDeleteVisible(false)}
       />
 
-      <h1>Manage Weekly Piatti</h1>
+      <h1>Organizzare il Menu Della Settimana</h1>
       <Button
-        label="Add New Piatto"
+        label="Aggiungere Singolo Piatto"
         icon="pi pi-plus"
         onClick={addNewPiatto}
         className="p-button-primary add-piatto-button"
       />
       <Button
-        label="Add Multiple Piatti"
+        label="Aggiungi il Menu per Giorno"
         icon="pi pi-plus"
         onClick={() => navigate('/add-multiple-piatti')} // Navigate to the new page
         className="p-button-secondary add-multiple-piatto-button"
@@ -257,10 +257,10 @@ function ManagePiatti() {
         header={header}
       >
         <Column field="id_piatto" header="ID" />
-        <Column field="nome_piatto" header="Nome Piatto" />
+        <Column field="nome_piatto" header="Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="data" header="Data" />
-        <Column field="dayOfWeek" header="Day of Week" />
+        <Column field="dayOfWeek" header="Giorno Della Settimana" />
         <Column
           field="sempreDisponibile"
           header="Disponibile"
@@ -268,7 +268,7 @@ function ManagePiatti() {
         />
         <Column
           body={actionTemplate}
-          header="Actions"
+          header="Azioni"
           style={{ width: "150px" }}
         />
       </DataTable>
