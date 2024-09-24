@@ -13,7 +13,7 @@ import '../styles/DisplayMenu.css';
 import { InputTextarea } from 'primereact/inputtextarea';
 
 function MenuPage() {
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(new Date()); // Set default to current date
   const [showMenu, setShowMenu] = useState(false);
   const [dishes, setDishes] = useState([]);
   const [altri, setAltri] = useState(null); // Campo para "Altri"
