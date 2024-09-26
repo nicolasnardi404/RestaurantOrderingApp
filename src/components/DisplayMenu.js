@@ -155,7 +155,7 @@ function MenuPage() {
         combination.every((type) => selectedTypes.includes(type))
     );
 
-    return isValid; // Retorna se a combinação é válida
+    return isValid;
   };
 
   const renderOrderMenu = () => (
@@ -210,7 +210,7 @@ function MenuPage() {
 
     return (
       <div className="full-menu-list">
-        <h2>Weekly Menu</h2>
+        <h2>Menù settimanale</h2>
         <table className="styled-table">
           <thead>
             <tr>
@@ -294,10 +294,10 @@ function MenuPage() {
         );
 
         // Se a resposta retornar alguma prenotazione, significa que já existe uma reserva
-        if (response.data == false) {
-          return true;
+        if (!response.data) {
+          return false;
         }
-        return false;
+        return true;
       } catch (error) {
         console.error('Error checking existing reservation:', error);
         setError('Errore durante la verifica della prenotazione esistente. Riprova.');
@@ -395,7 +395,7 @@ function MenuPage() {
 
   return (
     <div className='container-menu'>
-      <h1>Menu</h1>
+      <h1>Effettua il tuo ordine</h1>
       <div className="date-selection">
         <Calendar
           value={selectedDay}
@@ -407,7 +407,7 @@ function MenuPage() {
       </div>
 
       <div className="menu-button-container">
-        <Button label="View Full Menu" onClick={handleViewFullMenu} className="menu-button" />
+        <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
       </div>
 
       {selectedDay && (

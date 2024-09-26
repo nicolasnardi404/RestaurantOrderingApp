@@ -84,7 +84,7 @@ export default function UserMenu() {
   return (
     <header className="user-menu-header">
       <div className="logo-container">
-        <a href="/menu">
+        <a href="/open-orders">
           <img src={Logo} alt="Logo" className="logo" />
         </a>
       </div>

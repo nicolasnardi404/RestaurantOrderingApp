@@ -7,7 +7,7 @@ import '../styles/AddMultiplePiatti.css';
 
 const AddMultiplePiatti = () => {
     const [piatti, setPiatti] = useState([{ nome_piatto: '', idTipoPiatto: 1, nome_tipo: 'Primo' }]);
-    const [commonDate, setCommonDate] = useState(new Date()); // State for common date
+    const [commonDate, setCommonDate] = useState(new Date());
     const toast = useRef(null);
     const { getToken } = useAuth();
     const token = getToken();

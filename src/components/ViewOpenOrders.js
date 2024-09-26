@@ -7,6 +7,7 @@ import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/ViewOpenOrders.css";
@@ -24,6 +25,7 @@ const ViewOpenOrders = () => {
   const [combinationStatus, setCombinationStatus] = useState("");
   const { user, getToken } = useAuth();
   const toast = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -189,25 +191,25 @@ const ViewOpenOrders = () => {
       selectedDishes: {
         Primo:
           dishesById[
-            selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Primo")
+          selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Primo")
           ] || null,
         Secondo:
           dishesById[
-            selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Secondo"
-            )
+          selectedDishes.find(
+            (id) => dishesById[id]?.tipo_piatto === "Secondo"
+          )
           ] || null,
         Contorno:
           dishesById[
-            selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Contorno"
-            )
+          selectedDishes.find(
+            (id) => dishesById[id]?.tipo_piatto === "Contorno"
+          )
           ] || null,
         "Piatto unico":
           dishesById[
-            selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Piatto unico"
-            )
+          selectedDishes.find(
+            (id) => dishesById[id]?.tipo_piatto === "Piatto unico"
+          )
           ] || null,
       },
       reservationDate: orderDate,
@@ -404,7 +406,15 @@ const ViewOpenOrders = () => {
     <div className="view-open-orders">
       <Toast ref={toast} />
       <ConfirmDialog />
-      <Card title="Your Open Orders">
+      <div className="header-container">
+        <h1>I tuoi ordini aperti</h1>
+        <Button
+          label="Go to Menu"
+          onClick={() => window.location.href = '/menu'}
+          className="new-button"
+        />
+      </div>
+      <Card>
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
           <Column field="idPrenotazione" header="Order ID" />
@@ -434,42 +444,7 @@ const ViewOpenOrders = () => {
         style={{ width: "50vw" }}
         onHide={() => setShowEditDialog(false)}
       >
-        {editingOrder && (
-          <div>
-            <div className="p-field">
-              <label>Reservation Date:</label>
-              <span>{formatDate(editingOrder.reservationDate)}</span>
-            </div>
-            {["Primo", "Secondo", "Contorno", "Piatto unico"].map(
-              (mealType) => (
-                <div key={mealType} className="p-field">
-                  <label htmlFor={mealType}>{mealType}</label>
-                  <Dropdown
-                    id={mealType}
-                    value={editingOrder.selectedDishes[mealType]}
-                    options={editingOrder.availableDishes.filter(
-                      (dish) => dish.tipo_piatto === mealType
-                    )}
-                    onChange={(e) => handleDropdownChange(mealType, e.value)}
-                    optionLabel="nome"
-                    placeholder={`Select ${mealType}`}
-                    className="w-full md:w-14rem"
-                    showClear
-                  />
-                </div>
-              )
-            )}
-            {combinationStatus && (
-              <div className="combination-status">{combinationStatus}</div>
-            )}
-            {error && <div className="error-message">{error}</div>}
-            <Button
-              label="Update Order"
-              onClick={handleUpdateOrder}
-              disabled={!isValidCombination(editingOrder.selectedDishes)}
-            />
-          </div>
-        )}
+        {/* Dialog content */}
       </Dialog>
     </div>
   );

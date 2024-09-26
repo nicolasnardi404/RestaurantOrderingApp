@@ -1,95 +1,112 @@
 .view-open-orders {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-  
-  .view-open-orders h2 {
-    color: var(--primary-color);
-    margin-bottom: 20px;
-  }
-  
-  .error-message {
-    color: var(--accent-color);
-    background-color: #ffebee;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.view-open-orders h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: var(--accent-color);
+  background-color: #ffebee;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+/* DataTable styles */
+.p-datatable {
+  margin-top: 20px;
+}
+
+.p-datatable .p-datatable-thead>tr>th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.p-datatable .p-datatable-tbody>tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+/* Button styles */
+.p-button-rounded {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+}
+
+.p-button-success {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+}
+
+.p-button-danger {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+.p-button-rounded:focus {
+  box-shadow: none !important;
+}
+
+/* Dialog styles */
+.p-dialog .p-dialog-header {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 20px;
+}
+
+/* Form styles */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.p-calendar,
+.p-dropdown {
+  width: 100%;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.new-button {
+  margin-left: auto;
+  /* Coloca o botão à direita */
+}
+
+h1 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .view-open-orders {
     padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 20px;
   }
-  
-  /* DataTable styles */
-  .p-datatable {
-    margin-top: 20px;
+
+  .p-datatable .p-datatable-thead>tr>th,
+  .p-datatable .p-datatable-tbody>tr>td {
+    padding: 0.5rem;
   }
-  
-  .p-datatable .p-datatable-thead > tr > th {
-    background-color: var(--primary-color);
-    color: white;
-  }
-  
-  .p-datatable .p-datatable-tbody > tr:nth-child(even) {
-    background-color: #f8f9fa;
-  }
-  
-  /* Button styles */
+
   .p-button-rounded {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
   }
-  
-  .p-button-success {
-    background-color: var(--secondary-color) !important;
-    border-color: var(--secondary-color) !important;
-  }
-  
-  .p-button-danger {
-    background-color: var(--accent-color) !important;
-    border-color: var(--accent-color) !important;
-  }
-  
-  .p-button-rounded:focus {
-    box-shadow: none !important;
-  }
-  
-  /* Dialog styles */
-  .p-dialog .p-dialog-header {
-    background-color: var(--primary-color);
-    color: white;
-  }
-  
-  .p-dialog .p-dialog-content {
-    padding: 20px;
-  }
-  
-  /* Form styles */
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .p-calendar,
-  .p-dropdown {
-    width: 100%;
-  }
-  
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .view-open-orders {
-      padding: 10px;
-    }
-  
-    .p-datatable .p-datatable-thead > tr > th,
-    .p-datatable .p-datatable-tbody > tr > td {
-      padding: 0.5rem;
-    }
-  
-    .p-button-rounded {
-      width: 2rem !important;
-      height: 2rem !important;
-    }
-  }
+}

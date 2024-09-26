@@ -34,6 +34,11 @@
   margin-bottom: 20px;
 }
 
+h2 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
   .card-row {
     flex-direction: column;

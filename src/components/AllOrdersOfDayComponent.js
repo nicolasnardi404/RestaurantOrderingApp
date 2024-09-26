@@ -15,7 +15,7 @@ const AllOrderOfDayComponent = () => {
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user , getToken } = useAuth(); // Use the useAuth hook to get the getToken function
+  const { user, getToken } = useAuth(); // Use the useAuth hook to get the getToken function
   const [userRole, setUserRole] = useState('');
 
   useEffect(() => {
@@ -46,21 +46,23 @@ const AllOrderOfDayComponent = () => {
 
   const fetchDailySummary = async (date) => {
     setLoading(true);
-    try {
-      const dateString = formatDateForServer(date);
-      const token = getToken(); // Get the token
-      const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
-        headers: {
-          Authorization: `Bearer ${token}` // Add the token to the request headers
-        }
-      });
-      console.log('Daily summary:', response.data);
-      setDailySummary(response.data);
-    } catch (error) {
-      console.error('Error fetching daily summary:', error);
-      setDailySummary([]);
-    } finally {
-      setLoading(false);
+    if (userRole === 'Amministratore') {
+      try {
+        const dateString = formatDateForServer(date);
+        const token = getToken();
+        const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
+          headers: {
+            Authorization: `Bearer ${token}` // Add the token to the request headers
+          }
+        });
+        console.log('Daily summary:', response.data);
+        setDailySummary(response.data);
+      } catch (error) {
+        console.error('Error fetching daily summary:', error);
+        setDailySummary([]);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -125,7 +127,7 @@ const AllOrderOfDayComponent = () => {
 
   return (
     <div className="all-order-of-day">
-      <h2>Daily Order Summary</h2>
+      <h1>Elenco degli ordini del giorno</h1>
       <div className="date-selector">
         <Calendar
           value={selectedDate}

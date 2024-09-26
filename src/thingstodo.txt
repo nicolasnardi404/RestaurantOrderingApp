@@ -2,14 +2,14 @@
  
 Menu 
 
-[ ] - título para explicar melhor que é o Menu
+[x] - título para explicar melhor que é o Menu
 [ ] - não é possível fazer pedidos para dias passados
 [ ] - exibir todas as combinações possíveis
  
 Pedido Aberto 
 
-[ ] - Tornar a primeira página e também redirecionar do logo
-[ ] - botão para ir ao Menu
+[X] - Tornar a primeira página e também redirecionar do logo
+[x] - botão para ir ao Menu
 [ ] - adicionar pao e fruta no update
  
 Pedido do Dia

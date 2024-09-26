@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import Cookies from 'js-cookie';
 import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
@@ -9,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = Cookies.get('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -32,7 +31,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token) => {
+  const login = (token, rememberMe) => {
     try {
       const decodedToken = jwtDecode(token);
       const isExpired = decodedToken.exp * 1000 < Date.now();
@@ -42,7 +41,12 @@ export const AuthProvider = ({ children }) => {
           nome: decodedToken.data.nome,
           ruolo: decodedToken.data.ruolo
         });
-        Cookies.set('token', token, { expires: 7 });
+
+        if (rememberMe) {
+          localStorage.setItem('token', token);
+        } else {
+          sessionStorage.setItem('token', token);
+        }
       } else {
         console.error("Token expired");
       }
@@ -52,14 +56,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    Cookies.remove('token');
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     setUser(null);
   };
 
-  const getToken = () => Cookies.get('token');
+  const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
 
   if (loading) {
-    return <div>Loading...</div>; // Renderiza enquanto o estado está sendo carregado
+    return <div>Loading...</div>;
   }
 
   return (
