@@ -15,12 +15,11 @@ import { UseDataLocal } from '../util/UseDataLocal';
 import { useAuth } from '../context/AuthContext';
 import '../styles/HistoricComponent.css';
 
-// Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const HistoricComponent = () => {
   const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
+  let [filteredData, setFilteredData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedUsername, setSelectedUsername] = useState('');
@@ -45,6 +44,7 @@ const HistoricComponent = () => {
     const token = getToken();
     const currentUsername = user.nome;
 
+    // Defina a URL com base no modo de visualização e nas seleções de data
     if (ruolo === "Amministratore") {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
@@ -58,7 +58,7 @@ const HistoricComponent = () => {
     } else {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
-        url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
+        url = `http://localhost:8080/api/ordine/readByIdAndMese/${monthString}/${user.userId}`;
       } else {
         return; // Não busca se nenhuma data for selecionada
       }
@@ -69,17 +69,19 @@ const HistoricComponent = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (!isAdmin) {
-        setFilteredData(response.data.filter(item => item.username === currentUsername));
-        console.log(filteredData);
-        setData(filteredData);
-      }
-
+      // Atualize os dados com base no modo de visualização
       if (isAdmin) {
-        setFilteredData(response.data)
-        setData(filteredData);
-        const uniqueUsernames = [...new Set(filteredData.map(item => item.username))];
+        setFilteredData(response.data);
+        setData(response.data); // Armazene a resposta em 'data'
+
+        // Atualize os nomes de usuários disponíveis
+        const uniqueUsernames = [...new Set(response.data.map(item => item.username))];
         setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
+      } else {
+        // Se não for admin, filtrar os dados para o usuário atual
+        const filtered = response.data.filter(item => item.username === currentUsername);
+        setFilteredData(filtered);
+        setData(filtered); // Armazene os dados filtrados em 'data'
       }
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
@@ -121,7 +123,7 @@ const HistoricComponent = () => {
 
   // Calcula total de pedidos por dia
   const calculateTotalPerDayData = () => {
-    const totals = data.reduce((acc, order) => {
+    const totals = filteredData.reduce((acc, order) => {
       const date = order.reservation_date.split('T')[0]; // Obtém apenas a data
       if (!acc[date]) {
         acc[date] = 0;
@@ -139,10 +141,10 @@ const HistoricComponent = () => {
   };
 
   useEffect(() => {
-    if (showTotalPerDay && data.length > 0) {
+    if (showTotalPerDay && filteredData.length > 0) {
       calculateTotalPerDayData();
     }
-  }, [showTotalPerDay, data]);
+  }, [showTotalPerDay, filteredData]);
 
   // Gera o PDF
   const generatePDF = () => {
@@ -239,16 +241,14 @@ const HistoricComponent = () => {
           </div>
 
           {/* O botão de InputSwitch é visível para ambos */}
-          {isAdmin && (
-            < div className="p-field">
-              <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-              <InputSwitch
-                id="totalPerDaySwitch"
-                checked={showTotalPerDay}
-                onChange={(e) => setShowTotalPerDay(e.value)}
-              />
-            </div>
-          )}
+          < div className="p-field">
+            <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+            <InputSwitch
+              id="totalPerDaySwitch"
+              checked={showTotalPerDay}
+              onChange={(e) => setShowTotalPerDay(e.value)}
+            />
+          </div>
 
           {/* O dropdown de usuários é exibido apenas para o administrador */}
           {!showTotalPerDay && isAdmin && (

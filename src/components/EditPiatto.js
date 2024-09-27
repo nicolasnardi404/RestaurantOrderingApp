@@ -7,6 +7,8 @@ import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { UseDataLocal } from '../util/UseDataLocal';
+import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
@@ -15,6 +17,8 @@ import "../styles/EditPiatto.css";
 import Delete from "../assets/icons8-delete-25.png";
 import Edit from "../assets/icons8-edit-24.png";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 function ManagePiatti() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
@@ -36,6 +40,8 @@ function ManagePiatti() {
     { label: "Secondo", value: "Secondo" },
     { label: "Contorno", value: "Contorno" },
     { label: "Piatto unico", value: "Piatto unico" },
+    { label: "Complement", value: "Complement"},
+    { label: "Altri", value: "Altri"},
   ];
 
   const dayOptions = [
@@ -61,7 +67,6 @@ function ManagePiatti() {
   const fetchWeeklyPiatti = async () => {
     try {
       const response = await api.get("/piatto/piattoSettimana");
-      console.log("API response:", response.data);
       if (Array.isArray(response.data)) {
         setWeeklyPiatti(response.data);
       } else {
@@ -142,7 +147,6 @@ function ManagePiatti() {
   };
 
   const confirmDelete = async () => {
-    console.log("Deletion confirmed for ID:", deleteId); // Log confirmation
     try {
       await api.delete(`/piatto/delete/${deleteId}`);
       fetchWeeklyPiatti();
@@ -157,7 +161,6 @@ function ManagePiatti() {
   };
 
   const rejectDelete = () => {
-    console.log("Deletion rejected for ID:", deleteId); // Log rejection
     setConfirmDeleteVisible(false); // Close the dialog
   };
 

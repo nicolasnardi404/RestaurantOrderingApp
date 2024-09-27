@@ -133,7 +133,7 @@ function MenuPage() {
     }
   };
 
-  let validCombinations = [
+  const validCombinations = [
     ['Primo', 'Secondo', 'Contorno'],
     ['Primo', 'Piatto unico', 'Contorno'],
     ['Primo', 'Contorno'],

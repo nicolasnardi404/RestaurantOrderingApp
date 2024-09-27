@@ -3,7 +3,11 @@ import { Button, Dropdown, Calendar } from 'primereact';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { UseDataLocal } from '../util/UseDataLocal';
+import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import '../styles/AddMultiplePiatti.css';
+
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const AddMultiplePiatti = () => {
     const [piatti, setPiatti] = useState([{ nome_piatto: '', idTipoPiatto: 1, nome_tipo: 'Primo' }]);
@@ -23,22 +27,37 @@ const AddMultiplePiatti = () => {
         setPiatti([...piatti, { nome_piatto: '', idTipoPiatto: 1, nome_tipo: 'Primo' }]);
     };
 
+    const removePiatto = (index) => {
+        const updatedPiatti = piatti.filter((_, i) => i !== index);
+        setPiatti(updatedPiatti);
+    };
+
+    const validatePiatti = () => {
+        for (let i = 0; i < piatti.length; i++) {
+            if (!piatti[i].nome_piatto) {
+                showToast("error", "Validation Error", `Nome piatto is required for row ${i + 1}`);
+                return false;
+            }
+        }
+        return true;
+    };
+
     const savePiatti = async () => {
+        if (!validatePiatti()) return; // Stop if validation fails
+
         try {
             const api = axios.create({
                 baseURL: "http://localhost:8080/api",
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            // Construct the JSON array
             const piattiToSave = piatti.map(piatto => ({
                 nome: piatto.nome_piatto,
                 tipo_piatto: piatto.idTipoPiatto,
             }));
 
-            // Get the formatted date for the URL
             const formattedDate = commonDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-            // Send the POST request
+
             await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
 
             showToast("success", "Success", "Piatti added successfully");
@@ -61,9 +80,9 @@ const AddMultiplePiatti = () => {
     return (
         <div className="add-multiple-piatti">
             <Toast ref={toast} />
-            <h1>Add Multiple Piatti</h1>
+            <h1>Aggiungi Piatti del giorno</h1>
             <div className="p-field">
-                <label htmlFor="commonDate">Common Date</label>
+                <label htmlFor="commonDate">Data</label>
                 <Calendar
                     id="commonDate"
                     value={commonDate}
@@ -77,6 +96,7 @@ const AddMultiplePiatti = () => {
                     <tr>
                         <th>Nome Piatto</th>
                         <th>Tipo Piatto</th>
+                        <th>Actions</th> {/* Added Actions column */}
                     </tr>
                 </thead>
                 <tbody>
@@ -106,6 +126,13 @@ const AddMultiplePiatti = () => {
                                     }}
                                     placeholder="Select a type"
                                     optionLabel="label"
+                                />
+                            </td>
+                            <td>
+                                <Button
+                                    icon="pi pi-times"
+                                    className="p-button-text custom-remove-btn" // Apply custom class
+                                    onClick={() => removePiatto(index)} // Remove button for each row
                                 />
                             </td>
                         </tr>

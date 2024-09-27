@@ -5,8 +5,11 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-        
+import { UseDataLocal } from '../util/UseDataLocal';
+import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
+        
 const CsvUpload = () => {
     const [isOver, setIsOver] = useState(false);
     const [files, setFiles] = useState([]);
@@ -53,7 +56,6 @@ const tipoOptions = [
                     'Content-Type': 'application/json',
                 },
             });
-            console.log(response.data);
             // Reset state after successful send
             setEditableData([]);
             setNewItem({ nome: '', data: '', tipo: '' });

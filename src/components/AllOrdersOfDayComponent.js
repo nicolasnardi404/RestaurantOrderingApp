@@ -4,11 +4,15 @@ import { Card } from 'primereact/card';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import { UseDataLocal } from '../util/UseDataLocal';
+import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import '../styles/AllOrderOfDayComponent.css';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const AllOrderOfDayComponent = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -47,6 +51,7 @@ const AllOrderOfDayComponent = () => {
   const fetchDailySummary = async (date) => {
     setLoading(true);
     if (userRole === 'Amministratore') {
+      console.log("passou")
       try {
         const dateString = formatDateForServer(date);
         const token = getToken();
@@ -55,7 +60,6 @@ const AllOrderOfDayComponent = () => {
             Authorization: `Bearer ${token}` // Add the token to the request headers
           }
         });
-        console.log('Daily summary:', response.data);
         setDailySummary(response.data);
       } catch (error) {
         console.error('Error fetching daily summary:', error);
@@ -96,13 +100,40 @@ const AllOrderOfDayComponent = () => {
     doc.text(`Date: ${formatDateForDisplay(selectedDate)}`, 14, 30);
     doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
-    // Add summary table
+    // Add detailed orders table
+    const detailedOrdersBody = dailyOrders.map(order => [order.username, order.piatti]);
+
     doc.autoTable({
       startY: 45,
-      head: [['Dish Name', 'Quantity']],
-      body: dailySummary.map(item => [item.nome, item.quantita]),
+      head: [['User', 'Dishes Ordered']],
+      body: detailedOrdersBody,
       styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+      headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+    });
+
+    // Update startY for summary table
+    const summaryTableStartY = doc.autoTable.previous.finalY + 10; // Adding space after detailed orders
+
+    // Add summary table
+    const summaryTableBody = [];
+
+    dailySummary.forEach(entry => {
+      entry.piatti.forEach((piatto, piattoIndex) => {
+        if (piattoIndex === 0) {
+          summaryTableBody.push([entry.tipo_piatto, entry.tipo_quantita, piatto.nome, piatto.quantita]);
+        } else {
+          summaryTableBody.push(['', '', piatto.nome, piatto.quantita]);
+        }
+      });
+    });
+
+    doc.autoTable({
+      startY: summaryTableStartY,
+      head: [['Tipo di Piatto', 'Quantità Totale', 'Nome del Piatto', 'Quantità']],
+      body: summaryTableBody,
+      styles: { fontSize: 10, cellPadding: 5 },
+      headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
       alternateRowStyles: { fillColor: [245, 245, 245] },
     });
 
@@ -136,21 +167,7 @@ const AllOrderOfDayComponent = () => {
           showIcon
         />
       </div>
-      {userRole === 'Amministratore' && (
-        <Card title={`Summary for ${selectedDate.toLocaleDateString()}`} className="summary-card">
-          <DataTable
-            value={dailySummary}
-            paginator
-            rows={10}
-            loading={loading}
-            emptyMessage="No orders for this day."
-            className="p-datatable-responsive"
-          >
-            <Column field="nome" header="Dish Name" sortable />
-            <Column field="quantita" header="Quantity" sortable />
-          </DataTable>
-        </Card>
-      )}
+
       <Card title={`Detailed Orders for ${selectedDate.toLocaleDateString()}`} className="details-card">
         <DataTable
           value={dailyOrders}
@@ -165,20 +182,36 @@ const AllOrderOfDayComponent = () => {
         </DataTable>
       </Card>
 
-      {/* New Table for tipo_quantita */}
       {userRole === 'Amministratore' && (
-        <Card title={`Tipo Quantità for ${selectedDate.toLocaleDateString()}`} className="tipo-quantita-card">
-          <DataTable
-            value={dailySummary}
-            paginator
-            rows={10}
-            loading={loading}
-            emptyMessage="No summary data available."
-            className="p-datatable-responsive"
-          >
-            <Column field="tipo_quantita" header="Tipo Piatto" body={(rowData) => rowData.tipo_quantita.split(':')[0]} sortable />
-            <Column field="quantita" header="Quantity" sortable />
-          </DataTable>
+        <Card title={`Summary for ${selectedDate.toLocaleDateString()}`} className="summary-card">
+          <div>
+            <table className="summary-table">
+              <thead>
+                <tr>
+                  <th>Tipo di Piatto</th>
+                  <th>Quantità Totale</th>
+                  <th>Nome del Piatto</th>
+                  <th>Quantità</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dailySummary.map((entry, index) => (
+                  entry.piatti.map((piatto, piattoIndex) => (
+                    <tr key={`${index}-${piattoIndex}`}>
+                      {piattoIndex === 0 && (
+                        <>
+                          <td rowSpan={entry.piatti.length}>{entry.tipo_piatto}</td>
+                          <td rowSpan={entry.piatti.length}>{entry.tipo_quantita}</td>
+                        </>
+                      )}
+                      <td>{piatto.nome}</td>
+                      <td>{piatto.quantita}</td>
+                    </tr>
+                  ))
+                ))}
+              </tbody>
+            </table>
+          </div>
         </Card>
       )}
 

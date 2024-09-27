@@ -1,6 +1,6 @@
 export default function PrenotazionePerPersonaComponent({idUser}) {
     const [data, setData] = useState([]);
-    const navigate = useNavigate();
+    const navigate = navigate();
   
     useEffect(() => {
       fetch('http://localhost:8080/api/api/prenotazione/${idUser}')

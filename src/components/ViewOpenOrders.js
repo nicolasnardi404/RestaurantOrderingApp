@@ -4,6 +4,8 @@ import { Column } from "primereact/column";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { UseDataLocal } from '../util/UseDataLocal';
+import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { Dropdown } from "primereact/dropdown";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
@@ -14,6 +16,8 @@ import "../styles/ViewOpenOrders.css";
 import "primeicons/primeicons.css";
 import Delete from "../assets/icons8-delete-25.png";
 import Edit from "../assets/icons8-edit-24.png";
+
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const ViewOpenOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -36,14 +40,12 @@ const ViewOpenOrders = () => {
     try {
       setLoading(true);
       const token = getToken();
-      console.log("Fetching orders for user ID:", user.userId);
       const response = await axios.get(
         `http://localhost:8080/api/ordine/ordineByUserId/${user.userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("Fetched orders:", response.data);
       setOrders(response.data);
       setError("");
     } catch (error) {
@@ -63,7 +65,6 @@ const ViewOpenOrders = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("Fetched available dishes:", response.data);
       setAvailableDishes(response.data);
     } catch (error) {
       console.error("Error fetching available dishes:", error);
@@ -136,7 +137,6 @@ const ViewOpenOrders = () => {
   const fetchDishesForOrder = async (date) => {
     try {
       const formattedDate = date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
-      console.log("Fetching dishes for date:", formattedDate);
       const token = getToken();
       const response = await axios.get(
         `http://localhost:8080/api/piatto/readByData/${formattedDate}`,
@@ -144,7 +144,6 @@ const ViewOpenOrders = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      console.log("Fetched dishes for date:", response.data);
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching dishes for date:", error);
@@ -156,11 +155,9 @@ const ViewOpenOrders = () => {
   };
 
   const handleEditOrder = async (order) => {
-    console.log("Editing order:", order);
     const selectedDishes = order.idPiatti
       ? order.idPiatti.split(", ").map((id) => parseInt(id))
       : [];
-    console.log("Selected dishes:", selectedDishes);
 
     let orderDate;
     if (order.datePiatti && order.datePiatti.includes(",")) {
@@ -170,10 +167,8 @@ const ViewOpenOrders = () => {
     } else {
       orderDate = new Date(); // Default to current date if datePiatti is undefined
     }
-    console.log("Order date:", orderDate);
 
     const dishesForOrder = await fetchDishesForOrder(orderDate);
-    console.log("Dishes for order:", dishesForOrder);
 
     if (!Array.isArray(dishesForOrder)) {
       console.error("Dishes for order is not an array:", dishesForOrder);
@@ -211,6 +206,18 @@ const ViewOpenOrders = () => {
             (id) => dishesById[id]?.tipo_piatto === "Piatto unico"
           )
           ] || null,
+          "Complement":
+          dishesById[
+          selectedDishes.find(
+            (id) => dishesById[id]?.tipo_piatto === "Complement"
+          )
+          ] || null,
+          "Altri":
+          dishesById[
+          selectedDishes.find(
+            (id) => dishesById[id]?.tipo_piatto === "Altri"
+          )
+          ] || null,
       },
       reservationDate: orderDate,
       availableDishes: dishesForOrder,
@@ -225,10 +232,6 @@ const ViewOpenOrders = () => {
   };
 
   const handleDropdownChange = (mealType, selectedDish) => {
-    console.log(
-      `Dropdown change for ${mealType}:`,
-      selectedDish ? selectedDish.nome : "None"
-    );
     setEditingOrder((prevOrder) => {
       const newSelectedDishes = {
         ...prevOrder.selectedDishes,
@@ -239,35 +242,28 @@ const ViewOpenOrders = () => {
     });
   };
 
-  const isValidCombination = (selectedDishes) => {
-    const validCombinations = [
-      ["Primo", "Secondo", "Contorno"],
-      ["Primo", "Piatto unico", "Contorno"],
-      ["Primo", "Contorno"],
-      ["Secondo", "Contorno"],
-      ["Piatto unico", "Contorno"],
-      ["Piatto unico"],
-    ];
+  const validCombinations = [
+    ['Primo', 'Secondo', 'Contorno'],
+    ['Primo', 'Piatto unico', 'Contorno'],
+    ['Primo', 'Contorno'],
+    ['Primo', 'Contorno', 'Complement'],
+    ['Secondo', 'Contorno'],
+    ['Piatto unico', 'Contorno'],
+    ['Piatto unico'],
+  ];
 
-    const selectedTypes = Object.keys(selectedDishes).filter(
-      (type) =>
-        selectedDishes[type] !== null && selectedDishes[type] !== undefined
+  const isValidCombination = (selectedDishes) => {
+    // Filtra os tipos de pratos selecionados, exceto "Altri"
+    const selectedTypes = Object.keys(selectedDishes)
+      .filter((type) => selectedDishes[type] !== null && type !== 'Altri');
+
+    // Verifica se a combinação é válida sem considerar "Altri"
+    const isValid = validCombinations.some(
+      (combination) =>
+        combination.length === selectedTypes.length &&
+        combination.every((type) => selectedTypes.includes(type))
     );
 
-    console.log("Selected types:", selectedTypes);
-
-    const isValid = validCombinations.some((combination) => {
-      const matchesLength = combination.length === selectedTypes.length;
-      const includesAll = combination.every((type) =>
-        selectedTypes.includes(type)
-      );
-      console.log(
-        `Checking combination: ${combination}, Length match: ${matchesLength}, Includes all: ${includesAll}`
-      );
-      return matchesLength && includesAll;
-    });
-
-    console.log("Is valid combination:", isValid);
     return isValid;
   };
 
@@ -314,7 +310,6 @@ const ViewOpenOrders = () => {
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
-          console.log("Cancelling order:", idPrenotazione);
           const token = getToken();
           await axios.delete(
             `http://localhost:8080/api/prenotazione/delete/${idPrenotazione}`,
@@ -352,8 +347,6 @@ const ViewOpenOrders = () => {
   const handleUpdateOrder = async () => {
     if (isValidCombination(editingOrder.selectedDishes)) {
       try {
-        console.log("Updating order:", editingOrder);
-
         // Filter out null or undefined dishes and get their IDs
         const selectedDishIds = Object.values(editingOrder.selectedDishes)
           .filter((dish) => dish !== null && dish !== undefined)
@@ -368,12 +361,12 @@ const ViewOpenOrders = () => {
           idPrenotazione: editingOrder.idPrenotazione,
           dataPrenotazione: editingOrder.reservationDate
             .toISOString()
-            .split("T")[0], // Format: YYYY-MM-DD
+            .split("T")[0],
           idPiatto: selectedDishIds,
           idOrdine: idOrdineArray,
         };
 
-        console.log("Update data:", JSON.stringify(updateData, null, 2));
+        console.log(editingOrder.reservationDate)
 
         const token = getToken();
         const response = await axios.put(
@@ -386,7 +379,6 @@ const ViewOpenOrders = () => {
             },
           }
         );
-        console.log("Update response:", response.data);
 
         setShowEditDialog(false);
         await fetchOrders(); // Refresh the orders after update
@@ -406,15 +398,7 @@ const ViewOpenOrders = () => {
     <div className="view-open-orders">
       <Toast ref={toast} />
       <ConfirmDialog />
-      <div className="header-container">
-        <h1>I tuoi ordini aperti</h1>
-        <Button
-          label="Go to Menu"
-          onClick={() => window.location.href = '/menu'}
-          className="new-button"
-        />
-      </div>
-      <Card>
+      <Card title="Your Open Orders">
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
           <Column field="idPrenotazione" header="Order ID" />
@@ -444,7 +428,42 @@ const ViewOpenOrders = () => {
         style={{ width: "50vw" }}
         onHide={() => setShowEditDialog(false)}
       >
-        {/* Dialog content */}
+        {editingOrder && (
+          <div>
+            <div className="p-field">
+              <label>Reservation Date:</label>
+              <span>{formatDate(editingOrder.reservationDate)}</span>
+            </div>
+            {["Primo", "Secondo", "Contorno", "Piatto unico", "Complement", "Altri"].map(
+              (mealType) => (
+                <div key={mealType} className="p-field">
+                  <label htmlFor={mealType}>{mealType}</label>
+                  <Dropdown
+                    id={mealType}
+                    value={editingOrder.selectedDishes[mealType]}
+                    options={editingOrder.availableDishes.filter(
+                      (dish) => dish.tipo_piatto === mealType
+                    )}
+                    onChange={(e) => handleDropdownChange(mealType, e.value)}
+                    optionLabel="nome"
+                    placeholder={`Select ${mealType}`}
+                    className="w-full md:w-14rem"
+                    showClear
+                  />
+                </div>
+              )
+            )}
+            {combinationStatus && (
+              <div className="combination-status">{combinationStatus}</div>
+            )}
+            {error && <div className="error-message">{error}</div>}
+            <Button
+              label="Update Order"
+              onClick={handleUpdateOrder}
+              disabled={!isValidCombination(editingOrder.selectedDishes)}
+            />
+          </div>
+        )}
       </Dialog>
     </div>
   );

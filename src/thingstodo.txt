@@ -14,8 +14,8 @@ Pedido Aberto
  
 Pedido do Dia
 
-[ ] - mudar PDF para todos os dados
-[ ] - corrigir tabela
+[x] - mudar PDF para todos os dados
+[x] - corrigir tabela
 
         Contorno 4
 
@@ -24,11 +24,11 @@ Pedido do Dia
             - Cenoura 2
 
 Editar Piatto 
-[ ] - título
-[ ] - adicionar btn para remover linha dentro da opcao de multiplo pratos
-[ ] - nao aceitar valor nulo no db do multiplo piatos
-[ ] - adicionar pao e fruta
+[x] - título
+[x] - adicionar btn para remover linha dentro da opcao de multiplo pratos
+[x] - nao aceitar valor nulo no db do multiplo piatos
+[x] - adicionar pao e fruta
 
 Storico per User
-[ ] - total
+[x] - total
  

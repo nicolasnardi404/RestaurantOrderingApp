@@ -23,7 +23,6 @@ const LoginPage = () => {
       });
 
       const token = response.data.token;
-      console.log(response.data);
 
       // Passar o valor de rememberMe para a função de login
       login(token, rememberMe);

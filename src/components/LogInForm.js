@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from 'axios'; // Ensure axios is installed via npm or yarn
 import '../App.css';
 
+UseDataLocal(ITALIAN_LOCALE_CONFIG);
+
 export default function LogInForm() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -15,7 +17,6 @@ export default function LogInForm() {
             const response = await axios.post("http://localhost:80/project/login", dataToSend, {
                 headers: { 'Content-Type': 'application/json' }
             });
-            console.log(response.data); // Handle success response
         } catch (error) {
             console.error('Error submitting login data:', error); // Handle errors
         }
