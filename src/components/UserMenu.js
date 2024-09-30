@@ -26,15 +26,15 @@ export default function UserMenu() {
 
   const getMenuItems = () => {
     const commonItems = [
-      { label: 'Historic', icon: 'calendar', path: '/historic' },
-      { label: 'Make an Order', icon: 'shopping-cart', path: '/menu' },
-      { label: 'View Open Orders', icon: 'list', path: '/open-orders' },
-      { label: 'All Orders of the Day', icon: 'book', path: '/day-order' },
-      { label: 'Logout', icon: 'power-off', action: handleLogout },
+      { label: 'Storico', icon: 'calendar', path: '/historic' }, // Changed to Italian
+      { label: 'Fai un Ordine', icon: 'shopping-cart', path: '/menu' }, // Changed to Italian
+      { label: 'Visualizza Ordini Aperti', icon: 'list', path: '/open-orders' }, // Changed to Italian
+      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' }, // Changed to Italian
+      { label: 'Logout', icon: 'power-off', action: handleLogout }, // Unchanged
     ];
 
     const amministratoreItems = [
-      { label: 'Edit Piatti', icon: 'pencil', path: '/managepiatti' }
+      { label: 'Modifica Piatti', icon: 'pencil', path: '/managepiatti' } // Unchanged
     ];
 
     return user && user.ruolo === 'Amministratore'
