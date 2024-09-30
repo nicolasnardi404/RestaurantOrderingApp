@@ -14,8 +14,6 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/ViewOpenOrders.css";
 import "primeicons/primeicons.css";
-import Delete from "../assets/icons8-delete-25.png";
-import Edit from "../assets/icons8-edit-24.png";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -121,15 +119,18 @@ const ViewOpenOrders = () => {
   const actionTemplate = (rowData) => {
     return (
       <div className="action-buttons">
-        <button className="btn-edit" onClick={() => handleEditOrder(rowData)}>
-          <img src={Edit} alt="Edit" className="action-icon" />
-        </button>
-        <button
+        <Button
+          icon="pi pi-pencil"
+          className="btn-edit"
+          onClick={() => handleEditOrder(rowData)}
+          tooltip="Edit Order"
+        />
+        <Button
+          icon="pi pi-trash"
           className="btn-delete"
           onClick={() => handleCancelOrder(rowData.idPrenotazione)}
-        >
-          <img src={Delete} alt="Delete" className="action-icon" />
-        </button>
+          tooltip="Cancel Order"
+        />
       </div>
     );
   };
