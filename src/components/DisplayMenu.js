@@ -326,9 +326,6 @@ function MenuPage() {
         observazioni: observazioni,
       };
 
-      console.log(orderData);
-
-      console.log('Submitting order:', JSON.stringify(orderData));
       try {
         const token = getToken();
         const response = await axios.post(
@@ -343,7 +340,6 @@ function MenuPage() {
         );
 
         if (response.status === 200 || response.status === 201) {
-          console.log('Order submitted successfully');
           setShowSuccessModal(true);
         } else {
           throw new Error('Failed to submit order');
@@ -404,6 +400,7 @@ function MenuPage() {
           dateFormat="dd/mm/yy"
           showIcon
           placeholder="Select a date"
+          minDate={new Date()} // Set the minimum date to today
         />
       </div>
 

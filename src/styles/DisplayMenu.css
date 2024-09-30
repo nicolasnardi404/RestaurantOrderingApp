@@ -122,6 +122,8 @@ body {
   justify-content: center;
   align-items: center;
   box-shadow: none;
+  padding: 40px 0px ;
+  max-width: 95%;
 }
 
 .combinazioni-card h4{
