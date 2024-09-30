@@ -189,22 +189,22 @@ const AllOrderOfDayComponent = () => {
         />
       </div>
 
-      <Card title={`Detailed Orders for ${DisplayData(selectedDate)}`} className="details-card">
+      <Card title={`Ordini Dettagliati per ${DisplayData(selectedDate)}`} className="details-card"> {/* Changed to Italian */}
         <DataTable
           value={dailyOrders}
           paginator
           rows={10}
           loading={loading}
-          emptyMessage="No orders for this day."
+          emptyMessage="Nessun ordine per questo giorno." // Changed to Italian
           className="p-datatable-responsive"
         >
-          <Column field="username" header="User" sortable />
-          <Column field="piatti" header="Dishes Ordered" sortable />
+          <Column field="username" header="Utente" sortable /> {/* Changed to Italian */}
+          <Column field="piatti" header="Piatti Ordinati" sortable /> {/* Changed to Italian */}
         </DataTable>
       </Card>
 
       {userRole === 'Amministratore' && (
-        <Card title={`Summary for ${DisplayData(selectedDate)}`} className="summary-card">
+        <Card title={`Riepilogo per ${DisplayData(selectedDate)}`} className="summary-card">
           <div>
             <table className="summary-table">
               <thead>
@@ -239,7 +239,7 @@ const AllOrderOfDayComponent = () => {
       {userRole === 'Amministratore' && (
         <div className="pdf-button-section">
           <Button
-            label="Generate PDF"
+            label="Genera PDF" // Changed to Italian
             icon="pi pi-file-pdf"
             onClick={generatePDF}
             className="p-button-lg btn"

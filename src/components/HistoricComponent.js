@@ -33,7 +33,7 @@ const HistoricComponent = () => {
   const [isAdmin, setAdmin] = useState(false);
   const { getToken } = useAuth();
 
-  // Corrige para definir `isAdmin` corretamente
+  // Correctly define `isAdmin`
   useEffect(() => {
     if (ruolo === "Amministratore") {
       setAdmin(true);
@@ -54,14 +54,14 @@ const HistoricComponent = () => {
         const dateString = formatDateforServer(selectedDate);
         url = `http://localhost:8080/api/ordine/ordineByDay/${dateString}`;
       } else {
-        return; // Não busca se nenhuma data for selecionada
+        return; // Do not fetch if no date is selected
       }
     } else {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
       } else {
-        return; // Não busca se nenhuma data for selecionada
+        return; // Do not fetch if no date is selected
       }
     }
 
@@ -74,7 +74,7 @@ const HistoricComponent = () => {
         setFilteredData(response.data.filter(item => item.username === currentUsername));
         setData(filteredData);
       } else {
-        setFilteredData(response.data)
+        setFilteredData(response.data);
         setData(filteredData);
         const uniqueUsernames = [...new Set(filteredData.map(item => item.username))];
         setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
@@ -84,7 +84,6 @@ const HistoricComponent = () => {
       console.error('Erro ao buscar dados:', error);
     }
   };
-
 
   useEffect(() => {
     fetchData();
@@ -107,6 +106,7 @@ const HistoricComponent = () => {
       setTotalOrders(filteredData.length);
     }
   }, [filteredData]);
+
   const formatDateForDisplay = (dateString) => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('it-IT', options);
@@ -114,14 +114,14 @@ const HistoricComponent = () => {
 
   const handleViewModeChange = (mode) => {
     setViewMode(mode);
-    setSelectedDate(null); // Reseta a data selecionada
-    setSelectedMonth(null); // Reseta o mês selecionado
+    setSelectedDate(null); // Reset selected date
+    setSelectedMonth(null); // Reset selected month
   };
 
-  // Calcula total de pedidos por dia
+  // Calculate total orders per day
   const calculateTotalPerDayData = () => {
     const totals = data.reduce((acc, order) => {
-      const date = order.reservation_date.split('T')[0]; // Obtém apenas a data
+      const date = order.reservation_date.split('T')[0]; // Get only the date
       if (!acc[date]) {
         acc[date] = 0;
       }
@@ -143,10 +143,10 @@ const HistoricComponent = () => {
     }
   }, [showTotalPerDay, data]);
 
-  // Gera o PDF
+  // Generate PDF
   const generatePDF = () => {
     if (!selectedMonth) {
-      alert('Por favor, selecione um mês para gerar o PDF.');
+      alert('Per favore, seleziona un mese per generare il PDF.');
       return;
     }
 
@@ -154,18 +154,18 @@ const HistoricComponent = () => {
     doc.setFont('helvetica');
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('Relatório Mensal de Pedidos', 14, 30);
+    doc.text('Relazione Mensile degli Ordini', 14, 30); // Changed to Italian
 
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Usuário: ${selectedUsername || 'Todos'}`, 14, 45);
-    doc.text(`Mês: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 14, 52);
-    doc.text(`Total de Pedidos: ${totalOrders}`, 14, 59);
+    doc.text(`Utente: ${selectedUsername || 'Tutti'}`, 14, 45); // Changed to Italian
+    doc.text(`Mese: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 14, 52);
+    doc.text(`Totale Ordini: ${totalOrders}`, 14, 59); // Changed to Italian
 
     if (showTotalPerDay) {
       doc.autoTable({
         startY: 70,
-        head: [['Data', 'Total de Pedidos']],
+        head: [['Data', 'Totale Ordini']], // Changed to Italian
         body: totalPerDayData.map(item => [
           formatDateForDisplay(item.date).split(',')[0],
           item.totalOrders
@@ -177,7 +177,7 @@ const HistoricComponent = () => {
     } else {
       doc.autoTable({
         startY: 70,
-        head: [['Data', 'Tipo de Pratos']],
+        head: [['Data', 'Tipo di Piatti']], // Changed to Italian
         body: filteredData.map(order => [
           formatDateForDisplay(order.reservation_date),
           order.piatti
@@ -193,17 +193,17 @@ const HistoricComponent = () => {
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setTextColor(150);
-      doc.text(`Página ${i} de ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+      doc.text(`Pagina ${i} di ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' }); // Changed to Italian
     }
 
-    doc.save(`${selectedUsername || 'todos'}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_pedidos.pdf`);
+    doc.save(`${selectedUsername || 'tutti'}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`); // Changed to Italian
   };
 
   return (
     <div className="historic-container">
       <div className="card-row">
         <Card className="filter-card">
-          <h2>Storico Ordini</h2>
+          <h2>Storico Ordini</h2> {/* Changed to Italian */}
           <div className="p-field">
             <label>Visualizzazione</label>
             <div className="p-buttonset">
@@ -212,7 +212,7 @@ const HistoricComponent = () => {
                 onClick={() => handleViewModeChange('month')}
                 className={viewMode === 'month' ? 'p-button-primary' : 'p-button-secondary'}
               />
-              {/* O botão "Giorno" só aparece para o administrador */}
+              {/* The "Day" button only appears for the administrator */}
               {isAdmin && (
                 <Button
                   label="Giorno"
@@ -223,7 +223,7 @@ const HistoricComponent = () => {
             </div>
           </div>
 
-          {/* O Dipendente só pode selecionar o mês, o admin pode selecionar o mês ou dia */}
+          {/* The employee can only select the month, the admin can select the month or day */}
           <div className="p-field">
             <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
             <Calendar
@@ -233,13 +233,13 @@ const HistoricComponent = () => {
               view={viewMode === 'month' ? "month" : "date"}
               dateFormat={viewMode === 'month' ? "mm/yy" : "dd/mm/yy"}
               showIcon
-              disabled={!isAdmin && viewMode === 'day'} // Desabilita o campo de dia para o Dipendente
+              disabled={!isAdmin && viewMode === 'day'} // Disable the day field for the employee
             />
           </div>
 
-          {/* O botão de InputSwitch é visível para ambos */}
+          {/* The InputSwitch button is visible for both */}
           {isAdmin && (
-            < div className="p-field">
+            <div className="p-field">
               <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
               <InputSwitch
                 id="totalPerDaySwitch"
@@ -249,7 +249,7 @@ const HistoricComponent = () => {
             </div>
           )}
 
-          {/* O dropdown de usuários é exibido apenas para o administrador */}
+          {/* The user dropdown is displayed only for the administrator */}
           {!showTotalPerDay && isAdmin && (
             <div className="p-field">
               <label htmlFor="userDropdown">Seleziona Utente</label>
@@ -265,7 +265,7 @@ const HistoricComponent = () => {
           )}
         </Card>
 
-        {/* Exibição dos dados: tabelas diferentes para total por dia ou dados filtrados */}
+        {/* Display of data: different tables for total per day or filtered data */}
         <Card className="data-card">
           {showTotalPerDay ? (
             <DataTable
@@ -277,13 +277,13 @@ const HistoricComponent = () => {
             >
               <Column
                 field="date"
-                header="Data"
+                header="Data" // Changed to Italian
                 body={(rowData) => formatDateForDisplay(rowData.date)}
                 sortable
               />
               <Column
                 field="totalOrders"
-                header="Totale Ordini"
+                header="Totale Ordini" // Changed to Italian
                 sortable
               />
             </DataTable>
@@ -295,23 +295,23 @@ const HistoricComponent = () => {
               className="p-datatable-responsive"
               emptyMessage="Nessun ordine trovato"
             >
-              {/* Exibição de dados diferente para admin e dipendente */}
+              {/* Display of data different for admin and employee */}
               {isAdmin && (
                 <Column
                   field="username"
-                  header="Nome Utente"
+                  header="Nome Utente" // Changed to Italian
                   sortable
                 />
               )}
               <Column
                 field="reservation_date"
-                header="Data Prenotazione"
+                header="Data Prenotazione" // Changed to Italian
                 body={(rowData) => formatDateForDisplay(rowData.reservation_date)}
                 sortable
               />
               <Column
                 field="piatti"
-                header="Tipo di Piatti"
+                header="Tipo di Piatti" // Changed to Italian
                 sortable
               />
             </DataTable>
@@ -319,17 +319,17 @@ const HistoricComponent = () => {
         </Card>
       </div >
 
-      {/* O card com o total e o botão de gerar PDF será visível apenas para o administrador */}
+      {/* The card with the total and the PDF generation button will be visible only for the administrator */}
       {
         isAdmin && (
           <Card className="total-pdf-card">
             <div className="total-orders-section">
-              <h3>Total Orders</h3>
+              <h3>Totale Ordini</h3> {/* Changed to Italian */}
               <p className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</p>
             </div>
             <div className="pdf-button-section">
               <Button
-                label="Generate PDF"
+                label="Genera PDF" // Changed to Italian
                 icon="pi pi-file-pdf"
                 onClick={generatePDF}
                 disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
