@@ -14,6 +14,8 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/ViewOpenOrders.css";
 import "primeicons/primeicons.css";
+import formatDateforServer from "../util/formatDateForServer";
+import { formatCalendarData } from "../util/FormatCalendarData";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -137,10 +139,9 @@ const ViewOpenOrders = () => {
 
   const fetchDishesForOrder = async (date) => {
     try {
-      const formattedDate = date.toISOString().split("T")[0]; // Format: YYYY-MM-DD
       const token = getToken();
       const response = await axios.get(
-        `http://localhost:8080/api/piatto/readByData/${formattedDate}`,
+        `http://localhost:8080/api/piatto/readByData/${formatDateforServer(date)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -360,14 +361,10 @@ const ViewOpenOrders = () => {
 
         const updateData = {
           idPrenotazione: editingOrder.idPrenotazione,
-          dataPrenotazione: editingOrder.reservationDate
-            .toISOString()
-            .split("T")[0],
+          dataPrenotazione: formatCalendarData(editingOrder.reservationDate),
           idPiatto: selectedDishIds,
           idOrdine: idOrdineArray,
         };
-
-        console.log(editingOrder.reservationDate)
 
         const token = getToken();
         const response = await axios.put(

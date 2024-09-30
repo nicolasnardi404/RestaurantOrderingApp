@@ -35,7 +35,6 @@ const AllOrderOfDayComponent = () => {
     setLoading(true);
     try {
       const dateString = formatDateforServer(date);
-      console.log("hello im date: " +dateString)
       const token = getToken(); // Get the token
       const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`, {
         headers: {
@@ -75,11 +74,6 @@ const AllOrderOfDayComponent = () => {
   const handleDateChange = (e) => {
     const selectedDate = e.value; // Get the selected date
     const formattedDate = formatCalendarData(selectedDate); // Format the date using formatCalendarData
-
-    // Log both the selected and formatted dates for clarity
-    console.log('Selected Date:', selectedDate);
-    console.log('Formatted Date:', formattedDate);
-
     setSelectedDate(selectedDate); // Update selectedDate for fetching orders
   };
 
