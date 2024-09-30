@@ -17,19 +17,20 @@ import formatDateforServer from '../util/formatDateForServer';
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const AllOrderOfDayComponent = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, getToken } = useAuth(); // Use the useAuth hook to get the getToken function
   const [userRole, setUserRole] = useState('');
+  
 
   useEffect(() => {
-    fetchDailyOrders(selectedDate);
-    fetchDailySummary(selectedDate);
     const role = user.ruolo;
     setUserRole(role);
-  }, [selectedDate]);
+    fetchDailyOrders(selectedDate); // Fetch daily orders for the selected date
+    fetchDailySummary(selectedDate); // Fetch daily summary for the selected date
+  }, [selectedDate]); // Dependency on selectedDate
 
   const fetchDailyOrders = async (date) => {
     setLoading(true);
@@ -52,7 +53,9 @@ const AllOrderOfDayComponent = () => {
 
   const fetchDailySummary = async (date) => {
     setLoading(true);
-    if (userRole === 'Amministratore') {
+    const role = user.ruolo;
+    setUserRole(role);
+    if (role === 'Amministratore') {
       try {
         const dateString = formatDateforServer(date);
         const token = getToken();

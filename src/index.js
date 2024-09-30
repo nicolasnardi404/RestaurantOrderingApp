@@ -1,7 +1,6 @@
 import React from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import Menu from "./pages/Menu";
 import Historic from "./pages/Historic";
@@ -26,7 +25,6 @@ export default function App() {
 
           {/* Protected routes for both Amministratore and Dipendente */}
           <Route element={<ProtectedRoute allowedRoles={['Amministratore', 'Dipendente']} />}>
-            <Route path="/" element={<Home />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/open-orders" element={<OpenOrders />} />
             <Route path="/day-order" element={<AllOrderOfDay />} />
