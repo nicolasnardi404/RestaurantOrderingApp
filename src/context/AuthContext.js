@@ -1,14 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
-
+ 
 const AuthContext = createContext(null);
-
+ 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+ 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -20,53 +20,60 @@ export const AuthProvider = ({ children }) => {
             ruolo: decodedToken.data.ruolo
           });
         } else {
-          logout();
+          console.error("Token expired");
+          setUser(null);
         }
       } catch (error) {
         console.error("Invalid token", error);
         setUser(null);
       }
     }
-    setLoading(false); // Finaliza o estado de carregamento
+    setLoading(false);
   }, []);
-
-  const login = (token) => {
+ 
+  const login = (token, rememberMe) => {
     try {
       const decodedToken = jwtDecode(token);
-      setUser({
-        userId: decodedToken.data.userId,
-        nome: decodedToken.data.nome,
-        ruolo: decodedToken.data.ruolo
-      });
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', decodedToken.data.userId);
-      localStorage.setItem('nome', decodedToken.data.nome);
-      localStorage.setItem('ruolo', decodedToken.data.ruolo);
+      const isExpired = decodedToken.exp * 1000 < Date.now();
+      if (!isExpired) {
+        setUser({
+          userId: decodedToken.data.userId,
+          nome: decodedToken.data.nome,
+          ruolo: decodedToken.data.ruolo
+        });
+ 
+        if (rememberMe) {
+          localStorage.setItem('token', token);
+        } else {
+          sessionStorage.setItem('token', token);
+        }
+      } else {
+        console.error("Token expired");
+      }
     } catch (error) {
       console.error("Failed to decode token", error);
     }
   };
-
+ 
   const logout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     setUser(null);
   };
-
-  // Reintroduzindo o método getToken
-  const getToken = () => localStorage.getItem('token');
-
+ 
+  const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
+ 
   if (loading) {
-    return <div>Loading...</div>; // Renderiza enquanto o estado está sendo carregado
+    return <div>Loading...</div>;
   }
-
+ 
   return (
     <AuthContext.Provider value={{ user, login, logout, getToken }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
+ 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

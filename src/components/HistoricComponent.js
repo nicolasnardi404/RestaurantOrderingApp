@@ -29,9 +29,9 @@ const HistoricComponent = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [showTotalPerDay, setShowTotalPerDay] = useState(false);
   const [totalPerDayData, setTotalPerDayData] = useState([]);
-  const ruolo = localStorage.getItem('ruolo');
   const [isAdmin, setAdmin] = useState(false);
-  const { getToken } = useAuth();
+  const { user, getToken } = useAuth();
+  const ruolo = user.ruolo;
 
   // Correctly define `isAdmin`
   useEffect(() => {
@@ -43,9 +43,9 @@ const HistoricComponent = () => {
   const fetchData = async () => {
     let url;
     const token = getToken();
-    const currentUsername = localStorage.getItem('nome');
+    const currentUsername = user.nome
 
-    if (ruolo === "Amministratore") {
+    if (isAdmin) {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
