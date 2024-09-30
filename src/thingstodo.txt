@@ -31,4 +31,13 @@ Editar Piatto
 
 Storico per User
 [x] - total
- 
+
+Regolazione della data
+[] - Add Single Piatto
+[] - Add multiplo Piatto
+[] - Edit piatto
+[] - View Open Order (edit order)
+[] - All orders of the day
+
+Historic
+[] - value null for "Seleziona Utente"
