@@ -115,3 +115,21 @@ body {
   justify-content: space-between;
   align-items: center;
 }
+
+.combinazioni-card{
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: none;
+}
+
+.combinazioni-card h4{
+  font-size: 0.8em;
+  padding: 0;
+}
+
+.text-bold{
+  color: black;
+  font-weight: 700;
+}

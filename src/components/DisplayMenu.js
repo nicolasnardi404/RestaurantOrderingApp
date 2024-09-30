@@ -11,6 +11,7 @@ import { UseDataLocal } from '../util/UseDataLocal';
 import { useAuth } from '../context/AuthContext';
 import '../styles/DisplayMenu.css';
 import { InputTextarea } from 'primereact/inputtextarea';
+import { Card } from 'primereact/card';
 
 function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(new Date()); // Set default to current date
@@ -409,6 +410,9 @@ function MenuPage() {
       <div className="menu-button-container">
         <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
       </div>
+        <Card className='combinazioni-card'>
+          <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
+          </Card>
 
       {selectedDay && (
         <>
