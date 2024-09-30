@@ -11,7 +11,7 @@ import MyApp from "./_app";
 import CRUDPiatti from "./pages/CRUDPiatti";
 import AllOrderOfDay from "./pages/AllOrderOfDay";
 import ProtectedRoute from './components/ProtectedRoute';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client'; // Updated import
 import MultiplePiatti from './pages/MultiplePiatti';
 
 export default function App() {
