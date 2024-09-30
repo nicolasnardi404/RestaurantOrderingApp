@@ -96,7 +96,7 @@ const AddMultiplePiatti = () => {
                     <tr>
                         <th>Nome Piatto</th>
                         <th>Tipo Piatto</th>
-                        <th>Actions</th> {/* Added Actions column */}
+                        <th>Azione</th> {/* New column for actions */}
                     </tr>
                 </thead>
                 <tbody>
@@ -129,9 +129,9 @@ const AddMultiplePiatti = () => {
                                 />
                             </td>
                             <td>
-                                <Button
-                                    icon="pi pi-times"
-                                    className="p-button-text custom-remove-btn" // Apply custom class
+                                <Button 
+                                    icon="pi pi-trash" // Use the trash bin icon
+                                    className="custom-remove-btn" // Add danger styling for red color
                                     onClick={() => removePiatto(index)} // Remove button for each row
                                 />
                             </td>
@@ -139,8 +139,8 @@ const AddMultiplePiatti = () => {
                     ))}
                 </tbody>
             </table>
-            <Button label="Add Another Piatto" icon="pi pi-plus" onClick={addPiatto} />
-            <Button label="Save All" icon="pi pi-check" onClick={savePiatti} />
+            <Button label="Add Another Piatto" icon="pi pi-plus" onClick={addPiatto} className="p-button-primary" />
+            <Button label="Save All" icon="pi pi-check" onClick={savePiatti}  />
         </div>
     );
 };

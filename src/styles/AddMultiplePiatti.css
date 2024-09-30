@@ -27,12 +27,14 @@
     width: 100%; /* Full width for the table */
     border-collapse: collapse; /* Collapse borders */
     margin-bottom: 20px; /* Space below the table */
+
 }
 
 .p-table th, .p-table td {
     padding: 10px; /* Padding for table cells */
-    text-align: left; /* Align text to the left */
+    text-align: center; /* Align text to the left */
     border: 1px solid #ddd; /* Light border for cells */
+
 }
 
 .p-table th {
@@ -55,14 +57,14 @@ button {
 }
 
 .custom-calendar {
-    width: 200px; /* Set a smaller width for the calendar */
-    margin-top: 10px; /* Add some space above the calendar */
+    width: 200px;
+    margin-top: 10px; 
 }
 
 .custom-remove-btn {
-    color: red; /* Set the icon color to red */
+    background-color: red;
 }
 
 .custom-remove-btn:hover {
-    color: darkred; /* Optional: Make it darker when hovered */
+    background-color:  darkred; 
 }
