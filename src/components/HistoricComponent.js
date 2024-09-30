@@ -15,11 +15,12 @@ import { UseDataLocal } from '../util/UseDataLocal';
 import { useAuth } from '../context/AuthContext';
 import '../styles/HistoricComponent.css';
 
+// Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const HistoricComponent = () => {
   const [data, setData] = useState([]);
-  let [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedUsername, setSelectedUsername] = useState('');
@@ -28,9 +29,9 @@ const HistoricComponent = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [showTotalPerDay, setShowTotalPerDay] = useState(false);
   const [totalPerDayData, setTotalPerDayData] = useState([]);
+  const ruolo = localStorage.getItem('ruolo');
   const [isAdmin, setAdmin] = useState(false);
-  const { user, getToken } = useAuth();
-  const ruolo = user.ruolo;
+  const { getToken } = useAuth();
 
   // Corrige para definir `isAdmin` corretamente
   useEffect(() => {
@@ -42,13 +43,13 @@ const HistoricComponent = () => {
   const fetchData = async () => {
     let url;
     const token = getToken();
-    const currentUsername = user.nome;
+    const currentUsername = localStorage.getItem('nome');
 
-    // Defina a URL com base no modo de visualização e nas seleções de data
     if (ruolo === "Amministratore") {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
+        console.log(monthString)
       } else if (viewMode === 'day' && selectedDate) {
         const dateString = formatDateforServer(selectedDate);
         url = `http://localhost:8080/api/ordine/ordineByDay/${dateString}`;
@@ -58,7 +59,7 @@ const HistoricComponent = () => {
     } else {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
-        url = `http://localhost:8080/api/ordine/readByIdAndMese/${monthString}/${user.userId}`;
+        url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
       } else {
         return; // Não busca se nenhuma data for selecionada
       }
@@ -69,20 +70,16 @@ const HistoricComponent = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Atualize os dados com base no modo de visualização
-      if (isAdmin) {
-        setFilteredData(response.data);
-        setData(response.data); // Armazene a resposta em 'data'
-
-        // Atualize os nomes de usuários disponíveis
-        const uniqueUsernames = [...new Set(response.data.map(item => item.username))];
-        setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
+      if (!isAdmin) {
+        setFilteredData(response.data.filter(item => item.username === currentUsername));
+        setData(filteredData);
       } else {
-        // Se não for admin, filtrar os dados para o usuário atual
-        const filtered = response.data.filter(item => item.username === currentUsername);
-        setFilteredData(filtered);
-        setData(filtered); // Armazene os dados filtrados em 'data'
+        setFilteredData(response.data)
+        setData(filteredData);
+        const uniqueUsernames = [...new Set(filteredData.map(item => item.username))];
+        setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
       }
+      console.log(data)
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     }
@@ -123,7 +120,7 @@ const HistoricComponent = () => {
 
   // Calcula total de pedidos por dia
   const calculateTotalPerDayData = () => {
-    const totals = filteredData.reduce((acc, order) => {
+    const totals = data.reduce((acc, order) => {
       const date = order.reservation_date.split('T')[0]; // Obtém apenas a data
       if (!acc[date]) {
         acc[date] = 0;
@@ -141,10 +138,10 @@ const HistoricComponent = () => {
   };
 
   useEffect(() => {
-    if (showTotalPerDay && filteredData.length > 0) {
+    if (showTotalPerDay && data.length > 0) {
       calculateTotalPerDayData();
     }
-  }, [showTotalPerDay, filteredData]);
+  }, [showTotalPerDay, data]);
 
   // Gera o PDF
   const generatePDF = () => {
@@ -241,14 +238,16 @@ const HistoricComponent = () => {
           </div>
 
           {/* O botão de InputSwitch é visível para ambos */}
-          < div className="p-field">
-            <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-            <InputSwitch
-              id="totalPerDaySwitch"
-              checked={showTotalPerDay}
-              onChange={(e) => setShowTotalPerDay(e.value)}
-            />
-          </div>
+          {isAdmin && (
+            < div className="p-field">
+              <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+              <InputSwitch
+                id="totalPerDaySwitch"
+                checked={showTotalPerDay}
+                onChange={(e) => setShowTotalPerDay(e.value)}
+              />
+            </div>
+          )}
 
           {/* O dropdown de usuários é exibido apenas para o administrador */}
           {!showTotalPerDay && isAdmin && (
@@ -260,6 +259,7 @@ const HistoricComponent = () => {
                 options={usernames}
                 onChange={(e) => setSelectedUsername(e.value)}
                 placeholder="Tutti gli utenti"
+                showClear
               />
             </div>
           )}
