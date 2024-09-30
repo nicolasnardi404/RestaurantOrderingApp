@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { UseDataLocal } from '../util/UseDataLocal';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import '../styles/AddMultiplePiatti.css';
+import { formatCalendarData } from '../util/FormatCalendarData';
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -56,7 +57,7 @@ const AddMultiplePiatti = () => {
                 tipo_piatto: piatto.idTipoPiatto,
             }));
 
-            const formattedDate = commonDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+            const formattedDate = formatCalendarData(commonDate); // Format to YYYY-MM-DD
 
             await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
 

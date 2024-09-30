@@ -97,7 +97,7 @@ function ManagePiatti() {
   const addNewPiatto = () => {
     setEditingPiatto({
       nome_piatto: "",
-      data: new Date().toISOString().split("T")[0],
+      data: formatCalendarData(new Date()),
       idTipoPiatto: 1,
       nome_tipo: "Primo",
       sempreDisponibile: false,

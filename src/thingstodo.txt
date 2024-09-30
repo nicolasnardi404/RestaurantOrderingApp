@@ -35,9 +35,9 @@ Storico per User
 Regolazione della data
 [] - Add Single Piatto
 [] - Add multiplo Piatto
-[] - Edit piatto
-[] - View Open Order (edit order)
-[] - All orders of the day
+[X] - Edit piatto
+[X] - View Open Order (edit order)
+[X] - All orders of the day
 
 Historic
 [] - value null for "Seleziona Utente"
