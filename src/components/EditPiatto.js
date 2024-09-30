@@ -14,8 +14,6 @@ import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
-import Delete from "../assets/icons8-delete-25.png";
-import Edit from "../assets/icons8-edit-24.png";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
@@ -175,15 +173,12 @@ function ManagePiatti() {
   const actionTemplate = (rowData) => {
     return (
       <div className="action-buttons">
-        <button className="btn-edit" onClick={() => editPiatto(rowData)}>
-          <img src={Edit} alt="Edit" className="action-icon" />
-        </button>
-        <button
+        <Button className="btn-edit" onClick={() => editPiatto(rowData)} icon="pi pi-pencil" />
+        <Button
           className="btn-delete"
           onClick={() => deletePiatto(rowData.id_piatto)}
-        >
-          <img src={Delete} alt="Delete" className="action-icon" />
-        </button>
+          icon="pi pi-trash"
+        />
       </div>
     );
   };
