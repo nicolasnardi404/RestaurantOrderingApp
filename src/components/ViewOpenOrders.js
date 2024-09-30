@@ -206,13 +206,13 @@ const ViewOpenOrders = () => {
             (id) => dishesById[id]?.tipo_piatto === "Piatto unico"
           )
           ] || null,
-          "Complement":
+        "Complement":
           dishesById[
           selectedDishes.find(
             (id) => dishesById[id]?.tipo_piatto === "Complement"
           )
           ] || null,
-          "Altri":
+        "Altri":
           dishesById[
           selectedDishes.find(
             (id) => dishesById[id]?.tipo_piatto === "Altri"
@@ -398,7 +398,15 @@ const ViewOpenOrders = () => {
     <div className="view-open-orders">
       <Toast ref={toast} />
       <ConfirmDialog />
-      <Card title="Your Open Orders">
+      <Card>
+        <div className="header-container">
+          <h2>I tuoi ordini aperti</h2>
+          <Button
+            label="Go to Menu"
+            onClick={() => window.location.href = '/menu'}
+            className="new-button"
+          />
+        </div>
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
           <Column field="idPrenotazione" header="Order ID" />
@@ -465,7 +473,7 @@ const ViewOpenOrders = () => {
           </div>
         )}
       </Dialog>
-    </div>
+    </div >
   );
 };
 

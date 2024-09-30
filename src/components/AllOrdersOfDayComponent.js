@@ -109,7 +109,7 @@ const AllOrderOfDayComponent = () => {
       body: detailedOrdersBody,
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
-      alternateRowStyles: { fillColor: [245, 245, 245] },
+      alternateRowStyles: { fillColor: [220, 220, 220] },
     });
 
     // Update startY for summary table
@@ -121,20 +121,31 @@ const AllOrderOfDayComponent = () => {
     dailySummary.forEach(entry => {
       entry.piatti.forEach((piatto, piattoIndex) => {
         if (piattoIndex === 0) {
-          summaryTableBody.push([entry.tipo_piatto, entry.tipo_quantita, piatto.nome, piatto.quantita]);
+          // Adding the "tipo_piatto" and "quantita_totale" row
+          summaryTableBody.push([entry.tipo_piatto, entry.tipo_quantita, '', '']);
+          // Adding the dish and quantity for the first piatto
+          summaryTableBody.push(['', '', piatto.nome, piatto.quantita]);
         } else {
+          // Adding subsequent piatti rows without the tipo_piatto and quantita_totale
           summaryTableBody.push(['', '', piatto.nome, piatto.quantita]);
         }
       });
     });
 
+    // Draw the summary table with conditional row styles
     doc.autoTable({
       startY: summaryTableStartY,
       head: [['Tipo di Piatto', 'Quantità Totale', 'Nome del Piatto', 'Quantità']],
       body: summaryTableBody,
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
-      alternateRowStyles: { fillColor: [245, 245, 245] },
+      rowStyles: (row, data) => {
+        // Check if it's a "tipo_piatto" row (not empty in first column)
+        if (row.data[0] !== '') {
+          return { fillColor: [220, 220, 220] }; // Changed to (220, 220, 220)
+        }
+        return { fillColor: [255, 255, 255] }; // White for the piatto rows
+      },
     });
 
     // Add footer
