@@ -38,8 +38,8 @@ function ManagePiatti() {
     { label: "Secondo", value: "Secondo" },
     { label: "Contorno", value: "Contorno" },
     { label: "Piatto unico", value: "Piatto unico" },
-    { label: "Complement", value: "Complement"},
-    { label: "Altri", value: "Altri"},
+    { label: "Complement", value: "Complement" },
+    { label: "Altri", value: "Altri" },
   ];
 
   const dayOptions = [
@@ -107,6 +107,7 @@ function ManagePiatti() {
 
   const savePiatto = async () => {
     try {
+      console.log("Saving piatto with data:", editingPiatto.data); // Log the date being saved
       const piattoToSave = {
         nome: editingPiatto.nome_piatto,
         data: editingPiatto.data,
@@ -312,18 +313,26 @@ function ManagePiatti() {
                 optionLabel="label"
               />
             </div>
-          
             <div className="p-field">
               <label htmlFor="data">Data</label>
               <Calendar
                 id="data"
-                value={new Date(editingPiatto.data)}
-                onChange={(e) =>
+                value={new Date(editingPiatto.data)} // Ensure this is a Date object
+                onChange={(e) => {
+                  const selectedDate = e.value; // Get the selected date
+                  console.log("Selected date object:", selectedDate); // Log the selected date object
+
+                  const year = selectedDate.getFullYear();
+                  const month = String(selectedDate.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
+                  const day = String(selectedDate.getDate()).padStart(2, "0");
+
+                  console.log("Formatted date:", `${year}-${month}-${day}`); // Log the formatted date
+
                   setEditingPiatto({
                     ...editingPiatto,
-                    data: e.value.toISOString().split("T")[0],
-                  })
-                }
+                    data: `${year}-${month}-${day}`, // Set the formatted date
+                  });
+                }}
                 dateFormat="yy-mm-dd"
               />
             </div>

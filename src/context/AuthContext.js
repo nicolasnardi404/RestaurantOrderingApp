@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
@@ -20,36 +20,28 @@ export const AuthProvider = ({ children }) => {
             ruolo: decodedToken.data.ruolo
           });
         } else {
-          console.error("Token expired");
-          setUser(null);
+          logout();
         }
       } catch (error) {
         console.error("Invalid token", error);
         setUser(null);
       }
     }
-    setLoading(false);
+    setLoading(false); // Finaliza o estado de carregamento
   }, []);
 
-  const login = (token, rememberMe) => {
+  const login = (token) => {
     try {
       const decodedToken = jwtDecode(token);
-      const isExpired = decodedToken.exp * 1000 < Date.now();
-      if (!isExpired) {
-        setUser({
-          userId: decodedToken.data.userId,
-          nome: decodedToken.data.nome,
-          ruolo: decodedToken.data.ruolo
-        });
-
-        if (rememberMe) {
-          localStorage.setItem('token', token);
-        } else {
-          sessionStorage.setItem('token', token);
-        }
-      } else {
-        console.error("Token expired");
-      }
+      setUser({
+        userId: decodedToken.data.userId,
+        nome: decodedToken.data.nome,
+        ruolo: decodedToken.data.ruolo
+      });
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', decodedToken.data.userId);
+      localStorage.setItem('nome', decodedToken.data.nome);
+      localStorage.setItem('ruolo', decodedToken.data.ruolo);
     } catch (error) {
       console.error("Failed to decode token", error);
     }
@@ -61,10 +53,11 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
+  // Reintroduzindo o método getToken
+  const getToken = () => localStorage.getItem('token');
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>; // Renderiza enquanto o estado está sendo carregado
   }
 
   return (
