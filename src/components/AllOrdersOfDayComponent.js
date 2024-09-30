@@ -11,6 +11,8 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import '../styles/AllOrderOfDayComponent.css';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
+import { formatCalendarData } from '../util/FormatCalendarData';
+import formatDateforServer from '../util/formatDateForServer';
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -32,7 +34,8 @@ const AllOrderOfDayComponent = () => {
   const fetchDailyOrders = async (date) => {
     setLoading(true);
     try {
-      const dateString = formatDateForServer(date);
+      const dateString = formatDateforServer(date);
+      console.log("hello im date: " +dateString)
       const token = getToken(); // Get the token
       const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`, {
         headers: {
@@ -51,9 +54,8 @@ const AllOrderOfDayComponent = () => {
   const fetchDailySummary = async (date) => {
     setLoading(true);
     if (userRole === 'Amministratore') {
-      console.log("passou")
       try {
-        const dateString = formatDateForServer(date);
+        const dateString = formatDateforServer(date);
         const token = getToken();
         const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
           headers: {
@@ -71,11 +73,14 @@ const AllOrderOfDayComponent = () => {
   };
 
   const handleDateChange = (e) => {
-    setSelectedDate(e.value);
-  };
+    const selectedDate = e.value; // Get the selected date
+    const formattedDate = formatCalendarData(selectedDate); // Format the date using formatCalendarData
 
-  const formatDateForServer = (date) => {
-    return date.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    // Log both the selected and formatted dates for clarity
+    console.log('Selected Date:', selectedDate);
+    console.log('Formatted Date:', formattedDate);
+
+    setSelectedDate(selectedDate); // Update selectedDate for fetching orders
   };
 
   const formatDateForDisplay = (date) => {
@@ -163,9 +168,17 @@ const AllOrderOfDayComponent = () => {
     }
 
     // Save the PDF with the date in the filename
-    const fileName = `DailyOrderReport_${formatDateForServer(selectedDate)}.pdf`;
+    const fileName = `DailyOrderReport_${formatDateforServer(selectedDate)}.pdf`;
     doc.save(fileName);
   };
+
+  const DisplayData = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${day}-${month}-${year}`;
+  }
+
 
   return (
     <div className="all-order-of-day">
@@ -179,7 +192,7 @@ const AllOrderOfDayComponent = () => {
         />
       </div>
 
-      <Card title={`Detailed Orders for ${selectedDate.toLocaleDateString()}`} className="details-card">
+      <Card title={`Detailed Orders for ${DisplayData(selectedDate)}`} className="details-card">
         <DataTable
           value={dailyOrders}
           paginator
@@ -194,7 +207,7 @@ const AllOrderOfDayComponent = () => {
       </Card>
 
       {userRole === 'Amministratore' && (
-        <Card title={`Summary for ${selectedDate.toLocaleDateString()}`} className="summary-card">
+        <Card title={`Summary for ${DisplayData(selectedDate)}`} className="summary-card">
           <div>
             <table className="summary-table">
               <thead>
