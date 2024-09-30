@@ -15,6 +15,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { formatCalendarData } from '../util/FormatCalendarData' 
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -320,17 +321,11 @@ function ManagePiatti() {
                 value={new Date(editingPiatto.data)} // Ensure this is a Date object
                 onChange={(e) => {
                   const selectedDate = e.value; // Get the selected date
-                  console.log("Selected date object:", selectedDate); // Log the selected date object
-
-                  const year = selectedDate.getFullYear();
-                  const month = String(selectedDate.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
-                  const day = String(selectedDate.getDate()).padStart(2, "0");
-
-                  console.log("Formatted date:", `${year}-${month}-${day}`); // Log the formatted date
+                  const formatCalendar = formatCalendarData(selectedDate);
 
                   setEditingPiatto({
                     ...editingPiatto,
-                    data: `${year}-${month}-${day}`, // Set the formatted date
+                    data: formatCalendar, // Set the formatted date
                   });
                 }}
                 dateFormat="yy-mm-dd"
