@@ -12,30 +12,26 @@ import 'jspdf-autotable';
 import '../styles/AllOrderOfDayComponent.css';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 import { formatCalendarData } from '../util/FormatCalendarData';
-import formatDateforServer from '../util/formatDateForServer';
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const AllOrderOfDayComponent = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Default to current date
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user, getToken } = useAuth(); // Use the useAuth hook to get the getToken function
-  const [userRole, setUserRole] = useState('');
-  
+  const role = user.ruolo;
 
   useEffect(() => {
-    const role = user.ruolo;
-    setUserRole(role);
-    fetchDailyOrders(selectedDate); // Fetch daily orders for the selected date
-    fetchDailySummary(selectedDate); // Fetch daily summary for the selected date
-  }, [selectedDate]); // Dependency on selectedDate
+    fetchDailyOrders(selectedDate);
+    fetchDailySummary(selectedDate);
+  }, [selectedDate]);
 
   const fetchDailyOrders = async (date) => {
     setLoading(true);
     try {
-      const dateString = formatDateforServer(date);
+      const dateString = formatCalendarData(date);
       const token = getToken(); // Get the token
       const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`, {
         headers: {
@@ -53,11 +49,9 @@ const AllOrderOfDayComponent = () => {
 
   const fetchDailySummary = async (date) => {
     setLoading(true);
-    const role = user.ruolo;
-    setUserRole(role);
     if (role === 'Amministratore') {
       try {
-        const dateString = formatDateforServer(date);
+        const dateString = formatCalendarData(date);
         const token = getToken();
         const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
           headers: {
@@ -75,9 +69,7 @@ const AllOrderOfDayComponent = () => {
   };
 
   const handleDateChange = (e) => {
-    const selectedDate = e.value; // Get the selected date
-    const formattedDate = formatCalendarData(selectedDate); // Format the date using formatCalendarData
-    setSelectedDate(selectedDate); // Update selectedDate for fetching orders
+    setSelectedDate(e.value);
   };
 
   const formatDateForDisplay = (date) => {
@@ -165,7 +157,7 @@ const AllOrderOfDayComponent = () => {
     }
 
     // Save the PDF with the date in the filename
-    const fileName = `DailyOrderReport_${formatDateforServer(selectedDate)}.pdf`;
+    const fileName = `DailyOrderReport_${formatCalendarData(selectedDate)}.pdf`;
     doc.save(fileName);
   };
 
@@ -175,7 +167,6 @@ const AllOrderOfDayComponent = () => {
     const day = String(date.getDate()).padStart(2, "0");
     return `${day}-${month}-${year}`;
   }
-
 
   return (
     <div className="all-order-of-day">
@@ -189,21 +180,21 @@ const AllOrderOfDayComponent = () => {
         />
       </div>
 
-      <Card title={`Ordini Dettagliati per ${DisplayData(selectedDate)}`} className="details-card"> {/* Changed to Italian */}
+      <Card title={`Ordini Dettagliati per ${DisplayData(selectedDate)}`} className="details-card">
         <DataTable
           value={dailyOrders}
           paginator
           rows={10}
           loading={loading}
-          emptyMessage="Nessun ordine per questo giorno." // Changed to Italian
+          emptyMessage="No orders for this day."
           className="p-datatable-responsive"
         >
-          <Column field="username" header="Utente" sortable /> {/* Changed to Italian */}
-          <Column field="piatti" header="Piatti Ordinati" sortable /> {/* Changed to Italian */}
+          <Column field="username" header="User" sortable />
+          <Column field="piatti" header="Dishes Ordered" sortable />
         </DataTable>
       </Card>
 
-      {userRole === 'Amministratore' && (
+      {role === 'Amministratore' && (
         <Card title={`Riepilogo per ${DisplayData(selectedDate)}`} className="summary-card">
           <div>
             <table className="summary-table">
@@ -236,10 +227,10 @@ const AllOrderOfDayComponent = () => {
         </Card>
       )}
 
-      {userRole === 'Amministratore' && (
+      {role === 'Amministratore' && (
         <div className="pdf-button-section">
           <Button
-            label="Genera PDF" // Changed to Italian
+            label="Generate PDF"
             icon="pi pi-file-pdf"
             onClick={generatePDF}
             className="p-button-lg btn"
