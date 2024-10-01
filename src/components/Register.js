@@ -34,7 +34,7 @@ const RegisterPage = () => {
     <div className="container">
       <header>
         <img src={Logo} alt="Logo" className="logo" />
-        <a href="/">
+        <a href="/login">
           <button className="login-btn-header">Accedi</button>
         </a>
       </header>

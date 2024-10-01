@@ -11,6 +11,7 @@ import MyApp from "./_app";
 import CRUDPiatti from "./pages/CRUDPiatti";
 import AllOrderOfDay from "./pages/AllOrderOfDay";
 import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from "./components/NotFound";
 import ReactDOM from 'react-dom/client'; // Updated import
 import MultiplePiatti from './pages/MultiplePiatti';
 
@@ -20,7 +21,7 @@ export default function App() {
       <Router>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<LogIn />} />
+          <Route path="/login" element={<LogIn />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected routes for both Amministratore and Dipendente */}
@@ -39,6 +40,7 @@ export default function App() {
 
           {/* Keep this route if you still need it, or remove if not used */}
           <Route path="/test" element={<MyApp />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>

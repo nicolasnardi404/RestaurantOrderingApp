@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
- 
+
 const AuthContext = createContext(null);
- 
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
- 
+
   useEffect(() => {
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     if (token) {
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   }, []);
- 
+
   const login = (token, rememberMe) => {
     try {
       const decodedToken = jwtDecode(token);
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
           nome: decodedToken.data.nome,
           ruolo: decodedToken.data.ruolo
         });
- 
+
         if (rememberMe) {
           localStorage.setItem('token', token);
         } else {
@@ -54,26 +54,26 @@ export const AuthProvider = ({ children }) => {
       console.error("Failed to decode token", error);
     }
   };
- 
+
   const logout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem('token');
     setUser(null);
   };
- 
+
   const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
- 
+
   if (loading) {
     return <div>Loading...</div>;
   }
- 
+
   return (
     <AuthContext.Provider value={{ user, login, logout, getToken }}>
       {children}
     </AuthContext.Provider>
   );
 };
- 
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

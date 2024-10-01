@@ -42,7 +42,6 @@ const HistoricComponent = () => {
   const fetchData = async () => {
     let url;
     const token = getToken();
-    const currentUsername = user.nome
 
     if (ruolo === "Amministratore") {
       if (viewMode === 'month' && selectedMonth) {
