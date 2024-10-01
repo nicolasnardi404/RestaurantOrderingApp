@@ -194,7 +194,7 @@ function MenuPage() {
     ];
 
     const getDishesByDay = (day) => {
-      return weeklyMenu.filter((dish) => dish.dayOfWeek === day);
+      return weeklyMenu.filter((dish) => dish.dayOfWeek === day && dish.sempreDisponibile != 1);
     };
 
     const getSempreDisponibileDishesByType = (mealType) => {

@@ -23,7 +23,7 @@ const RegisterPage = () => {
         idRuolo,
         attivo
       });
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       setErrorMessage("Registration failed. Please try again.");
       console.error("Error during registration:", error);

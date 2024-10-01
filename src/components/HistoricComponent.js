@@ -22,7 +22,7 @@ const HistoricComponent = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [selectedUsername, setSelectedUsername] = useState('');
   const [usernames, setUsernames] = useState([]);
   const [viewMode, setViewMode] = useState('month');
@@ -33,7 +33,6 @@ const HistoricComponent = () => {
   const { user, getToken } = useAuth();
   const ruolo = user.ruolo;
 
-  // Correctly define `isAdmin`
   useEffect(() => {
     if (ruolo === "Amministratore") {
       setAdmin(true);
@@ -45,7 +44,7 @@ const HistoricComponent = () => {
     const token = getToken();
     const currentUsername = user.nome
 
-    if (isAdmin) {
+    if (ruolo === "Amministratore") {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
@@ -59,7 +58,7 @@ const HistoricComponent = () => {
     } else {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
-        url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
+        url = `http://localhost:8080/api/ordine/readByIdAndMese/${monthString}/${user.userId}`;
       } else {
         return; // Do not fetch if no date is selected
       }
@@ -69,17 +68,9 @@ const HistoricComponent = () => {
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
-
-      if (!isAdmin) {
-        setFilteredData(response.data.filter(item => item.username === currentUsername));
-        setData(filteredData);
-      } else {
-        setFilteredData(response.data);
-        setData(filteredData);
-        const uniqueUsernames = [...new Set(filteredData.map(item => item.username))];
-        setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
-      }
-      console.log(data)
+      setData(response.data);
+      const uniqueUsernames = [...new Set(response.data.map(item => item.username))];
+      setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     }
@@ -88,6 +79,12 @@ const HistoricComponent = () => {
   useEffect(() => {
     fetchData();
   }, [selectedDate, selectedMonth, viewMode]);
+
+  useEffect(() => {
+    if (data) {
+      setTotalOrders(data.length);
+    }
+  }, [data]);
 
   const filterData = () => {
     if (selectedUsername) {
@@ -238,16 +235,14 @@ const HistoricComponent = () => {
           </div>
 
           {/* The InputSwitch button is visible for both */}
-          {isAdmin && (
-            <div className="p-field">
-              <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-              <InputSwitch
-                id="totalPerDaySwitch"
-                checked={showTotalPerDay}
-                onChange={(e) => setShowTotalPerDay(e.value)}
-              />
-            </div>
-          )}
+          <div className="p-field">
+            <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+            <InputSwitch
+              id="totalPerDaySwitch"
+              checked={showTotalPerDay}
+              onChange={(e) => setShowTotalPerDay(e.value)}
+            />
+          </div>
 
           {/* The user dropdown is displayed only for the administrator */}
           {!showTotalPerDay && isAdmin && (
