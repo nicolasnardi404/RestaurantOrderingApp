@@ -21,7 +21,7 @@ export default function UserMenu() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const getMenuItems = () => {

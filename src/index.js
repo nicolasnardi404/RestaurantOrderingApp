@@ -20,7 +20,7 @@ export default function App() {
       <Router>
         <Routes>
           {/* Public routes */}
-          <Route path="/login" element={<LogIn />} />
+          <Route path="/" element={<LogIn />} />
           <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected routes for both Amministratore and Dipendente */}

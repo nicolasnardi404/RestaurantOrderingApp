@@ -23,7 +23,7 @@ const RegisterPage = () => {
         idRuolo,
         attivo
       });
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       setErrorMessage("Registration failed. Please try again.");
       console.error("Error during registration:", error);
@@ -34,7 +34,7 @@ const RegisterPage = () => {
     <div className="container">
       <header>
         <img src={Logo} alt="Logo" className="logo" />
-        <a href="/login">
+        <a href="/">
           <button className="login-btn-header">Accedi</button>
         </a>
       </header>
