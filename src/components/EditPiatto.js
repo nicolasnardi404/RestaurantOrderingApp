@@ -6,7 +6,7 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
-import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog } from "primereact/confirmdialog";
 import { UseDataLocal } from '../util/UseDataLocal';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { InputSwitch } from "primereact/inputswitch";
@@ -15,7 +15,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import { formatCalendarData } from '../util/FormatCalendarData' 
+import { formatCalendarData } from '../util/FormatCalendarData'
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -44,11 +44,11 @@ function ManagePiatti() {
   ];
 
   const dayOptions = [
-    { label: "Monday", value: "Monday" },
-    { label: "Tuesday", value: "Tuesday" },
-    { label: "Wednesday", value: "Wednesday" },
-    { label: "Thursday", value: "Thursday" },
-    { label: "Friday", value: "Friday" },
+    { label: "Lunedì", value: "Lunedì" },
+    { label: "Martedì", value: "Martedì" },
+    { label: "Mercoledì", value: "Mercoledì" },
+    { label: "Giovedì", value: "Giovedì" },
+    { label: "Venerdì", value: "Venerdì" },
   ];
 
   const api = useCallback(
@@ -175,11 +175,15 @@ function ManagePiatti() {
   const actionTemplate = (rowData) => {
     return (
       <div className="action-buttons">
-        <Button className="btn-edit" onClick={() => editPiatto(rowData)} icon="pi pi-pencil" />
+        <Button className="btn-edit"
+          onClick={() => editPiatto(rowData)}
+          icon="pi pi-pencil"
+          tooltip="Modifica piatto" />
         <Button
           className="btn-delete"
           onClick={() => deletePiatto(rowData.id_piatto)}
           icon="pi pi-trash"
+          tooltip="Annulla piatto"
         />
       </div>
     );
@@ -229,8 +233,8 @@ function ManagePiatti() {
       <Toast ref={toast} />
       <ConfirmDialog
         visible={confirmDeleteVisible}
-        message="Are you sure you want to delete this piatto?"
-        header="Confirm Deletion"
+        message="Sei sicuro di voler eliminare questo piatto?"
+        header="Confermare l'eliminazione"
         accept={confirmDelete}
         reject={rejectDelete}
         onHide={() => setConfirmDeleteVisible(false)}
@@ -273,7 +277,7 @@ function ManagePiatti() {
         />
       </DataTable>
       <Dialog
-        header={isNewPiatto ? "Add New Piatto" : "Edit Piatto"}
+        header={isNewPiatto ? "Aggiungi un nuovo piatto" : "Modifica piatto"}
         visible={showDialog}
         style={{ width: "50vw" }}
         modal
@@ -320,7 +324,7 @@ function ManagePiatti() {
                 id="data"
                 value={new Date(editingPiatto.data)} // Ensure this is a Date object
                 onChange={(e) => {
-                  const selectedDate = e.value; // Get the selected date
+                  const selectedDate = e.value ?? new Date(); // Get the selected date
                   const formatCalendar = formatCalendarData(selectedDate);
 
                   setEditingPiatto({

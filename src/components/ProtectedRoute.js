@@ -9,6 +9,11 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
+  if (allowedRoles && !allowedRoles.includes(user.ruolo)) {
+    console.log("Don't have permission!")
+    return <Navigate to="/open-orders" replace />;
+  }
+
   return <Outlet />;
 };
 

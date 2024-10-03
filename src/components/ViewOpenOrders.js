@@ -125,13 +125,13 @@ const ViewOpenOrders = () => {
           icon="pi pi-pencil"
           className="btn-edit"
           onClick={() => handleEditOrder(rowData)}
-          tooltip="Edit Order"
+          tooltip="Modifica ordine"
         />
         <Button
           icon="pi pi-trash"
           className="btn-delete"
           onClick={() => handleCancelOrder(rowData.idPrenotazione)}
-          tooltip="Cancel Order"
+          tooltip="Annulla ordine"
         />
       </div>
     );
@@ -307,8 +307,8 @@ const ViewOpenOrders = () => {
 
   const handleCancelOrder = async (idPrenotazione) => {
     confirmDialog({
-      message: "Are you sure you want to cancel this order?",
-      header: "Confirm Cancellation",
+      message: "Sei sicuro di voler eliminare questo piatto?",
+      header: "Confermare l'eliminazione",
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
@@ -429,7 +429,7 @@ const ViewOpenOrders = () => {
       </Card>
 
       <Dialog
-        header="Edit Order"
+        header="Modifica ordine"
         visible={showEditDialog}
         style={{ width: "50vw" }}
         onHide={() => setShowEditDialog(false)}

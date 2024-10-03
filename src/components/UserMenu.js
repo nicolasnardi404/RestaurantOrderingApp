@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Import useAuth
 import Logo from '../assets/logoNetSurf.png';
@@ -6,6 +6,7 @@ import '../styles/UserMenu.css';
 
 export default function UserMenu() {
   const [visibleLeft, setVisibleLeft] = useState(false);
+  const [dropdownVisible, setDropdownVisible] = useState(false); // Novo state para controlar a visibilidade do dropdown
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { user, logout } = useAuth();
@@ -26,15 +27,14 @@ export default function UserMenu() {
 
   const getMenuItems = () => {
     const commonItems = [
-      { label: 'Storico', icon: 'calendar', path: '/historic' }, // Changed to Italian
-      { label: 'Fai un Ordine', icon: 'shopping-cart', path: '/menu' }, // Changed to Italian
-      { label: 'Visualizza Ordini Aperti', icon: 'list', path: '/open-orders' }, // Changed to Italian
-      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' }, // Changed to Italian
-      { label: 'Logout', icon: 'power-off', action: handleLogout }, // Unchanged
+      { label: 'Storico', icon: 'calendar', path: '/historic' },
+      { label: 'Fai un Ordine', icon: 'shopping-cart', path: '/menu' },
+      { label: 'Visualizza Ordini Aperti', icon: 'list', path: '/open-orders' },
+      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' },
     ];
 
     const amministratoreItems = [
-      { label: 'Modifica Piatti', icon: 'pencil', path: '/managepiatti' } // Unchanged
+      { label: 'Modifica Piatti', icon: 'pencil', path: '/managepiatti' }
     ];
 
     return user && user.ruolo === 'Amministratore'
@@ -43,6 +43,25 @@ export default function UserMenu() {
   };
 
   const items = getMenuItems();
+
+  // Novo render para o dropdown de perfil e logout
+  const renderProfileDropdown = () => (
+    <div className="profile-dropdown">
+      <button className="profile-button" onClick={() => setDropdownVisible(!dropdownVisible)}>
+        <i className="pi pi-user"></i> {user.name || 'User'}
+      </button>
+      {dropdownVisible && (
+        <div className="dropdown-menu">
+          <button className="dropdown-item" onClick={() => navigate('/profile')}>
+            <i className="pi pi-user"></i> Profilo
+          </button>
+          <button className="dropdown-item" onClick={handleLogout}>
+            <i className="pi pi-power-off"></i> Logout
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   const renderMobileMenu = () => (
     <div className="user-menu-wrapper">
@@ -60,6 +79,7 @@ export default function UserMenu() {
               <i className={`pi pi-${item.icon}`}></i> {item.label}
             </button>
           ))}
+          {renderProfileDropdown()}
         </div>
       )}
     </div>
@@ -76,6 +96,7 @@ export default function UserMenu() {
           <i className={`pi pi-${item.icon}`}></i> {item.label}
         </button>
       ))}
+      {renderProfileDropdown()}
     </div>
   );
 

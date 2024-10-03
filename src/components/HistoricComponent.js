@@ -109,6 +109,8 @@ const HistoricComponent = () => {
   };
 
   const handleViewModeChange = (mode) => {
+    setFilteredData(null);
+    setData(null);
     setViewMode(mode);
     setSelectedDate(null); // Reset selected date
     setSelectedMonth(null); // Reset selected month

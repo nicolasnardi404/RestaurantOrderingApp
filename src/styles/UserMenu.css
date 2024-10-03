@@ -98,6 +98,43 @@
   margin-right: 5px;
 }
 
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-button {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  background-color: black;
+  min-width: 150px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 5px;
+}
+
+.dropdown-item {
+  padding: 10px;
+  text-align: left;
+  background: none;
+  border: none;
+  width: 85%;
+  color: white;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: #1a1818;
+}
+
 /* Oculta o menu desktop em dispositivos móveis */
 @media (max-width: 767px) {
   .user-menu-desktop {

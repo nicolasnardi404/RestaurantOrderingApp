@@ -7,51 +7,53 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const checkTokenValidity = (token) => {
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const decodedToken = jwtDecode(token);
+      const isExpired = decodedToken.exp * 1000 < Date.now();
+      return !isExpired;
+    } catch (error) {
+      console.error("Failed to decode token", error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        const isExpired = decodedToken.exp * 1000 < Date.now();
-        if (!isExpired) {
-          setUser({
-            userId: decodedToken.data.userId,
-            nome: decodedToken.data.nome,
-            ruolo: decodedToken.data.ruolo
-          });
-        } else {
-          console.error("Token expired");
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("Invalid token", error);
-        setUser(null);
-      }
+    if (checkTokenValidity(token)) {
+      const decodedToken = jwtDecode(token);
+      setUser({
+        userId: decodedToken.data.userId,
+        nome: decodedToken.data.nome,
+        ruolo: decodedToken.data.ruolo,
+      });
+    } else {
+      console.error("Token expired");
+      logout();
     }
     setLoading(false);
   }, []);
 
   const login = (token, rememberMe) => {
-    try {
+    if (checkTokenValidity(token)) {
       const decodedToken = jwtDecode(token);
-      const isExpired = decodedToken.exp * 1000 < Date.now();
-      if (!isExpired) {
-        setUser({
-          userId: decodedToken.data.userId,
-          nome: decodedToken.data.nome,
-          ruolo: decodedToken.data.ruolo
-        });
+      setUser({
+        userId: decodedToken.data.userId,
+        nome: decodedToken.data.nome,
+        ruolo: decodedToken.data.ruolo,
+      });
 
-        if (rememberMe) {
-          localStorage.setItem('token', token);
-        } else {
-          sessionStorage.setItem('token', token);
-        }
+      if (rememberMe) {
+        localStorage.setItem('token', token);
       } else {
-        console.error("Token expired");
+        sessionStorage.setItem('token', token);
       }
-    } catch (error) {
-      console.error("Failed to decode token", error);
+    } else {
+      console.error("Token expired or invalid");
     }
   };
 
@@ -61,7 +63,10 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  const getToken = () => sessionStorage.getItem('token') || localStorage.getItem('token');
+  const getToken = () => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    return checkTokenValidity(token) ? token : null;
+  };
 
   if (loading) {
     return <div>Loading...</div>;
