@@ -108,7 +108,6 @@ function ManagePiatti() {
 
   const savePiatto = async () => {
     try {
-      console.log("Saving piatto with data:", editingPiatto.data); // Log the date being saved
       const piattoToSave = {
         nome: editingPiatto.nome_piatto,
         data: editingPiatto.data,
@@ -322,14 +321,14 @@ function ManagePiatti() {
               <label htmlFor="data">Data</label>
               <Calendar
                 id="data"
-                value={new Date(editingPiatto.data)} // Ensure this is a Date object
+                value={editingPiatto.data ? new Date(editingPiatto.data) : null}
                 onChange={(e) => {
-                  const selectedDate = e.value ?? new Date(); // Get the selected date
-                  const formatCalendar = formatCalendarData(selectedDate);
+                  const selectedDate = e.value ?? null;
+                  const formatCalendar = selectedDate ? formatCalendarData(selectedDate) : null;
 
                   setEditingPiatto({
                     ...editingPiatto,
-                    data: formatCalendar, // Set the formatted date
+                    data: formatCalendar,
                   });
                 }}
                 dateFormat="yy-mm-dd"

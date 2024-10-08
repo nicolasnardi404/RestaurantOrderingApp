@@ -41,7 +41,6 @@ function MenuPage() {
 
   const fetchDishes = async () => {
     const formDateForServer = formatDateforServer(selectedDay);
-    console.log('Fetching dishes for date:', formDateForServer);
 
     try {
       const token = getToken();
@@ -50,8 +49,6 @@ function MenuPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log('Response data:', response.data);
 
       // Preencha dishes com todos os pratos retornados pela API
       const allDishes = response.data;
@@ -74,7 +71,6 @@ function MenuPage() {
         },
       });
 
-      console.log('Weekly menu response data:', response.data);
       setWeeklyMenu(response.data);
     } catch (error) {
       console.error('Error fetching weekly menu:', error);
@@ -190,11 +186,13 @@ function MenuPage() {
 
   const renderFullMenuList = () => {
     const daysOfWeek = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
+      'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì'
     ];
 
     const getDishesByDay = (day) => {
-      return weeklyMenu.filter((dish) => dish.dayOfWeek === day && dish.sempreDisponibile != 1);
+      return weeklyMenu.filter(
+        (dish) => dish.dayOfWeek === day && dish.sempreDisponibile === 0
+      );
     };
 
     const getSempreDisponibileDishesByType = (mealType) => {
@@ -407,9 +405,9 @@ function MenuPage() {
       <div className="menu-button-container">
         <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
       </div>
-        <Card className='combinazioni-card'>
-          <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
-          </Card>
+      <Card className='combinazioni-card'>
+        <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
+      </Card>
 
       {selectedDay && (
         <>

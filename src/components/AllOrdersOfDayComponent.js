@@ -191,6 +191,7 @@ const AllOrderOfDayComponent = () => {
         >
           <Column field="username" header="User" sortable />
           <Column field="piatti" header="Dishes Ordered" sortable />
+          <Column field="observazioni" header="Observazioni" sortable />
         </DataTable>
       </Card>
 

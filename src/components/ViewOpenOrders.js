@@ -227,7 +227,6 @@ const ViewOpenOrders = () => {
       idPrenotazione: order.idPrenotazione, // Ensure this is included
     };
 
-    console.log("Editing order data:", editingOrderData);
     setEditingOrder(editingOrderData);
     checkCombination(editingOrderData.selectedDishes);
     setShowEditDialog(true);

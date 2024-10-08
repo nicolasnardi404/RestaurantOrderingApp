@@ -111,6 +111,7 @@ const HistoricComponent = () => {
   const handleViewModeChange = (mode) => {
     setFilteredData(null);
     setData(null);
+    setUsernames(null);
     setViewMode(mode);
     setSelectedDate(null); // Reset selected date
     setSelectedMonth(null); // Reset selected month
@@ -236,17 +237,19 @@ const HistoricComponent = () => {
           </div>
 
           {/* The InputSwitch button is visible for both */}
-          <div className="p-field">
-            <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-            <InputSwitch
-              id="totalPerDaySwitch"
-              checked={showTotalPerDay}
-              onChange={(e) => setShowTotalPerDay(e.value)}
-            />
-          </div>
+          {isAdmin && (
+            <div className="p-field">
+              <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+              <InputSwitch
+                id="totalPerDaySwitch"
+                checked={showTotalPerDay}
+                onChange={(e) => setShowTotalPerDay(e.value)}
+              />
+            </div>
+          )}
 
           {/* The user dropdown is displayed only for the administrator */}
-          {!showTotalPerDay && isAdmin && (
+          {!showTotalPerDay && usernames && isAdmin && (
             <div className="p-field">
               <label htmlFor="userDropdown">Seleziona Utente</label>
               <Dropdown
