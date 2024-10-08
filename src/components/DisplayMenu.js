@@ -4,6 +4,7 @@ import { Dialog } from 'primereact/dialog';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { useNavigate } from 'react-router-dom';
+import '../util/addLocale';
 import axios from 'axios';
 import formatDateforServer from '../util/formatDateForServer';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
@@ -97,7 +98,7 @@ function MenuPage() {
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, 'Piatto unico': PiattoUnico, Altri, Complement } = currentCart;
+    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Complement } = currentCart;
 
     const selectedItems = new Set();
     if (Primo) selectedItems.add('Primo');
@@ -122,11 +123,9 @@ function MenuPage() {
       if (!PiattoUnico) missingItems.push('Piatto unico');
 
       // Define a mensagem com base nos itens faltantes
-      if (missingItems.length === 4) {
-        setCombinationStatus('Please select dishes to create a valid combination');
-      } else {
-        setCombinationStatus(`Add ${missingItems.join(' or ')} to complete the combination`);
-      }
+      // if (validCombinations) {
+      //   setCombinationStatus(`Aggiungere ${missingItems.join(' or ')} per completare le combinazione`);
+      // }
     }
   };
 
@@ -165,7 +164,7 @@ function MenuPage() {
             options={getFilteredDishes(mealType)}
             onChange={(e) => handleDropdownChange(mealType, e.value)}
             optionLabel="nome"
-            placeholder={`Select ${mealType}`}
+            placeholder={`=== SELEZIONA ===`}
             className="w-full md:w-14rem"
             showClear
           />
@@ -308,7 +307,7 @@ function MenuPage() {
     const hasExistingReservation = await checkExistingReservation();
 
     if (hasExistingReservation) {
-      setError('Hai già una prenotazione per questo giorno');
+      setError('Ordine già presente per questa data');
       return; // Impede que o pedido seja enviado
     }
 
@@ -390,21 +389,20 @@ function MenuPage() {
 
   return (
     <div className='container-menu'>
-      <h1>Effettua il tuo ordine</h1>
+      <h1>Ordina Pasto</h1>
       <div className="date-selection">
         <Calendar
           value={selectedDay}
           onChange={(e) => setSelectedDay(e.value)}
-          dateFormat="dd/mm/yy"
-          showIcon
-          placeholder="Select a date"
+          placeholder="Seleziona la data"
+          locale="it"
           minDate={new Date()} // Set the minimum date to today
         />
+        <div className="menu-button-container">
+          <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
+        </div>
       </div>
 
-      <div className="menu-button-container">
-        <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
-      </div>
       <Card className='combinazioni-card'>
         <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
       </Card>

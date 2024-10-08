@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Button, Dropdown, Calendar } from 'primereact';
+import { Button, Dropdown} from 'primereact';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +7,8 @@ import { UseDataLocal } from '../util/UseDataLocal';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import '../styles/AddMultiplePiatti.css';
 import { formatCalendarData } from '../util/FormatCalendarData';
+import { Calendar } from 'primereact/calendar';
+import '../util/addLocale';
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -88,7 +90,8 @@ const AddMultiplePiatti = () => {
                     id="commonDate"
                     value={commonDate}
                     onChange={(e) => setCommonDate(e.value)}
-                    dateFormat="dd-mm-yy" // Set the date format to day-month-year
+                    locale="it"
+                    dateFormat="D. dd-mm-y" // Set the date format to day-month-year
                     className="custom-calendar" // Add a custom class for styling
                 />
             </div>

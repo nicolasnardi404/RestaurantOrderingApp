@@ -1,17 +1,101 @@
 .profile-page {
+  max-width: 600px;
+  /* Define a largura máxima da página */
+  margin: 20px auto;
+  /* Centraliza a página na tela */
   padding: 20px;
-  font-family: Arial, sans-serif;
+  /* Adiciona espaço interno */
+  border: 1px solid #ccc;
+  /* Borda suave ao redor da página */
+  border-radius: 8px;
+  /* Bordas arredondadas */
+  background-color: #f9f9f9;
+  /* Cor de fundo clara */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* Sombra suave para profundidade */
+}
+
+.profile-title {
+  font-size: 24px;
+  /* Tamanho da fonte do título */
+  margin-bottom: 20px;
+  /* Espaço abaixo do título */
 }
 
 .profile-details {
-  margin-top: 20px;
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  /* Espaço abaixo da seção de detalhes */
 }
 
-.profile-details p {
-  margin: 10px 0;
+.profile-detail {
   font-size: 16px;
+  /* Tamanho da fonte dos detalhes */
+  color: #333;
+  /* Cor do texto */
+}
+
+.warning-form {
+  margin-top: 10px;
+  /* Espaço acima do formulário */
+}
+
+.form-title {
+  font-size: 20px;
+  /* Tamanho da fonte do título do formulário */
+  margin-bottom: 15px;
+  /* Espaço abaixo do título do formulário */
+  color: #555;
+  /* Cor do texto */
+}
+
+.day-checkbox {
+  display: flex;
+  /* Flexbox para alinhar checkbox e texto */
+  align-items: center;
+  /* Alinha verticalmente */
+  margin-bottom: 5px;
+  /* Espaço abaixo de cada checkbox */
+}
+
+.save-button,
+.delete-button {
+  padding: 10px;
+  /* Espaço interno do botão */
+  border-radius: 5px;
+  /* Bordas arredondadas para o botão */
+  border: none;
+  /* Remove a borda padrão do botão */
+  cursor: pointer;
+  /* Muda o cursor para indicar que é clicável */
+  transition: background-color 0.3s;
+  /* Transição suave para a cor de fundo */
+}
+
+.save-button {
+  background-color: #28a745;
+  /* Cor de fundo verde */
+  color: white;
+  /* Cor do texto do botão */
+}
+
+.save-button:hover {
+  background-color: #218838;
+  /* Cor do botão quando o mouse está sobre ele */
+}
+
+.delete-button {
+  background-color: #dc3545;
+  /* Cor de fundo vermelho */
+  color: white;
+  /* Cor do texto do botão */
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+  /* Cor do botão quando o mouse está sobre ele */
+}
+
+.update-message {
+  color: #000000;
+  /* Cor do texto da mensagem de atualização */
 }

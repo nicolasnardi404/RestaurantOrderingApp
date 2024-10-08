@@ -5,6 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { UseDataLocal } from '../util/UseDataLocal';
+import '../util/addLocale';
 import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import axios from 'axios';
 import jsPDF from 'jspdf';
@@ -175,7 +176,7 @@ const AllOrderOfDayComponent = () => {
         <Calendar
           value={selectedDate}
           onChange={handleDateChange}
-          dateFormat="dd/mm/yy"
+          locale="it"
           showIcon
         />
       </div>

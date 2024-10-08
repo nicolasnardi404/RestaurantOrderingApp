@@ -5,6 +5,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
+import '../util/addLocale';
 import { InputSwitch } from 'primereact/inputswitch';
 import axios from 'axios';
 import jsPDF from 'jspdf';
@@ -230,8 +231,8 @@ const HistoricComponent = () => {
               value={viewMode === 'month' ? selectedMonth : selectedDate}
               onChange={(e) => viewMode === 'month' ? setSelectedMonth(e.value) : setSelectedDate(e.value)}
               view={viewMode === 'month' ? "month" : "date"}
-              dateFormat={viewMode === 'month' ? "mm/yy" : "dd/mm/yy"}
-              showIcon
+              locale="it"
+              dateFormat={viewMode === 'month' ? "M. mm/yy" : "D. dd/mm/y"}
               disabled={!isAdmin && viewMode === 'day'} // Disable the day field for the employee
             />
           </div>

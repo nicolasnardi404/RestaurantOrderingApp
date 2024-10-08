@@ -398,18 +398,18 @@ const ViewOpenOrders = () => {
       <Card>
         <div className="header-container">
           <h2>I tuoi ordini aperti</h2>
-          <Button
+          {/* <Button
             label="Go to Menu"
             onClick={() => window.location.href = '/menu'}
             className="new-button"
-          />
+          /> */}
         </div>
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
-          <Column field="idPrenotazione" header="Order ID" />
+          <Column field="idPrenotazione" header="ID" />
           <Column
             field="datePiatti"
-            header="Reservation Date"
+            header="Data Prenotazione"
             body={(rowData) => {
               if (rowData.datePiatti) {
                 return formatDate(rowData.datePiatti);
@@ -417,11 +417,11 @@ const ViewOpenOrders = () => {
               return "N/A"; // or any default value you prefer
             }}
           />
-          <Column field="piatti" header="Dishes" />
-          <Column field="tipo_piatti" header="Dish Types" />
+          <Column field="piatti" header="Piatti" />
+          <Column field="tipo_piatti" header="Combinazione" />
           <Column
             body={actionTemplate}
-            header="Actions"
+            header="Azioni"
             style={{ width: "150px" }}
           />
         </DataTable>

@@ -14,8 +14,10 @@ import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
+import '../util/addLocale';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import { formatCalendarData } from '../util/FormatCalendarData'
+import formatDateforServer from "../util/formatDateForServer";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -321,17 +323,18 @@ function ManagePiatti() {
               <label htmlFor="data">Data</label>
               <Calendar
                 id="data"
+                locale="it"
                 value={editingPiatto.data ? new Date(editingPiatto.data) : null}
                 onChange={(e) => {
                   const selectedDate = e.value ?? null;
-                  const formatCalendar = selectedDate ? formatCalendarData(selectedDate) : null;
+                  const formatCalendar = formatDateforServer(selectedDate);
 
                   setEditingPiatto({
                     ...editingPiatto,
                     data: formatCalendar,
                   });
                 }}
-                dateFormat="yy-mm-dd"
+                dateFormat="dd/mm/y"
               />
             </div>
             <div className="p-field">

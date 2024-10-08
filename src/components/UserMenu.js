@@ -28,13 +28,13 @@ export default function UserMenu() {
   const getMenuItems = () => {
     const commonItems = [
       { label: 'Storico', icon: 'calendar', path: '/historic' },
-      { label: 'Fai un Ordine', icon: 'shopping-cart', path: '/menu' },
-      { label: 'Visualizza Ordini Aperti', icon: 'list', path: '/open-orders' },
+      { label: 'Ordina Pasto', icon: 'shopping-cart', path: '/menu' },
+      { label: 'Ordini Aperti', icon: 'list', path: '/open-orders' },
       { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' },
     ];
 
     const amministratoreItems = [
-      { label: 'Modifica Piatti', icon: 'pencil', path: '/managepiatti' }
+      { label: 'Menu', icon: 'pencil', path: '/managepiatti' }
     ];
 
     return user && user.ruolo === 'Amministratore'
@@ -48,7 +48,7 @@ export default function UserMenu() {
   const renderProfileDropdown = () => (
     <div className="profile-dropdown">
       <button className="profile-button" onClick={() => setDropdownVisible(!dropdownVisible)}>
-        <i className="pi pi-user"></i> {user.name || 'User'}
+        <i className="pi pi-user"></i> {user.nome}
       </button>
       {dropdownVisible && (
         <div className="dropdown-menu">
