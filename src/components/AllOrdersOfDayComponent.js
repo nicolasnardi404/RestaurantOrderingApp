@@ -95,11 +95,11 @@ const AllOrderOfDayComponent = () => {
     doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
     // Add detailed orders table
-    const detailedOrdersBody = dailyOrders.map(order => [order.username, order.piatti]);
+    const detailedOrdersBody = dailyOrders.map(order => [order.username, order.piatti, order.observazioni]);
 
     doc.autoTable({
       startY: 45,
-      head: [['User', 'Dishes Ordered']],
+      head: [['User', 'Dishes Ordered', 'Observazioni']],
       body: detailedOrdersBody,
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
