@@ -412,7 +412,7 @@ const ViewOpenOrders = () => {
             header="Data Prenotazione"
             body={(rowData) => {
               if (rowData.datePiatti) {
-                return formatDate(rowData.datePiatti);
+                return rowData.datePiatti;
               }
               return "N/A"; // or any default value you prefer
             }}
