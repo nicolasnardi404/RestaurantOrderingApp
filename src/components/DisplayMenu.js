@@ -151,10 +151,12 @@ function MenuPage() {
       if (!Contorno) missingItems.push('Contorno');
       if (!PiattoUnico) missingItems.push('Piatto unico');
 
-      // Define a mensagem com base nos itens faltantes
-      // if (validCombinations) {
-      //   setCombinationStatus(`Aggiungere ${missingItems.join(' or ')} per completare le combinazione`);
-      // }
+      console.log(selectedItems.size)
+      console.log(!validCombinations)
+       //Define a mensagem com base nos itens faltantes
+       if (validCombinations && selectedItems.size >= 2) {
+         setCombinationStatus(`Combinazione non valida.`);
+       } 
     }
   };
 
