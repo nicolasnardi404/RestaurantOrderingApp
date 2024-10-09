@@ -61,8 +61,6 @@ function MenuPage() {
 
       if (!selectedDay) {
         setSelectedDay(availableDates[0]);
-      } else {
-        console.log("Fez todos os pedidos");
       }
     } catch (error) {
       console.error('Error fetching available dates:', error);
@@ -387,7 +385,7 @@ function MenuPage() {
           placeholder="Seleziona la data"
           locale="it"
           minDate={new Date()} // Define a data mínima como hoje
-          disabledDates={Array.from({ length: 31 }, (_, i) => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + i)).filter(date => !availableDates.some(availableDate => availableDate.toDateString() === date.toDateString()))}
+          disabledDates={Array.from({ length: 100 }, (_, i) => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + i)).filter(date => !availableDates.some(availableDate => availableDate.toDateString() === date.toDateString()))}
         />
         <div className="menu-button-container">
           <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />

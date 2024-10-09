@@ -306,7 +306,7 @@ const HistoricComponent = () => {
               <Column
                 field="reservation_date"
                 header="Data Prenotazione" // Changed to Italian
-                body={(rowData) => formatDateForDisplay(rowData.reservation_date)}
+                body={(rowData) => rowData.reservation_date}
                 sortable
               />
               <Column

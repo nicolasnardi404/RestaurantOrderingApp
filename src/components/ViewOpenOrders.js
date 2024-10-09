@@ -29,7 +29,6 @@ const ViewOpenOrders = () => {
   const [combinationStatus, setCombinationStatus] = useState("");
   const { user, getToken } = useAuth();
   const toast = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -40,8 +39,14 @@ const ViewOpenOrders = () => {
     try {
       setLoading(true);
       const token = getToken();
+      let url = null;
+      if (user.ruolo != "Amministratore") {
+        url = `http://localhost:8080/api/ordine/ordineByUserId/${user.userId}`;
+      } else {
+        url = `http://localhost:8080/api/ordine/ordineByUserIdAdmin`;
+      }
       const response = await axios.get(
-        `http://localhost:8080/api/ordine/ordineByUserId/${user.userId}`,
+        url,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -398,11 +403,9 @@ const ViewOpenOrders = () => {
       <Card>
         <div className="header-container">
           <h2>I tuoi ordini aperti</h2>
-          {/* <Button
-            label="Go to Menu"
-            onClick={() => window.location.href = '/menu'}
-            className="new-button"
-          /> */}
+          {/* {isAdmin &&(
+            funcao de filtragem para admin
+          )} */}
         </div>
         {error && <div className="error-message">{error}</div>}
         <DataTable value={orders} loading={loading} responsiveLayout="scroll">
