@@ -41,3 +41,23 @@ Regolazione della data
 
 Historic
 [] - value null for "Seleziona Utente"
+
+
+
+------NOVAS DEMANDAS--------
+
+=== GERAL ===
+
+[] -> Mudar as datas das tabelas, para o formato Dia reduzido. dia/mes/ano com dois digitos. ex: Mer. 24/10/07
+
+=== Ordina Pasto ===
+
+[] -> Bloquear os pedidos às 10:30am todos os dias
+[] -> No calendario da pagina Ordine Pasto, mostrar a ultima data que a pessoa tem disponivel para pedir.
+[] -> No Altri piatti se possivel fazer um radio (sistema de escolhas parecido com a checkbox)
+[] -> Mudar Complement para Dessert
+[] -> Ajustar a mensagem de combinações impossiveis
+
+=== Ordini Aperti === 
+
+[] -> Colocar um sistema de filtragem por nome, pois o admin deve ver o pedido de todas as pessoas.
