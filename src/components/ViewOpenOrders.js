@@ -9,7 +9,7 @@ import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { Dropdown } from "primereact/dropdown";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
-import { useNavigate } from "react-router-dom";
+import { InputText } from "primereact/inputtext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/ViewOpenOrders.css";
@@ -21,12 +21,14 @@ UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
 const ViewOpenOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingOrder, setEditingOrder] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [availableDishes, setAvailableDishes] = useState([]);
   const [error, setError] = useState("");
   const [combinationStatus, setCombinationStatus] = useState("");
+  const [usernameFilter, setUsernameFilter] = useState("");
   const { user, getToken } = useAuth();
   const toast = useRef(null);
 
@@ -35,24 +37,57 @@ const ViewOpenOrders = () => {
     fetchAvailableDishes();
   }, []);
 
+  useEffect(() => {
+    if (user && user.ruolo === "Amministratore" && orders.length > 0) {
+      setUsernameFilter(user.nome || "");
+    }
+  }, [orders, user]);
+
+  useEffect(() => {
+    if (user && user.ruolo === "Amministratore") {
+      filterOrders();
+    }
+  }, [usernameFilter, orders, user]);
+
+  const filterOrders = () => {
+    if (user && user.ruolo === "Amministratore") {
+      const lowercasedFilter = usernameFilter.toLowerCase();
+      const filtered = orders.filter(order => 
+        order && order.username && order.username.toLowerCase().includes(lowercasedFilter)
+      );
+      setFilteredOrders(filtered);
+    }
+  };
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const token = getToken();
-      let url = null;
-      if (user.ruolo != "Amministratore") {
-        url = `http://localhost:8080/api/ordine/ordineByUserId/${user.userId}`;
-      } else {
-        url = `http://localhost:8080/api/ordine/ordineByUserIdAdmin`;
+      if (!token) {
+        setError("No valid authentication token found. Please log in again.");
+        setLoading(false);
+        return;
       }
-      const response = await axios.get(
-        url,
-        {
-          headers: { Authorization: `Bearer ${token}` },
+
+      let url = user && user.ruolo === "Amministratore"
+        ? `http://localhost:8080/api/ordine/ordineByUserIdAdmin`
+        : `http://localhost:8080/api/ordine/ordineByUserId/${user?.userId}`;
+      
+      const response = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      console.log("Fetched orders:", response.data);
+
+      if (Array.isArray(response.data)) {
+        setOrders(response.data);
+        if (user && user.ruolo !== "Amministratore") {
+          setFilteredOrders(response.data);
         }
-      );
-      setOrders(response.data);
-      setError("");
+      } else {
+        console.error("Unexpected response format:", response.data);
+        setError("Received unexpected data format from server.");
+      }
     } catch (error) {
       console.error("Error fetching orders:", error);
       setError("Failed to fetch orders. Please try again.");
@@ -396,6 +431,36 @@ const ViewOpenOrders = () => {
     }
   };
 
+  const renderAdminTable = () => (
+    <div>
+      <div className="p-inputgroup mb-3">
+        <InputText
+          placeholder="Search by username"
+          value={usernameFilter}
+          onChange={(e) => setUsernameFilter(e.target.value)}
+        />
+      </div>
+      <DataTable value={filteredOrders} loading={loading} responsiveLayout="scroll">
+        <Column field="idPrenotazione" header="ID" />
+        <Column field="username" header="Username" />
+        <Column field="datePiatti" header="Data Prenotazione" />
+        <Column field="piatti" header="Piatti" />
+        <Column field="tipo_piatti" header="Combinazione" />
+        <Column body={actionTemplate} header="Azioni" style={{ width: "150px" }} />
+      </DataTable>
+    </div>
+  );
+
+  const renderUserTable = () => (
+    <DataTable value={orders} loading={loading} responsiveLayout="scroll">
+      <Column field="idPrenotazione" header="ID" />
+      <Column field="datePiatti" header="Data Prenotazione" />
+      <Column field="piatti" header="Piatti" />
+      <Column field="tipo_piatti" header="Combinazione" />
+      <Column body={actionTemplate} header="Azioni" style={{ width: "150px" }} />
+    </DataTable>
+  );
+
   return (
     <div className="view-open-orders">
       <Toast ref={toast} />
@@ -403,31 +468,9 @@ const ViewOpenOrders = () => {
       <Card>
         <div className="header-container">
           <h2>I tuoi ordini aperti</h2>
-          {/* {isAdmin &&(
-            funcao de filtragem para admin
-          )} */}
         </div>
         {error && <div className="error-message">{error}</div>}
-        <DataTable value={orders} loading={loading} responsiveLayout="scroll">
-          <Column field="idPrenotazione" header="ID" />
-          <Column
-            field="datePiatti"
-            header="Data Prenotazione"
-            body={(rowData) => {
-              if (rowData.datePiatti) {
-                return rowData.datePiatti;
-              }
-              return "N/A"; // or any default value you prefer
-            }}
-          />
-          <Column field="piatti" header="Piatti" />
-          <Column field="tipo_piatti" header="Combinazione" />
-          <Column
-            body={actionTemplate}
-            header="Azioni"
-            style={{ width: "150px" }}
-          />
-        </DataTable>
+        {user && user.ruolo === "Amministratore" ? renderAdminTable() : renderUserTable()}
       </Card>
 
       <Dialog
@@ -473,7 +516,7 @@ const ViewOpenOrders = () => {
           </div>
         )}
       </Dialog>
-    </div >
+    </div>
   );
 };
 
