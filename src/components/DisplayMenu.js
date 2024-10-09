@@ -270,7 +270,22 @@ function MenuPage() {
     );
   };
 
+  // Function to check if orders are closed for the selected day
+  const isOrderClosed = () => {
+    const now = new Date();
+    const selectedDate = new Date(selectedDay);
+    const cutoffTime = new Date(selectedDate.setHours(8, 30, 0, 0)); // Set to 10:30 AM
+
+    return now > cutoffTime && now.toDateString() === selectedDate.toDateString();
+  };
+
   const handleSubmit = async () => {
+    // Check if orders are closed
+    if (isOrderClosed()) {
+      setError('Ordini per oggi sono già chiusi.');
+      return; // Prevent submission if orders are closed
+    }
+
     const dataPrenotazione = formatDateforServer(selectedDay);
 
     // Função para verificar se já existe uma prenotazione para o dia selecionado
@@ -403,12 +418,21 @@ function MenuPage() {
         </div>
       </div>
 
-      <Card className='combinazioni-card'>
-        <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
-      </Card>
+      {/* Show error message if orders are closed */}
+      {isOrderClosed() && (
+        <div className="error-message">
+          <h1>Ordini per oggi sono già chiusi.</h1>
+          <p>avete tempo fino alle 10:30 AM del giorno in corso per ordinare</p>
+          </div>
+      )}
 
-      {selectedDay && (
+      {/* Only render the order form if orders are open */}
+      {!isOrderClosed() && selectedDay && (
         <>
+          <Card className='combinazioni-card'>
+            <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
+          </Card>
+
           {renderOrderMenu()}
           {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
           {error && <div className="error-message">{error}</div>}

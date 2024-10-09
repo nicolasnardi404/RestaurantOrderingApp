@@ -52,7 +52,7 @@ Historic
 
 === Ordina Pasto ===
 
-[] -> Bloquear os pedidos às 10:30am todos os dias
+[X] -> Bloquear os pedidos às 10:30am todos os dias
 [] -> No calendario da pagina Ordine Pasto, mostrar a ultima data que a pessoa tem disponivel para pedir.
 [] -> No Altri piatti se possivel fazer um radio (sistema de escolhas parecido com a checkbox)
 [] -> Mudar Complement para Dessert

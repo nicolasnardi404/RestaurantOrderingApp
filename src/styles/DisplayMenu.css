@@ -56,9 +56,21 @@ body {
   margin-bottom: 15px;
 }
 
-.error-message {
+.error-message{
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  margin: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.error-message h1{
   color: red;
-  margin: 15px 0;
+  margin: 10px 0;
   font-weight: bold;
 }
 
