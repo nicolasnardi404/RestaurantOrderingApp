@@ -15,10 +15,10 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { Card } from 'primereact/card';
 
 function MenuPage() {
-  const [selectedDay, setSelectedDay] = useState(new Date()); // Set default to current date
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [availableDates, setAvailableDates] = useState([]); // Set default to current date
   const [showMenu, setShowMenu] = useState(false);
   const [dishes, setDishes] = useState([]);
-  const [altri, setAltri] = useState(null); // Campo para "Altri"
   const [observazioni, setObservazioni] = useState(''); // Campo para observações
   const [sempreDisponibileDishes, setSempreDisponibileDishes] = useState([]);
   const [cart, setCart] = useState({});
@@ -33,12 +33,41 @@ function MenuPage() {
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
   useEffect(() => {
+    fetchAvailableDates();
     if (selectedDay) {
       fetchDishes();
       setCart({});
       setCombinationStatus('');
     }
   }, [selectedDay]);
+
+  const fetchAvailableDates = async () => {
+    try {
+      const token = getToken();
+      const response = await axios.post(
+        'http://localhost:8080/api/prenotazione/readByIdAndData',
+        { idUser: user.userId },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const dates = response.data;
+      const availableDates = dates.map(date => new Date(date));
+      setAvailableDates(availableDates);
+
+      if (!selectedDay) {
+        setSelectedDay(availableDates[0]);
+      } else {
+        console.log("Fez todos os pedidos");
+      }
+    } catch (error) {
+      console.error('Error fetching available dates:', error);
+    }
+  };
 
   const fetchDishes = async () => {
     const formDateForServer = formatDateforServer(selectedDay);
@@ -98,7 +127,7 @@ function MenuPage() {
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Complement } = currentCart;
+    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Dessert } = currentCart;
 
     const selectedItems = new Set();
     if (Primo) selectedItems.add('Primo');
@@ -106,7 +135,7 @@ function MenuPage() {
     if (Contorno) selectedItems.add('Contorno');
     if (PiattoUnico) selectedItems.add('Piatto unico');
     if (Altri) selectedItems.add('Altri');
-    if (Complement) selectedItems.add('Complement');
+    if (Dessert) selectedItems.add('Dessert');
 
     const combinations = validCombinations.find(combination => {
       return combination.every(item => selectedItems.has(item));
@@ -133,7 +162,7 @@ function MenuPage() {
     ['Primo', 'Secondo', 'Contorno'],
     ['Primo', 'Piatto unico', 'Contorno'],
     ['Primo', 'Contorno'],
-    ['Primo', 'Contorno', 'Complement'],
+    ['Primo', 'Contorno', 'Dessert'],
     ['Secondo', 'Contorno'],
     ['Piatto unico', 'Contorno'],
     ['Piatto unico'],
@@ -156,9 +185,9 @@ function MenuPage() {
 
   const renderOrderMenu = () => (
     <div className="order-menu">
-      {['Primo', 'Secondo', 'Contorno', 'Piatto unico', 'Altri', 'Complement'].map((mealType) => (
+      {['Primo', 'Secondo', 'Contorno', 'Piatto unico', 'Altri', 'Dessert'].map((mealType) => (
         <div key={mealType} className="menu-category">
-          <h3>{mealType}</h3>
+          <h3>{mealType === 'Altri' ? 'Pane/Grissini' : mealType}</h3>
           <Dropdown
             value={cart[mealType]}
             options={getFilteredDishes(mealType)}
@@ -270,62 +299,8 @@ function MenuPage() {
     );
   };
 
-  // Function to check if orders are closed for the selected day
-  const isOrderClosed = () => {
-    const now = new Date();
-    const selectedDate = new Date(selectedDay);
-    const cutoffTime = new Date(selectedDate.setHours(8, 30, 0, 0)); // Set to 10:30 AM
-
-    return now > cutoffTime && now.toDateString() === selectedDate.toDateString();
-  };
-
   const handleSubmit = async () => {
-    // Check if orders are closed
-    if (isOrderClosed()) {
-      setError('Ordini per oggi sono già chiusi.');
-      return; // Prevent submission if orders are closed
-    }
-
     const dataPrenotazione = formatDateforServer(selectedDay);
-
-    // Função para verificar se já existe uma prenotazione para o dia selecionado
-    const checkExistingReservation = async () => {
-      try {
-        const token = getToken();
-        const response = await axios.post(
-          'http://localhost:8080/api/prenotazione/readByIdAndData',
-          {
-            idUser: user.userId,
-            dataPrenotazione: `${dataPrenotazione}`,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        // Se a resposta retornar alguma prenotazione, significa que já existe uma reserva
-        if (!response.data) {
-          return false;
-        }
-        return true;
-      } catch (error) {
-        console.error('Error checking existing reservation:', error);
-        setError('Errore durante la verifica della prenotazione esistente. Riprova.');
-        return true; // Considera como existente em caso de erro
-      }
-    };
-
-    // Verifique se o usuário já tem uma reserva para o dia
-    const hasExistingReservation = await checkExistingReservation();
-
-    if (hasExistingReservation) {
-      setError('Ordine già presente per questa data');
-      return; // Impede que o pedido seja enviado
-    }
-
     // Verifique se a combinação de pratos é válida
     if (isValidCombination()) {
       setIsSubmitting(true);
@@ -411,7 +386,8 @@ function MenuPage() {
           onChange={(e) => setSelectedDay(e.value)}
           placeholder="Seleziona la data"
           locale="it"
-          minDate={new Date()} // Set the minimum date to today
+          minDate={new Date()} // Define a data mínima como hoje
+          disabledDates={Array.from({ length: 31 }, (_, i) => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + i)).filter(date => !availableDates.some(availableDate => availableDate.toDateString() === date.toDateString()))}
         />
         <div className="menu-button-container">
           <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
@@ -419,15 +395,15 @@ function MenuPage() {
       </div>
 
       {/* Show error message if orders are closed */}
-      {isOrderClosed() && (
+      {!selectedDay && (
         <div className="error-message">
-          <h1>Ordini per oggi sono già chiusi.</h1>
-          <p>avete tempo fino alle 10:30 AM del giorno in corso per ordinare</p>
-          </div>
+          <h1>Avviso</h1>
+          <p>avete già fatto tutti gli ordini della settimana</p>
+        </div>
       )}
 
       {/* Only render the order form if orders are open */}
-      {!isOrderClosed() && selectedDay && (
+      {selectedDay && (
         <>
           <Card className='combinazioni-card'>
             <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
