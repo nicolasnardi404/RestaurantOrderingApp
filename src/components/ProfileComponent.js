@@ -1,19 +1,37 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import '../styles/ProfilePage.css';
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, getToken } = useAuth();
   const [selectedDays, setSelectedDays] = useState([]);
   const [hasWarnings, setHasWarnings] = useState(false);
 
   useEffect(() => {
-    const storedWarnings = localStorage.getItem(user.userId);
-    if (storedWarnings) {
-      setSelectedDays(JSON.parse(storedWarnings));
-      setHasWarnings(true);
-    }
-  }, [user.userId]);
+    const fetchAlerts = async () => {
+      try {
+        const token = await getToken();
+        const response = await axios.get(`http://localhost:8080/api/avviso/readById/${user.userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        // Processa a resposta para definir os dias selecionados
+        if (response.data && Array.isArray(response.data)) {
+          const alerts = response.data.filter(alert => alert.idUser === user.userId);
+          const days = alerts.map(alert => alert.giorno);
+          setSelectedDays(days);
+          setHasWarnings(days.length > 0);
+        }
+      } catch (error) {
+        console.error('Errore nel recupero degli avvisi:', error);
+      }
+    };
+
+    fetchAlerts();
+  }, [getToken, user.userId]);
 
   const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì'];
 
@@ -23,24 +41,39 @@ export default function ProfilePage() {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (hasWarnings) {
-      localStorage.removeItem(user.userId); // Elimina avvisi precedenti
-    }
+    const token = await getToken();
     const data = {
       idUser: user.userId,
       alerts: selectedDays
     };
 
-    localStorage.setItem("alerts", JSON.stringify(data));
-    setHasWarnings(true);
+    try {
+      await axios.post('http://localhost:8080/api/avviso/create', data, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setHasWarnings(true);
+    } catch (error) {
+      console.error('Errore nella creazione degli avvisi:', error);
+    }
   };
 
-  const handleDelete = () => {
-    localStorage.removeItem(user.userId);
-    setSelectedDays([]);
-    setHasWarnings(false);
+  const handleDelete = async () => {
+    const token = await getToken();
+    try {
+      await axios.delete(`http://localhost:8080/api/avviso/delete/${user.userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setSelectedDays([]);
+      setHasWarnings(false);
+    } catch (error) {
+      console.error('Errore nella cancellazione degli avvisi:', error);
+    }
   };
 
   return (
