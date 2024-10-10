@@ -1,63 +1,31 @@
-[ ] - adicionar erro para todas as páginas
- 
-Menu 
+[ ] - admin
+    - [ ] - gestire utente (crea, reset password, modifica, elimina);
+    - [ ] - aggiungere ordine per tutti utenti
+    - [ ] - puoi aggiungere piatti nel passato
 
-[x] - título para explicar melhor que é o Menu
-[ ] - não é possível fazer pedidos para dias passados
-[ ] - exibir todas as combinações possíveis
- 
-Pedido Aberto 
+[ ] - remove register from login
 
-[X] - Tornar a primeira página e também redirecionar do logo
-[x] - botão para ir ao Menu
-[x] - adicionar pao e fruta no update
- 
-Pedido do Dia
-
-[x] - mudar PDF para todos os dados
-[x] - corrigir tabela
-
-        Contorno 4
-
-            - Pasta 2
-
-            - Cenoura 2
-
-Editar Piatto 
-[x] - título
-[x] - adicionar btn para remover linha dentro da opcao de multiplo pratos
-[x] - nao aceitar valor nulo no db do multiplo piatos
-[x] - adicionar pao e fruta
-
-Storico per User
-[x] - total
-
-Regolazione della data
-[] - Add Single Piatto
-[] - Add multiplo Piatto
-[X] - Edit piatto
-[X] - View Open Order (edit order)
-[X] - All orders of the day
-
-Historic
-[] - value null for "Seleziona Utente"
+[ ] - Historic
+    - [ ] - cambia stile grafico
+    - [ ] - excel
+    - [ ] - cambia bottoni per tutti
 
 
+[ ] - Modifica Ordine
+    - [ ] - cambia SELECT
+    - [ ] - cambiare data per giorno piu data
+    - [ ] - cambiare parole in inglese
 
-------NOVAS DEMANDAS--------
+[ ] - Menu
+    - [ ] - apri cuando aggiungere Menu
+    - [ ] - Optizoni - non puo ordinare Secondo e Piatto Unico ed Piu de 3
+    - [ ] - bottoni in itali
+    - [ ] - show giorni senza ordini - solo i giorni selezionati dall'utente
 
-=== GERAL ===
+[ ] - Ordine del giorno 
+    - [ ] - cambiare Ordini Detaggli Venerdi(11-11-2024)
 
-[] -> Mudar as datas das tabelas, para o formato Dia reduzido. dia/mes/ano com dois digitos. ex: Mer. 24/10/07
+[ ] - Profilo Utente
+    - [ ] - cambiare password
+    - [ ] - GIORNO PRENATOZIONE -no avviso
 
-=== Ordina Pasto ===
-
-[X] -> Bloquear os pedidos às 10:30am todos os dias
-[X] -> No calendario da pagina Ordine Pasto, mostrar a ultima data que a pessoa tem disponivel para pedir.
-[X] -> Trocar o nome de Altri para Pane/Grissini
-[X] -> Mudar Complement para Dessert
-[] -> Ajustar a mensagem de combinações impossiveis
-
-=== Ordini Aperti === 
-
-[] -> Colocar um sistema de filtragem por nome, pois o admin deve ver o pedido de todas as pessoas.
