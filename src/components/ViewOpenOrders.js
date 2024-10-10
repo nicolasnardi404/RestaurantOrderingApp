@@ -251,7 +251,7 @@ const ViewOpenOrders = () => {
         "Complement":
           dishesById[
           selectedDishes.find(
-            (id) => dishesById[id]?.tipo_piatto === "Complement"
+            (id) => dishesById[id]?.tipo_piatto === "Dessert"
           )
           ] || null,
         "Altri":

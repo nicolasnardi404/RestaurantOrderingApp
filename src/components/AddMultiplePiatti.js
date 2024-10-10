@@ -91,7 +91,7 @@ const AddMultiplePiatti = () => {
                     value={commonDate}
                     onChange={(e) => setCommonDate(e.value)}
                     locale="it"
-                    dateFormat="D. dd-mm-y" // Set the date format to day-month-year
+                    dateFormat="D. dd/mm/y" // Set the date format to day-month-year
                     className="custom-calendar" // Add a custom class for styling
                 />
             </div>

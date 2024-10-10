@@ -27,10 +27,10 @@ export default function UserMenu() {
 
   const getMenuItems = () => {
     const commonItems = [
-      { label: 'Storico', icon: 'calendar', path: '/historic' },
+      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' },
       { label: 'Ordina Pasto', icon: 'shopping-cart', path: '/menu' },
       { label: 'Ordini Aperti', icon: 'list', path: '/open-orders' },
-      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' },
+      { label: 'Storico', icon: 'calendar', path: '/historic' },
     ];
 
     const amministratoreItems = [

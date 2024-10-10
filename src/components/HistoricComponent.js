@@ -250,7 +250,7 @@ const HistoricComponent = () => {
           )}
 
           {/* The user dropdown is displayed only for the administrator */}
-          {!showTotalPerDay && usernames && isAdmin && (
+          {usernames && isAdmin && (
             <div className="p-field">
               <label htmlFor="userDropdown">Seleziona Utente</label>
               <Dropdown
