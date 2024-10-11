@@ -493,17 +493,17 @@ const HistoricComponent = () => {
               </tr>
             </tbody>
           </table>
-          <Button label="Generate Excel" icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
+          <div className="total-orders-section">
+            <h3>&nbsp;Totale Ordini:&nbsp;</h3> 
+            <h3 className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</h3>
+          </div>
         </Card>
       )}
       {/* The card with the total and the PDF generation button will be visible only for the administrator */}
       {
         isAdmin && (
           <Card className="total-pdf-card">
-            <div className="total-orders-section">
-              <h3>Totale Ordini</h3> {/* Changed to Italian */}
-              <p className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</p>
-            </div>
+            <h3>Rapporto di Amministrazione</h3>
             <div className="pdf-button-section">
               <Button
                 label="Genera PDF" // Changed to Italian
@@ -512,12 +512,14 @@ const HistoricComponent = () => {
                 disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
                 className="p-button-lg btn"
               />
+           
+              <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
             </div>
-            <p>
-              {showTotalPerDay
-                ? "La generazione del PDF è possibile solo quando è selezionato il mese"
-                : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
-            </p>
+              <p>
+                {showTotalPerDay
+                  ? "La generazione del PDF è possibile solo quando è selezionato il mese"
+                  : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
+              </p>
           </Card>
         )
       }
