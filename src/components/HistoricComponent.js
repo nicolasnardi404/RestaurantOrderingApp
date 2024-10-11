@@ -451,32 +451,6 @@ const HistoricComponent = () => {
         </Card>
       </div >
 
-      {/* The card with the total and the PDF generation button will be visible only for the administrator */}
-      {
-        isAdmin && (
-          <Card className="total-pdf-card">
-            <div className="total-orders-section">
-              <h3>Totale Ordini</h3> {/* Changed to Italian */}
-              <p className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</p>
-            </div>
-            <div className="pdf-button-section">
-              <Button
-                label="Genera PDF" // Changed to Italian
-                icon="pi pi-file-pdf"
-                onClick={generatePDF}
-                disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
-                className="p-button-lg btn"
-              />
-            </div>
-            <p>
-              {showTotalPerDay
-                ? "La generazione del PDF è possibile solo quando è selezionato il mese"
-                : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
-            </p>
-          </Card>
-        )
-      }
-
       {monthlyOverviewData && (
         <Card className="data-card">
           <h3>Panoramica Mensile - {monthlyOverviewData.month} {monthlyOverviewData.year}</h3>
@@ -511,13 +485,42 @@ const HistoricComponent = () => {
                     {monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0}
                   </td>
                 ))}
-                <td></td>
+                <td>
+                  {monthlyOverviewData.days.reduce((total, day) => 
+                    total + (monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0), 0
+                  )}
+                </td>
               </tr>
             </tbody>
           </table>
           <Button label="Generate Excel" icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
         </Card>
       )}
+      {/* The card with the total and the PDF generation button will be visible only for the administrator */}
+      {
+        isAdmin && (
+          <Card className="total-pdf-card">
+            <div className="total-orders-section">
+              <h3>Totale Ordini</h3> {/* Changed to Italian */}
+              <p className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</p>
+            </div>
+            <div className="pdf-button-section">
+              <Button
+                label="Genera PDF" // Changed to Italian
+                icon="pi pi-file-pdf"
+                onClick={generatePDF}
+                disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
+                className="p-button-lg btn"
+              />
+            </div>
+            <p>
+              {showTotalPerDay
+                ? "La generazione del PDF è possibile solo quando è selezionato il mese"
+                : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
+            </p>
+          </Card>
+        )
+      }
     </div >
   );
 }
