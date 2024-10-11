@@ -52,7 +52,7 @@ const ViewOpenOrders = () => {
   const filterOrders = () => {
     if (user && user.ruolo === "Amministratore") {
       const lowercasedFilter = usernameFilter.toLowerCase();
-      const filtered = orders.filter(order => 
+      const filtered = orders.filter(order =>
         order && order.username && order.username.toLowerCase().includes(lowercasedFilter)
       );
       setFilteredOrders(filtered);
@@ -72,11 +72,11 @@ const ViewOpenOrders = () => {
       let url = user && user.ruolo === "Amministratore"
         ? `http://localhost:8080/api/ordine/ordineByUserIdAdmin`
         : `http://localhost:8080/api/ordine/ordineByUserId/${user?.userId}`;
-      
+
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       console.log("Fetched orders:", response.data);
 
       if (Array.isArray(response.data)) {
@@ -120,6 +120,7 @@ const ViewOpenOrders = () => {
     // If value is already a Date object
     if (value instanceof Date) {
       return value.toLocaleString("it-IT", {
+        weekday: "short",
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -482,10 +483,9 @@ const ViewOpenOrders = () => {
         {editingOrder && (
           <div>
             <div className="p-field">
-              <label>Reservation Date:</label>
-              <span>{formatDate(editingOrder.reservationDate)}</span>
+              <label>Data Prenotazione: <span>{formatDate(editingOrder.reservationDate)}</span></label>
             </div>
-            {["Primo", "Secondo", "Contorno", "Piatto unico", "Complement", "Altri"].map(
+            {["Primo", "Secondo", "Contorno", "Piatto unico", "Dessert", "Altri"].map(
               (mealType) => (
                 <div key={mealType} className="p-field">
                   <label htmlFor={mealType}>{mealType}</label>
@@ -497,7 +497,7 @@ const ViewOpenOrders = () => {
                     )}
                     onChange={(e) => handleDropdownChange(mealType, e.value)}
                     optionLabel="nome"
-                    placeholder={`Select ${mealType}`}
+                    placeholder={`=== SELEZIONA ===`}
                     className="w-full md:w-14rem"
                     showClear
                   />
@@ -509,7 +509,7 @@ const ViewOpenOrders = () => {
             )}
             {error && <div className="error-message">{error}</div>}
             <Button
-              label="Update Order"
+              label="Aggiorna ordine"
               onClick={handleUpdateOrder}
               disabled={!isValidCombination(editingOrder.selectedDishes)}
             />
