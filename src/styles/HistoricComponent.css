@@ -64,3 +64,20 @@ h2 {
   color: var(--primary-color);
   margin-bottom: 20px;
 }
+
+.monthly-table {
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.monthly-table th,
+.monthly-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.monthly-table th {
+  background-color: #f2f2f2;
+}

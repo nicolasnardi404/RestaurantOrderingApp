@@ -15,9 +15,41 @@ import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
 import { UseDataLocal } from '../util/UseDataLocal';
 import { useAuth } from '../context/AuthContext';
 import '../styles/HistoricComponent.css';
+import * as XLSX from 'xlsx';
 
 // Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
+
+const processMonthlyOverviewData = (data) => {
+  const monthData = {};
+  const usernames = new Set();
+  let year, month;
+
+  data.forEach(item => {
+    const [, day, monthStr, yearStr] = item.reservation_date.match(/(\d{2})\/(\d{2})\/(\d{2})/);
+    const date = new Date(2000 + parseInt(yearStr), parseInt(monthStr) - 1, parseInt(day));
+    year = date.getFullYear();
+    month = date.getMonth();
+    const dayOfMonth = date.getDate();
+    usernames.add(item.username);
+
+    if (!monthData[dayOfMonth]) {
+      monthData[dayOfMonth] = {};
+    }
+    monthData[dayOfMonth] = { ...monthData[dayOfMonth], [item.username]: 'X' };
+  });
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const days = Array.from({length: daysInMonth}, (_, i) => i + 1);
+
+  return {
+    days: days,
+    users: Array.from(usernames),
+    data: monthData,
+    month: new Date(year, month).toLocaleString('it-IT', { month: 'long' }),
+    year: year
+  };
+};
 
 const HistoricComponent = () => {
   const [data, setData] = useState([]);
@@ -33,6 +65,8 @@ const HistoricComponent = () => {
   const [isAdmin, setAdmin] = useState(false);
   const { user, getToken } = useAuth();
   const ruolo = user.ruolo;
+  const [processedData, setProcessedData] = useState(null);
+  const [monthlyOverviewData, setMonthlyOverviewData] = useState(null);
 
   useEffect(() => {
     if (ruolo === "Amministratore") {
@@ -71,6 +105,7 @@ const HistoricComponent = () => {
       setData(response.data);
       const uniqueUsernames = [...new Set(response.data.map(item => item.username))];
       setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
+      processData(response.data);
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
     }
@@ -197,6 +232,90 @@ const HistoricComponent = () => {
     }
 
     doc.save(`${selectedUsername || 'tutti'}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`); // Changed to Italian
+  };
+
+  const processData = (data) => {
+    const monthData = {};
+    const usernames = new Set();
+    let year, month;
+
+    data.forEach(item => {
+      const date = new Date(item.reservation_date.split(' ')[1]);
+      year = date.getFullYear();
+      month = date.getMonth();
+      const day = date.getDate();
+      usernames.add(item.username);
+
+      if (!monthData[day]) {
+        monthData[day] = {};
+      }
+      monthData[day][item.username] = 'X';
+    });
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const days = Array.from({length: daysInMonth}, (_, i) => i + 1);
+
+    const processedData = {
+      days: days,
+      users: Array.from(usernames),
+      data: monthData,
+      month: new Date(year, month).toLocaleString('default', { month: 'long' }),
+      year: year
+    };
+
+    setProcessedData(processedData);
+  };
+
+  useEffect(() => {
+    if (data) {
+      // Existing data processing
+      processData(data);
+      
+      // New monthly overview data processing
+      const overviewData = processMonthlyOverviewData(data);
+      setMonthlyOverviewData(overviewData);
+    }
+  }, [data]);
+
+  const generateExcel = () => {
+    if (!monthlyOverviewData) return;
+
+    // Create a new workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([]);
+
+    // Add header row
+    XLSX.utils.sheet_add_aoa(ws, [['Utente', ...monthlyOverviewData.days, 'Totale']], { origin: 'A1' });
+
+    // Add data rows
+    monthlyOverviewData.users.forEach((user, index) => {
+      const rowData = [user];
+      let userTotal = 0;
+      monthlyOverviewData.days.forEach(day => {
+        if (monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]) {
+          rowData.push('X');
+          userTotal++;
+        } else {
+          rowData.push('');
+        }
+      });
+      rowData.push(userTotal);
+      XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
+    });
+
+    // Add total per day row
+    const totalRow = ['Totale per giorno'];
+    monthlyOverviewData.days.forEach(day => {
+      const dayTotal = monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0;
+      totalRow.push(dayTotal);
+    });
+    XLSX.utils.sheet_add_aoa(ws, [totalRow], { origin: `A${monthlyOverviewData.users.length + 2}` });
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Monthly Overview');
+
+    // Generate Excel file
+    XLSX.writeFile(wb, `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`);
   };
 
   return (
@@ -357,6 +476,48 @@ const HistoricComponent = () => {
           </Card>
         )
       }
+
+      {monthlyOverviewData && (
+        <Card className="data-card">
+          <h3>Panoramica Mensile - {monthlyOverviewData.month} {monthlyOverviewData.year}</h3>
+          <table className="monthly-table">
+            <thead>
+              <tr>
+                <th>Utente</th>
+                {monthlyOverviewData.days.map(day => <th key={day}>{day}</th>)}
+                <th>Totale</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthlyOverviewData.users.map(user => (
+                <tr key={user}>
+                  <td>{user}</td>
+                  {monthlyOverviewData.days.map(day => (
+                    <td key={day}>
+                      {monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user] ? 'X' : ''}
+                    </td>
+                  ))}
+                  <td>
+                    {monthlyOverviewData.days.filter(day => 
+                      monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]
+                    ).length}
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td>Totale per giorno</td>
+                {monthlyOverviewData.days.map(day => (
+                  <td key={day}>
+                    {monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0}
+                  </td>
+                ))}
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <Button label="Generate Excel" icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
+        </Card>
+      )}
     </div >
   );
 }
