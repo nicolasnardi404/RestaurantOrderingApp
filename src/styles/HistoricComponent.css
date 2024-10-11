@@ -58,6 +58,12 @@
   color: var(--primary-color);
 }
 
+.p-button-text {
+  display: flex;
+  margin: auto;
+
+}
+
 h2 {
   color: var(--primary-color);
   margin-bottom: 20px;

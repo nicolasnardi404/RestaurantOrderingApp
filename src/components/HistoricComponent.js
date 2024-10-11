@@ -16,6 +16,7 @@ import { UseDataLocal } from '../util/UseDataLocal';
 import { useAuth } from '../context/AuthContext';
 import '../styles/HistoricComponent.css';
 import * as XLSX from 'xlsx';
+import { ScrollTop } from 'primereact/scrolltop';
 
 // Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
@@ -318,14 +319,25 @@ const HistoricComponent = () => {
     XLSX.writeFile(wb, `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`);
   };
 
+  const scrollToBottom = () => {
+    const bottomElement = document.getElementById('rapporto-amministrazione');
+    if (bottomElement) {
+      bottomElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="historic-container">
       <div className="card-row">
         <Card className="filter-card">
+          {isAdmin && (
+            <>
+              <h2>Storico Ordini</h2>
+            </>
+          )}
           {isAdmin ? (
             // Admin view - keep it as is
             <>
-            <h2>Storico Ordini</h2>
               <div className="view-mode-section">
                 <div className="p-field">
                   <label>Visualizzazione</label>
@@ -377,6 +389,12 @@ const HistoricComponent = () => {
                   </div>
                 )}
               </div>
+              <Button 
+                label="Vai al Rapporto di Amministrazione" 
+                icon="pi pi-arrow-down" 
+                onClick={scrollToBottom}
+                className="p-button-text"
+              />
             </>
           ) : (
             // User view - only calendar
@@ -502,7 +520,7 @@ const HistoricComponent = () => {
       {/* The card with the total and the PDF generation button will be visible only for the administrator */}
       {
         isAdmin && (
-          <Card className="total-pdf-card">
+          <Card className="total-pdf-card" id="rapporto-amministrazione">
             <h3>Rapporto di Amministrazione</h3>
             <div className="pdf-button-section">
               <Button
@@ -523,6 +541,7 @@ const HistoricComponent = () => {
           </Card>
         )
       }
+      <ScrollTop />
     </div >
   );
 }
