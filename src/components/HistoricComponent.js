@@ -203,64 +203,77 @@ const HistoricComponent = () => {
     <div className="historic-container">
       <div className="card-row">
         <Card className="filter-card">
-          <h2>Storico Ordini</h2> {/* Changed to Italian */}
-          <div className="p-field">
-            <label>Visualizzazione</label>
-            <div className="p-buttonset">
-              <Button
-                label="Mese"
-                onClick={() => handleViewModeChange('month')}
-                className={viewMode === 'month' ? 'p-button-primary' : 'p-button-secondary'}
-              />
-              {/* The "Day" button only appears for the administrator */}
-              {isAdmin && (
-                <Button
-                  label="Giorno"
-                  onClick={() => handleViewModeChange('day')}
-                  className={viewMode === 'day' ? 'p-button-primary' : 'p-button-secondary'}
+          {isAdmin ? (
+            // Admin view - keep it as is
+            <>
+            <h2>Storico Ordini</h2>
+              <div className="view-mode-section">
+                <div className="p-field">
+                  <label>Visualizzazione</label>
+                  <div className="p-buttonset">
+                    <Button
+                      label="Mese"
+                      onClick={() => handleViewModeChange('month')}
+                      className={viewMode === 'month' ? 'p-button-primary' : 'p-button-secondary'}
+                    />
+                    <Button
+                      label="Giorno"
+                      onClick={() => handleViewModeChange('day')}
+                      className={viewMode === 'day' ? 'p-button-primary' : 'p-button-secondary'}
+                    />
+                  </div>
+                </div>
+                <div className="p-field">
+                  <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
+                  <Calendar
+                    id="datePicker"
+                    value={viewMode === 'month' ? selectedMonth : selectedDate}
+                    onChange={(e) => viewMode === 'month' ? setSelectedMonth(e.value) : setSelectedDate(e.value)}
+                    view={viewMode === 'month' ? "month" : "date"}
+                    locale="it"
+                    dateFormat={viewMode === 'month' ? "M. mm/yy" : "D. dd/mm/y"}
+                  />
+                </div>
+              </div>
+              <div className="input-switch-section">
+                <div className="p-field">
+                  <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+                  <InputSwitch
+                    id="totalPerDaySwitch"
+                    checked={showTotalPerDay}
+                    onChange={(e) => setShowTotalPerDay(e.value)}
+                  />
+                </div>
+                {usernames && isAdmin && (
+                  <div className="p-field">
+                    <label htmlFor="userDropdown">Seleziona Utente</label>
+                    <Dropdown
+                      id="userDropdown"
+                      value={selectedUsername}
+                      options={usernames}
+                      onChange={(e) => setSelectedUsername(e.value)}
+                      placeholder="Tutti gli utenti"
+                      showClear
+                    />
+                  </div>
+                )}
+              </div>
+            </>
+          ) : (
+            // User view - only calendar
+            <div className="user-view-section">
+              <h2>Storico Ordini</h2>
+              <div className="p-field">
+                <label htmlFor="datePicker">Seleziona Mese</label>
+                <Calendar
+                  id="datePicker"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.value)}
+                  view="month"
+                  locale="it"
+                  dateFormat="mm/yy"
                 />
-              )}
-            </div>
-          </div>
-
-          {/* The employee can only select the month, the admin can select the month or day */}
-          <div className="p-field">
-            <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
-            <Calendar
-              id="datePicker"
-              value={viewMode === 'month' ? selectedMonth : selectedDate}
-              onChange={(e) => viewMode === 'month' ? setSelectedMonth(e.value) : setSelectedDate(e.value)}
-              view={viewMode === 'month' ? "month" : "date"}
-              locale="it"
-              dateFormat={viewMode === 'month' ? "M. mm/yy" : "D. dd/mm/y"}
-              disabled={!isAdmin && viewMode === 'day'} // Disable the day field for the employee
-            />
-          </div>
-
-          {/* The InputSwitch button is visible for both */}
-          {isAdmin && (
-            <div className="p-field">
-              <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-              <InputSwitch
-                id="totalPerDaySwitch"
-                checked={showTotalPerDay}
-                onChange={(e) => setShowTotalPerDay(e.value)}
-              />
-            </div>
-          )}
-
-          {/* The user dropdown is displayed only for the administrator */}
-          {usernames && isAdmin && (
-            <div className="p-field">
-              <label htmlFor="userDropdown">Seleziona Utente</label>
-              <Dropdown
-                id="userDropdown"
-                value={selectedUsername}
-                options={usernames}
-                onChange={(e) => setSelectedUsername(e.value)}
-                placeholder="Tutti gli utenti"
-                showClear
-              />
+              </div>
             </div>
           )}
         </Card>
