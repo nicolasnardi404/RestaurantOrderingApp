@@ -21,6 +21,7 @@ function MenuPage() {
   const [dishes, setDishes] = useState([]);
   const [observazioni, setObservazioni] = useState(''); // Campo para observações
   const [sempreDisponibileDishes, setSempreDisponibileDishes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState({});
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
@@ -63,6 +64,8 @@ function MenuPage() {
       }
     } catch (error) {
       console.error('Error fetching available dates:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -378,6 +381,41 @@ function MenuPage() {
     </Dialog>
   );
 
+  const getMinDate = () => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    // Se já passou de 10:30, define a data mínima para o próximo dia
+    if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
+      now.setDate(now.getDate() + 1);
+    }
+
+    // Ajusta para o próximo dia se cair em fim de semana
+    while (now.getDay() === 0 || now.getDay() === 6) { // 0 = Domingo, 6 = Sábado
+      now.setDate(now.getDate() + 1);
+    }
+
+    return now;
+  };
+
+  const getDisabledDates = () => {
+    const disabledDates = [];
+    const startDate = getMinDate();
+
+    for (let i = 0; i < 30; i++) { // Ajuste o número conforme necessário
+      const dateToCheck = new Date(startDate);
+      dateToCheck.setDate(startDate.getDate() + i);
+
+      // Adiciona datas de sábado e domingo ao array
+      if (dateToCheck.getDay() === 0 || dateToCheck.getDay() === 6) {
+        disabledDates.push(new Date(dateToCheck)); // Adiciona a data como um objeto Date
+      }
+    }
+
+    return disabledDates;
+  };
+
   return (
     <div className='container-menu'>
       <h1>Ordina Pasto</h1>
@@ -387,7 +425,8 @@ function MenuPage() {
           onChange={(e) => setSelectedDay(e.value)}
           placeholder="Seleziona la data"
           locale="it"
-          minDate={new Date()} // Define a data mínima como hoje
+          minDate={getMinDate()}
+          disabledDates={getDisabledDates()}
         />
         <div className="menu-button-container">
           <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
@@ -395,7 +434,7 @@ function MenuPage() {
       </div>
 
       {/* Show error message if orders are closed */}
-      {!selectedDay && (
+      {!selectedDay && !isLoading && (
         <div className="error-message">
           <h1>Avviso</h1>
           <p>avete già fatto tutti gli ordini della settimana</p>

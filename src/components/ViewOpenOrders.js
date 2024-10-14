@@ -26,11 +26,12 @@ const ViewOpenOrders = () => {
   const [editingOrder, setEditingOrder] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [availableDishes, setAvailableDishes] = useState([]);
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
-  const [combinationStatus, setCombinationStatus] = useState("");
   const [usernameFilter, setUsernameFilter] = useState("");
   const { user, getToken } = useAuth();
   const toast = useRef(null);
+  const [combinationStatus, setCombinationStatus] = useState("");
 
   useEffect(() => {
     fetchOrders();
@@ -59,6 +60,17 @@ const ViewOpenOrders = () => {
     }
   };
 
+  const getNames = (users) => {
+    let listNames = [];
+    if (user.ruolo === "Amministratore") {
+      for (let i = 0; i < users.length; i++) {
+        listNames.push(users[i]["username"]);
+      }
+    }
+
+    return listNames;
+  }
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -81,6 +93,7 @@ const ViewOpenOrders = () => {
 
       if (Array.isArray(response.data)) {
         setOrders(response.data);
+        setUsers(getNames(response.data));
         if (user && user.ruolo !== "Amministratore") {
           setFilteredOrders(response.data);
         }
@@ -435,10 +448,13 @@ const ViewOpenOrders = () => {
   const renderAdminTable = () => (
     <div>
       <div className="p-inputgroup mb-3">
-        <InputText
-          placeholder="Cerca utente pernome"
+        <Dropdown
           value={usernameFilter}
-          onChange={(e) => setUsernameFilter(e.target.value)}
+          options={users}
+          onChange={(e) => setUsernameFilter(e.value)}
+          optionLabel="nome" // Assuming 'nome' is the key for display
+          placeholder="Seleziona utente"
+          className="w-full md:w-14rem"
         />
       </div>
       <DataTable value={filteredOrders} loading={loading} responsiveLayout="scroll">
