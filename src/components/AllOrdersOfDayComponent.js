@@ -73,26 +73,18 @@ const AllOrderOfDayComponent = () => {
     setSelectedDate(e.value);
   };
 
-  const formatDateForDisplay = (date) => {
-    return date.toLocaleDateString('it-IT', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  };
-
   const generatePDF = () => {
     const doc = new jsPDF();
 
     // Add title
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('Daily Order Report', 14, 20);
+    doc.text('Rapporto giornaliero sugli ordini', 14, 20);
 
     // Add report info
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Date: ${formatDateForDisplay(selectedDate)}`, 14, 30);
+    doc.text(`Date: ${DisplayData(selectedDate)}`, 14, 30);
     doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
     // Add detailed orders table
@@ -163,10 +155,12 @@ const AllOrderOfDayComponent = () => {
   };
 
   const DisplayData = (date) => {
+    let dayOfWeek = date.getDay();
+    let daysName = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
     const day = String(date.getDate()).padStart(2, "0");
-    return `${day}-${month}-${year}`;
+    return `${daysName[dayOfWeek]}. ${day}/${month}/${year}`;
   }
 
   return (

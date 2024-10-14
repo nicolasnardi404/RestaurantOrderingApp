@@ -224,6 +224,13 @@ function ManagePiatti() {
     </div>
   );
 
+  const DisplayData = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${day}/${month}/${year}`;
+  }
+
   const disponibileBodyTemplate = (rowData) => {
     return <span>{rowData.sempreDisponibile === 1 ? "Yes" : "No"}</span>;
   };
@@ -264,8 +271,8 @@ function ManagePiatti() {
         <Column field="id_piatto" header="ID" />
         <Column field="nome_piatto" header="Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
-        <Column field="data" header="Data" />
         <Column field="dayOfWeek" header="Giorno Della Settimana" />
+        <Column field="data" header="Data" />
         <Column
           field="sempreDisponibile"
           header="Disponibile"
@@ -327,14 +334,14 @@ function ManagePiatti() {
                 value={editingPiatto.data ? new Date(editingPiatto.data) : null}
                 onChange={(e) => {
                   const selectedDate = e.value ?? null;
-                  const formatCalendar = formatDateforServer(selectedDate);
+                  const formatCalendar = DisplayData(selectedDate);
 
                   setEditingPiatto({
                     ...editingPiatto,
                     data: formatCalendar,
                   });
                 }}
-                dateFormat="dd/mm/y"
+                dateFormat="D. dd/mm/y"
               />
             </div>
             <div className="p-field">

@@ -109,7 +109,20 @@ const HistoricComponent = () => {
     return new Date(dateString).toLocaleDateString('it-IT', options);
   };
 
+  const formatDate = (date) => {
+    date = new Date(date);
+    let dayOfWeek = date.getDay();
+    let daysName = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${daysName[dayOfWeek]}. ${day}/${month}/${year}`;
+  }
+
+
   const handleViewModeChange = (mode) => {
+    setSelectedUsername(null);
+    setShowTotalPerDay(null);
     setFilteredData(null);
     setData(null);
     setUsernames(null);
@@ -238,7 +251,7 @@ const HistoricComponent = () => {
           </div>
 
           {/* The InputSwitch button is visible for both */}
-          {isAdmin && (
+          {(isAdmin && (selectedMonth || selectedDate)) && (
             <div className="p-field">
               <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
               <InputSwitch
@@ -278,7 +291,7 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => formatDateForDisplay(rowData.date)}
+                body={(rowData) => formatDate(rowData.date)}
                 sortable
               />
               <Column
@@ -306,7 +319,7 @@ const HistoricComponent = () => {
               <Column
                 field="reservation_date"
                 header="Data Prenotazione" // Changed to Italian
-                body={(rowData) => rowData.reservation_date}
+                body={(rowData) => formatDate(rowData.reservation_date)}
                 sortable
               />
               <Column
