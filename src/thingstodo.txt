@@ -11,10 +11,10 @@
     - [ ] - cambia bottoni per tutti
 
 
-[ ] - Modifica Ordine
-    - [ ] - cambia SELECT
-    - [ ] - cambiare data per giorno piu data
-    - [ ] - cambiare parole in inglese
+[X] - Modifica Ordine
+    - [X] - cambia SELECT
+    - [X] - cambiare data per giorno piu data
+    - [X] - cambiare parole in inglese
 
 [ ] - Menu
     - [ ] - apri cuando aggiungere Menu
