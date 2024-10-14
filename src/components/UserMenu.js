@@ -34,7 +34,7 @@ export default function UserMenu() {
     ];
 
     const amministratoreItems = [
-      { label: 'Menu', icon: 'pencil', path: '/managepiatti' }
+      { label: 'Pagina di Admin', icon: 'cog', path: '/admin' }
     ];
 
     return user && user.ruolo === 'Amministratore'

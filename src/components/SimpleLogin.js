@@ -38,9 +38,6 @@ const LoginPage = () => {
     <div className="container">
       <header>
         <img src={Logo} alt="Logo" className="logo" />
-        <Link to="/register">
-          <button className="register-btn-inLog">Register</button>
-        </Link>
       </header>
       <div className="login-box">
         <form onSubmit={handleLogin}>
@@ -74,10 +71,6 @@ const LoginPage = () => {
               onChange={(e) => setRememberMe(e.target.checked)}
             />
           </label>
-
-          <Link to="/register">
-            <p className="register-msg">Bisogna ancora fare il registro</p>
-          </Link>
 
           <button type="submit" className="login-btn">Accedi</button>
         </form>

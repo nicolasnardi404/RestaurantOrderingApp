@@ -23,7 +23,7 @@ const RegisterPage = () => {
         idRuolo,
         attivo
       });
-      navigate('/');
+      navigate('/open-orders');
     } catch (error) {
       setErrorMessage("Registration failed. Please try again.");
       console.error("Error during registration:", error);
@@ -34,40 +34,37 @@ const RegisterPage = () => {
     <div className="container">
       <header>
         <img src={Logo} alt="Logo" className="logo" />
-        <a href="/login">
-          <button className="login-btn-header">Accedi</button>
-        </a>
       </header>
       <div className="register-box">
         <form onSubmit={handleRegister}>
           <label htmlFor="name">Nome:</label>
-          <input 
-            type="text" 
-            id="name" 
-            name="nome" 
-            value={nome} 
-            onChange={(e) => setName(e.target.value)} 
-            required 
+          <input
+            type="text"
+            id="name"
+            name="nome"
+            value={nome}
+            onChange={(e) => setName(e.target.value)}
+            required
           />
-          
+
           <label htmlFor="email">Email:</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
-          
+
           <label htmlFor="password">Password:</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}

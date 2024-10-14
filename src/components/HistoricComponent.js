@@ -41,7 +41,7 @@ const processMonthlyOverviewData = (data) => {
   });
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const days = Array.from({length: daysInMonth}, (_, i) => i + 1);
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
   return {
     days: days,
@@ -267,7 +267,7 @@ const HistoricComponent = () => {
     });
 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const days = Array.from({length: daysInMonth}, (_, i) => i + 1);
+    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
     const processedData = {
       days: days,
@@ -284,7 +284,7 @@ const HistoricComponent = () => {
     if (data) {
       // Existing data processing
       processData(data);
-      
+
       // New monthly overview data processing
       const overviewData = processMonthlyOverviewData(data);
       setMonthlyOverviewData(overviewData);
@@ -313,17 +313,19 @@ const HistoricComponent = () => {
           rowData.push('');
         }
       });
-      rowData.push(userTotal);
+      rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
     });
 
-    // Add total per day row
-    const totalRow = ['Totale per giorno'];
+    const monthlyTotalRow = ['Totale del mese'];
+    let grandTotal = 0;
     monthlyOverviewData.days.forEach(day => {
       const dayTotal = monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0;
-      totalRow.push(dayTotal);
+      grandTotal += dayTotal;
+      monthlyTotalRow.push(dayTotal);
     });
-    XLSX.utils.sheet_add_aoa(ws, [totalRow], { origin: `A${monthlyOverviewData.users.length + 2}` });
+    monthlyTotalRow.push(grandTotal); // Add grand total
+    XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], { origin: `A${monthlyOverviewData.users.length + 2}` });
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Monthly Overview');
@@ -331,6 +333,7 @@ const HistoricComponent = () => {
     // Generate Excel file
     XLSX.writeFile(wb, `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`);
   };
+
 
   const scrollToBottom = () => {
     const bottomElement = document.getElementById('rapporto-amministrazione');
@@ -402,9 +405,9 @@ const HistoricComponent = () => {
                   </div>
                 )}
               </div>
-              <Button 
-                label="Vai al Rapporto di Amministrazione" 
-                icon="pi pi-arrow-down" 
+              <Button
+                label="Vai al Rapporto di Amministrazione"
+                icon="pi pi-arrow-down"
                 onClick={scrollToBottom}
                 className="p-button-text"
               />
@@ -503,7 +506,7 @@ const HistoricComponent = () => {
                     </td>
                   ))}
                   <td>
-                    {monthlyOverviewData.days.filter(day => 
+                    {monthlyOverviewData.days.filter(day =>
                       monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]
                     ).length}
                   </td>
@@ -517,7 +520,7 @@ const HistoricComponent = () => {
                   </td>
                 ))}
                 <td>
-                  {monthlyOverviewData.days.reduce((total, day) => 
+                  {monthlyOverviewData.days.reduce((total, day) =>
                     total + (monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0), 0
                   )}
                 </td>
@@ -525,7 +528,7 @@ const HistoricComponent = () => {
             </tbody>
           </table>
           <div className="total-orders-section">
-            <h3>&nbsp;Totale Ordini:&nbsp;</h3> 
+            <h3>&nbsp;Totale Ordini:&nbsp;</h3>
             <h3 className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</h3>
           </div>
         </Card>
@@ -543,14 +546,14 @@ const HistoricComponent = () => {
                 disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
                 className="p-button-lg btn"
               />
-           
+
               <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
             </div>
-              <p>
-                {showTotalPerDay
-                  ? "La generazione del PDF è possibile solo quando è selezionato il mese"
-                  : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
-              </p>
+            <p>
+              {showTotalPerDay
+                ? "La generazione del PDF è possibile solo quando è selezionato il mese"
+                : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
+            </p>
           </Card>
         )
       }

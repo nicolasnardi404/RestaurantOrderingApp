@@ -3,12 +3,12 @@
     - [ ] - aggiungere ordine per tutti utenti
     - [ ] - puoi aggiungere piatti nel passato
 
-[ ] - remove register from login
+[X] - remove register from login
 
-[ ] - Historic
+[X] - Historic
     - [X] - cambia stile grafico
-    - [ ] - excel
-    - [ ] - cambia bottoni per tutti
+    - [X] - excel
+    - [X] - cambia bottoni per tutti
 
 
 [X] - Modifica Ordine
@@ -22,10 +22,10 @@
     - [ ] - bottoni in itali
     - [ ] - show giorni senza ordini - solo i giorni selezionati dall'utente
 
-[ ] - Ordine del giorno 
-    - [ ] - cambiare Ordini Detaggli Venerdi(11-11-2024)
+[X] - Ordine del giorno 
+    - [X] - cambiare Ordini Detaggli Venerdi(11-11-2024)
 
 [ ] - Profilo Utente
     - [ ] - cambiare password
-    - [ ] - GIORNO PRENATOZIONE -no avviso
+    - [X] - GIORNO PRENATOZIONE -no avviso
 

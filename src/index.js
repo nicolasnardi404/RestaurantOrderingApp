@@ -16,6 +16,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import NotFound from "./components/NotFound";
 import MultiplePiatti from './pages/MultiplePiatti';
 import ProfilePage from './pages/ProfilePage';
+import AdminPage from './pages/Admin';
 
 // Componente principal App
 export default function App() {
@@ -24,7 +25,6 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LogIn />} />
-          <Route path="/register" element={<RegisterPage />} />
 
           <Route element={<ProtectedRoute allowedRoles={['Amministratore', 'Dipendente']} />}>
             <Route path="/menu" element={<Menu />} />
@@ -35,10 +35,12 @@ export default function App() {
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={['Amministratore']} />}>
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/managepiatti" element={<CRUDPiatti />} />
             <Route path="/add-multiple-piatti" element={<MultiplePiatti />} />
           </Route>
-          
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
