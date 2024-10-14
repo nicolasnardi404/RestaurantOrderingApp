@@ -161,6 +161,8 @@ function MenuPage() {
   const validCombinations = [
     ['Primo', 'Secondo', 'Contorno'],
     ['Primo', 'Piatto unico', 'Contorno'],
+    ['Primo', 'Secondo'],
+    ['Primo', 'Piatto unico'],
     ['Primo', 'Contorno'],
     ['Primo', 'Contorno', 'Dessert'],
     ['Secondo', 'Contorno'],

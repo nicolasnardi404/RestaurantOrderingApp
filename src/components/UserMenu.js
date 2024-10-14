@@ -38,7 +38,7 @@ export default function UserMenu() {
     ];
 
     return user && user.ruolo === 'Amministratore'
-      ? [...amministratoreItems, ...commonItems]
+      ? [...commonItems, ...amministratoreItems]
       : commonItems;
   };
 
