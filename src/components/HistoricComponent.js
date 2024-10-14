@@ -383,14 +383,16 @@ const HistoricComponent = () => {
                 </div>
               </div>
               <div className="input-switch-section">
-                <div className="p-field">
-                  <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-                  <InputSwitch
-                    id="totalPerDaySwitch"
-                    checked={showTotalPerDay}
-                    onChange={(e) => setShowTotalPerDay(e.value)}
-                  />
-                </div>
+                {(selectedDate || selectedMonth) && (
+                  <div className="p-field">
+                    <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+                    <InputSwitch
+                      id="totalPerDaySwitch"
+                      checked={showTotalPerDay}
+                      onChange={(e) => setShowTotalPerDay(e.value)}
+                    />
+                  </div>
+                )}
                 {usernames && isAdmin && (
                   <div className="p-field">
                     <label htmlFor="userDropdown">Seleziona Utente</label>
@@ -444,7 +446,7 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => formatDate(rowData.date)}
+                body={(rowData) => rowData.date}
                 sortable
               />
               <Column
@@ -472,7 +474,7 @@ const HistoricComponent = () => {
               <Column
                 field="reservation_date"
                 header="Data Prenotazione" // Changed to Italian
-                body={(rowData) => formatDate(rowData.reservation_date)}
+                body={(rowData) => rowData.reservation_date}
                 sortable
               />
               <Column
