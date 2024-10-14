@@ -44,9 +44,8 @@ function MenuPage() {
   const fetchAvailableDates = async () => {
     try {
       const token = getToken();
-      const response = await axios.post(
-        'http://localhost:8080/api/prenotazione/readByIdAndData',
-        { idUser: user.userId },
+      const response = await axios.get(
+        `http://localhost:8080/api/prenotazione/readByIdAndData/${user.userId}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -151,10 +150,10 @@ function MenuPage() {
 
       console.log(selectedItems.size)
       console.log(!validCombinations)
-       //Define a mensagem com base nos itens faltantes
-       if (validCombinations && selectedItems.size >= 2) {
-         setCombinationStatus(`Combinazione non valida.`);
-       } 
+      //Define a mensagem com base nos itens faltantes
+      if (validCombinations && selectedItems.size >= 2) {
+        setCombinationStatus(`Combinazione non valida.`);
+      }
     }
   };
 
@@ -389,7 +388,6 @@ function MenuPage() {
           placeholder="Seleziona la data"
           locale="it"
           minDate={new Date()} // Define a data mínima como hoje
-          disabledDates={Array.from({ length: 100 }, (_, i) => new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + i)).filter(date => !availableDates.some(availableDate => availableDate.toDateString() === date.toDateString()))}
         />
         <div className="menu-button-container">
           <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />

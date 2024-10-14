@@ -1,5 +1,5 @@
 [ ] - admin
-    - [ ] - gestire utente (crea, reset password, modifica, elimina);
+    - [X] - gestire utente (crea, reset password, modifica, elimina);
     - [ ] - aggiungere ordine per tutti utenti
     - [ ] - puoi aggiungere piatti nel passato
 
