@@ -6,7 +6,7 @@
 [ ] - remove register from login
 
 [ ] - Historic
-    - [ ] - cambia stile grafico
+    - [X] - cambia stile grafico
     - [ ] - excel
     - [ ] - cambia bottoni per tutti
 
