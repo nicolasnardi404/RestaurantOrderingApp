@@ -29,7 +29,7 @@ const LoginPage = () => {
 
       navigate('/open-orders');
     } catch (error) {
-      setErrorMessage("Login failed. Please check your credentials.");
+      setErrorMessage("Accesso non riuscito. Controlla le tue credenziali.");
       console.error("There was an error logging in!", error);
     }
   };

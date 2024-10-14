@@ -413,7 +413,7 @@ function MenuPage() {
           {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
           {error && <div className="error-message">{error}</div>}
           <Button
-            label="Submit Order"
+            label="Invia Ordine"
             onClick={handleSubmit}
             disabled={!isValidCombination() || isSubmitting}
             className="submit-button"

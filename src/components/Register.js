@@ -25,8 +25,8 @@ const RegisterPage = () => {
       });
       navigate('/open-orders');
     } catch (error) {
-      setErrorMessage("Registration failed. Please try again.");
-      console.error("Error during registration:", error);
+      setErrorMessage("Registrazione fallita. Riprova.");
+      console.error("Errore durante la registrazione:", error);
     }
   };
 

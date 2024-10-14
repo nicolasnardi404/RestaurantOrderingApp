@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Button, Dropdown} from 'primereact';
+import { Button, Dropdown } from 'primereact';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -38,7 +38,7 @@ const AddMultiplePiatti = () => {
     const validatePiatti = () => {
         for (let i = 0; i < piatti.length; i++) {
             if (!piatti[i].nome_piatto) {
-                showToast("error", "Validation Error", `Nome piatto is required for row ${i + 1}`);
+                showToast("error", "Errore di validazione", `Il nome del piatto è obbligatorio per la riga ${i + 1}`);
                 return false;
             }
         }
@@ -63,12 +63,12 @@ const AddMultiplePiatti = () => {
 
             await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
 
-            showToast("success", "Success", "Piatti added successfully");
+            showToast("success", "Successo", "Piatti aggiunti con successo");
             setPiatti([{ nome_piatto: '', idTipoPiatto: 1, nome_tipo: 'Primo' }]); // Reset the form
             setCommonDate(new Date()); // Reset the common date
         } catch (error) {
             console.error("Error saving piatti:", error);
-            showToast("error", "Error", "Failed to save piatti");
+            showToast("error", "Errore", "Impossibile salvare i piatti");
         }
     };
 
@@ -128,12 +128,12 @@ const AddMultiplePiatti = () => {
                                         updatedPiatti[index].idTipoPiatto = tipoPiattoOptions.findIndex(option => option.value === e.value) + 1;
                                         setPiatti(updatedPiatti);
                                     }}
-                                    placeholder="Select a type"
+                                    placeholder="Seleziona un tipo"
                                     optionLabel="label"
                                 />
                             </td>
                             <td>
-                                <Button 
+                                <Button
                                     icon="pi pi-trash" // Use the trash bin icon
                                     className="custom-remove-btn" // Add danger styling for red color
                                     onClick={() => removePiatto(index)} // Remove button for each row
@@ -143,8 +143,8 @@ const AddMultiplePiatti = () => {
                     ))}
                 </tbody>
             </table>
-            <Button label="Add Another Piatto" icon="pi pi-plus" onClick={addPiatto} className="p-button-primary" />
-            <Button label="Save All" icon="pi pi-check" onClick={savePiatti}  />
+            <Button label="Aggiungi un altro piatto" icon="pi pi-plus" onClick={addPiatto} className="p-button-primary" />
+            <Button label="Salva tutto" icon="pi pi-check" onClick={savePiatti} />
         </div>
     );
 };

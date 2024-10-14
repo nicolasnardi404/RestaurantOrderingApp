@@ -179,12 +179,12 @@ function ManagePiatti() {
         <Button className="btn-edit"
           onClick={() => editPiatto(rowData)}
           icon="pi pi-pencil"
-          tooltip="Modifica piatto" />
+          tooltip="Modifica Piattoo" />
         <Button
           className="btn-delete"
           onClick={() => deletePiatto(rowData.id_piatto)}
           icon="pi pi-trash"
-          tooltip="Annulla piatto"
+          tooltip="Annulla Piatto"
         />
       </div>
     );
@@ -198,7 +198,7 @@ function ManagePiatti() {
           <InputText
             type="search"
             onInput={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Ricerca per Nome..."
+            placeholder="Cerca per Nome..."
           />
         </span>
         <div className="disponibile-filter">
@@ -242,15 +242,15 @@ function ManagePiatti() {
       <ConfirmDialog
         visible={confirmDeleteVisible}
         message="Sei sicuro di voler eliminare questo piatto?"
-        header="Confermare l'eliminazione"
+        header="Conferma Eliminazione"
         accept={confirmDelete}
         reject={rejectDelete}
         onHide={() => setConfirmDeleteVisible(false)}
       />
 
-      <h1>Organizzare il Menu Della Settimana</h1>
+      <h1>Organizzare il Menu della Settimana</h1>
       <Button
-        label="Aggiungere Singolo Piatto"
+        label="Aggiungi Singolo Piatto"
         icon="pi pi-plus"
         onClick={addNewPiatto}
         className="p-button-primary add-piatto-button"
@@ -275,7 +275,7 @@ function ManagePiatti() {
         <Column field="data" header="Data" />
         <Column
           field="sempreDisponibile"
-          header="Disponibile"
+          header="Sempre Disponibile"
           body={disponibileBodyTemplate}
         />
         <Column
@@ -322,7 +322,7 @@ function ManagePiatti() {
                       ) + 1,
                   })
                 }
-                placeholder="Select a type"
+                placeholder="Seleziona un tipo"
                 optionLabel="label"
               />
             </div>
@@ -357,7 +357,7 @@ function ManagePiatti() {
                 }
               />
             </div>
-            <Button label="Save" icon="pi pi-check" onClick={savePiatto} />
+            <Button label="Salva" icon="pi pi-check" onClick={savePiatto} />
           </div>
         )}
       </Dialog>

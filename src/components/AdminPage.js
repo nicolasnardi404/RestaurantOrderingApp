@@ -22,7 +22,7 @@ const AdminPage = () => {
                 Gestione Utenti
             </button>
             <button onClick={() => handleRedirect('/ordiniAdmin')} className="button-admin">
-                Ordina Pasto Admin
+                Ordine Admin
             </button>
         </div>
     );

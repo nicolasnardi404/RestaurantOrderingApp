@@ -540,7 +540,7 @@ const HistoricComponent = () => {
             <h3>Rapporto di Amministrazione</h3>
             <div className="pdf-button-section">
               <Button
-                label="Genera PDF" // Changed to Italian
+                label="Genera PDF"
                 icon="pi pi-file-pdf"
                 onClick={generatePDF}
                 disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}

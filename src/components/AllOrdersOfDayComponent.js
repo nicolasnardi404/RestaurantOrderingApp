@@ -181,13 +181,13 @@ const AllOrderOfDayComponent = () => {
           paginator
           rows={10}
           loading={loading}
-          emptyMessage="No orders for this day."
+          emptyMessage="Nessun ordine per questo giorno."
           className="p-datatable-responsive"
         >
-          <Column field="username" header="User" sortable />
-          <Column field="piatti" header="Dishes Ordered" sortable />
+          <Column field="username" header="Utente" sortable />
+          <Column field="piatti" header="Piatti Ordinati" sortable />
           {user.ruolo === "Amministratore" && (
-            <Column field="observazioni" header="Observazioni" sortable />
+            <Column field="observazioni" header="Osservazioni" sortable />
           )}
         </DataTable>
       </Card>
@@ -228,7 +228,7 @@ const AllOrderOfDayComponent = () => {
       {role === 'Amministratore' && (
         <div className="pdf-button-section">
           <Button
-            label="Generate PDF"
+            label="Genera PDF"
             icon="pi pi-file-pdf"
             onClick={generatePDF}
             className="p-button-lg btn"

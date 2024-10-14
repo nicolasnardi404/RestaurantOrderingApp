@@ -64,7 +64,7 @@ const ViewOpenOrders = () => {
       setLoading(true);
       const token = getToken();
       if (!token) {
-        setError("No valid authentication token found. Please log in again.");
+        setError("Nessun token di autenticazione valido trovato. Effettua nuovamente il login.");
         setLoading(false);
         return;
       }
@@ -86,11 +86,11 @@ const ViewOpenOrders = () => {
         }
       } else {
         console.error("Unexpected response format:", response.data);
-        setError("Received unexpected data format from server.");
+        setError("Formato di dati imprevisto ricevuto dal server.");
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
-      setError("Failed to fetch orders. Please try again.");
+      setError("Impossibile recuperare gli ordini. Riprova.");
     } finally {
       setLoading(false);
     }
@@ -109,7 +109,7 @@ const ViewOpenOrders = () => {
     } catch (error) {
       console.error("Error fetching available dishes:", error);
       setError(
-        "Failed to fetch available dishes. Some features may be limited."
+        "Impossibile recuperare i piatti disponibili. Alcune funzionalità potrebbero essere limitate."
       );
     }
   };
@@ -191,7 +191,7 @@ const ViewOpenOrders = () => {
     } catch (error) {
       console.error("Error fetching dishes for date:", error);
       setError(
-        "Failed to fetch dishes for the order date. Some features may be limited."
+        "Impossibile recuperare i piatti per la data dell'ordine. Alcune funzionalità potrebbero essere limitate"
       );
       return [];
     }
@@ -215,7 +215,7 @@ const ViewOpenOrders = () => {
 
     if (!Array.isArray(dishesForOrder)) {
       console.error("Dishes for order is not an array:", dishesForOrder);
-      setError("Failed to fetch dishes for the order date. Please try again.");
+      setError("Impossibile recuperare i piatti per la data dell'ordine. Riprova.");
       return;
     }
 
@@ -335,7 +335,7 @@ const ViewOpenOrders = () => {
 
       if (missingItems.length === 0) {
         setCombinationStatus(
-          "Invalid combination. Please adjust your selection."
+          "Combinazione non valida. Seleziona una combinazione valida di piatti."
         );
       } else {
         setCombinationStatus(
@@ -348,7 +348,7 @@ const ViewOpenOrders = () => {
   const handleCancelOrder = async (idPrenotazione) => {
     confirmDialog({
       message: "Sei sicuro di voler eliminare questo piatto?",
-      header: "Confermare l'eliminazione",
+      header: "Conferma eliminazione",
       icon: "pi pi-exclamation-triangle",
       accept: async () => {
         try {
@@ -367,7 +367,7 @@ const ViewOpenOrders = () => {
           toast.current.show({
             severity: "success",
             summary: "Success",
-            detail: "Order cancelled successfully",
+            detail: "Ordine cancellato con successo.",
             life: 3000,
           });
         } catch (error) {
@@ -375,7 +375,7 @@ const ViewOpenOrders = () => {
           toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: "Failed to cancel the order. Please try again.",
+            detail: "Impossibile annullare l'ordine. Riprova.",
             life: 3000,
           });
         }
@@ -420,14 +420,14 @@ const ViewOpenOrders = () => {
 
         setShowEditDialog(false);
         await fetchOrders(); // Refresh the orders after update
-        alert("Order updated successfully");
+        alert("Ordine aggiornato con successo.");
       } catch (error) {
         console.error("Error updating order:", error);
-        setError("Failed to update order. Please try again.");
+        setError("Impossibile aggiornare l'ordine. Riprova.");
       }
     } else {
       setError(
-        "Invalid combination. Please select a valid combination of dishes."
+        "La combinazione selezionata non è valida. Assicurati di scegliere una combinazione corretta di piatti."
       );
     }
   };
@@ -436,7 +436,7 @@ const ViewOpenOrders = () => {
     <div>
       <div className="p-inputgroup mb-3">
         <InputText
-          placeholder="Search by username"
+          placeholder="Cerca utente pernome"
           value={usernameFilter}
           onChange={(e) => setUsernameFilter(e.target.value)}
         />
