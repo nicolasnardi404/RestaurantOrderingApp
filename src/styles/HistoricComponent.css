@@ -6,15 +6,38 @@
 
 .card-row {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  margin-bottom: 20px;
+
+}
+
+.p-field {
+  display: flex;
+  flex-direction: row;
+}
+
+.filter-card {
   margin-bottom: 20px;
 }
 
-.filter-card,
-.data-card {
-  flex: 1;
-  margin: 0 10px;
+.user-view-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+.view-mode-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+} 
+
+.input-switch-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+} 
 
 .total-pdf-card {
   display: flex;
@@ -26,15 +49,19 @@
 .total-orders-section {
   display: flex;
   justify-content: center;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
 }
 
 .total-orders {
-  font-size: 2em;
   font-weight: bold;
   color: var(--primary-color);
-  margin-bottom: 0;
+}
+
+.p-button-text {
+  display: flex;
+  margin: auto;
+
 }
 
 h2 {
@@ -42,13 +69,23 @@ h2 {
   margin-bottom: 20px;
 }
 
-@media (max-width: 768px) {
-  .card-row {
-    flex-direction: column;
-  }
+.monthly-table {
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
 
-  .filter-card,
-  .data-card {
-    margin: 10px 0;
-  }
+.data-card {
+  margin-bottom: 20px;
+}
+
+.monthly-table th,
+.monthly-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.monthly-table th {
+  background-color: #f2f2f2;
 }
