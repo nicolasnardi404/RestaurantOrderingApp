@@ -106,7 +106,7 @@ export default function ProfilePage() {
       ) : (
         <div className="update-section">
           <h2 className="update-title">Aggiornare Giorni di Prenotazione</h2>
-          <button onClick={handleDelete} className="delete-button">Elimina Avvisi Precedenti</button>
+          <button onClick={handleDelete} className="delete-button">Elimina Prenotazione Precedenti</button>
           <p className="update-message">Hai già fatto giorni di prenotazione. Se desideri aggiornare, elimina prima i precedenti.</p>
         </div>
       )}
