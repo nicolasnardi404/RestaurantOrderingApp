@@ -557,9 +557,7 @@ const HistoricComponent = () => {
               />
               <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
             </div>
-            <p>
             <p>Per attivare il pulsante di generazione PDF con Dettagli Ordini, seleziona un mese ed un utente.</p>
-            </p>
             <p>Per attivare il pulsante di generazione PDF con Totali Giornalieri, seleziona un mese e il pulsante "Mostra totale per giorno".</p>
           </Card>
         )

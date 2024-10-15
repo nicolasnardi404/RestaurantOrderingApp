@@ -29,6 +29,9 @@ function MenuPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [weeklyMenu, setWeeklyMenu] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const navigate = useNavigate();
   const { user, getToken } = useAuth();
 
@@ -43,6 +46,12 @@ function MenuPage() {
       setCombinationStatus('');
     }
   }, [selectedDay]);
+
+  useEffect(() => {
+    if (user.ruolo === 'Amministratore') {
+      fetchUsers();
+    }
+  }, [user.ruolo]);
 
   const fetchAvailableDates = async () => {
     try {
@@ -110,6 +119,20 @@ function MenuPage() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const token = getToken();
+      const response = await axios.get('http://localhost:8080/api/user/read', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
   const getFilteredDishes = (mealType) => {
     return dishes.filter((dish) => dish.tipo_piatto === mealType);
   };
@@ -174,6 +197,41 @@ function MenuPage() {
 
     return isValid;
   };
+
+  const handleUserChange = (e) => {
+    setSelectedUser(e.value);
+    setShowUserDropdown(false);
+    // Reset the cart and other related states when changing user
+    setCart({});
+    setCombinationStatus('');
+    setError('');
+    setObservazioni('');
+  };
+
+  const toggleUserDropdown = () => {
+    setShowUserDropdown(!showUserDropdown);
+  };
+
+  const renderUserSelection = () => (
+    <div className="user-selection">
+      <Button 
+        label="Cambia utente" 
+        onClick={toggleUserDropdown}
+        className="user-selection-button"
+      />
+      {showUserDropdown && (
+        <Dropdown
+          value={selectedUser}
+          options={users}
+          onChange={handleUserChange}
+          optionLabel="nome"
+          placeholder="Seleziona un utente"
+          className="user-selection-dropdown"
+          showClear
+        />
+      )}
+    </div>
+  );
 
   const renderOrderMenu = () => (
     <div className="order-menu">
@@ -329,7 +387,7 @@ function MenuPage() {
       const idPiatto = Object.values(cart).map((dish) => dish.id);
 
       const orderData = {
-        idUser: user.userId,
+        idUser: selectedUser ? selectedUser.id : user.userId,
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
         observazioni: observazioni,
@@ -437,6 +495,12 @@ function MenuPage() {
   return (
     <div className='container-menu'>
       <h1>Ordina Pasto</h1>
+      {user.ruolo === 'Amministratore' && renderUserSelection()}
+      <p className='user-selection-text'>
+        {selectedUser 
+          ? `Ordine per: ${selectedUser.nome}` 
+          : ""}
+      </p>
       <div className="date-selection">
         <Calendar
           value={selectedDay}
