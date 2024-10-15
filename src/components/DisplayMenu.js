@@ -182,7 +182,7 @@ function MenuPage() {
     ['Piatto unico', 'Contorno'],
     ['Piatto unico'],
   ];
-  
+
   const isValidCombination = () => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(cart)
@@ -214,8 +214,8 @@ function MenuPage() {
 
   const renderUserSelection = () => (
     <div className="user-selection">
-      <Button 
-        label="Cambia utente" 
+      <Button
+        label="Cambia utente"
         onClick={toggleUserDropdown}
         className="user-selection-button"
       />
@@ -462,13 +462,15 @@ function MenuPage() {
     const currentHour = now.getHours();
     const currentMinutes = now.getMinutes();
 
-    // Se já passou de 10:30, define a data mínima para o próximo dia
+    if (user.ruolo === "Amministratore") {
+      return null;
+    }
+
     if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
       now.setDate(now.getDate() + 1);
     }
 
-    // Ajusta para o próximo dia se cair em fim de semana
-    while (now.getDay() === 0 || now.getDay() === 6) { // 0 = Domingo, 6 = Sábado
+    while (now.getDay() === 0 || now.getDay() === 6) {
       now.setDate(now.getDate() + 1);
     }
 
@@ -479,13 +481,16 @@ function MenuPage() {
     const disabledDates = [];
     const startDate = getMinDate();
 
-    for (let i = 0; i < 30; i++) { // Ajuste o número conforme necessário
+    if (user.ruolo === "Amministratore") {
+      return [];
+    }
+
+    for (let i = 0; i < 60; i++) {
       const dateToCheck = new Date(startDate);
       dateToCheck.setDate(startDate.getDate() + i);
 
-      // Adiciona datas de sábado e domingo ao array
       if (dateToCheck.getDay() === 0 || dateToCheck.getDay() === 6) {
-        disabledDates.push(new Date(dateToCheck)); // Adiciona a data como um objeto Date
+        disabledDates.push(new Date(dateToCheck));
       }
     }
 
@@ -497,8 +502,8 @@ function MenuPage() {
       <h1>Ordina Pasto</h1>
       {user.ruolo === 'Amministratore' && renderUserSelection()}
       <p className='user-selection-text'>
-        {selectedUser 
-          ? `Ordine per: ${selectedUser.nome}` 
+        {selectedUser
+          ? `Ordine per: ${selectedUser.nome}`
           : ""}
       </p>
       <div className="date-selection">
