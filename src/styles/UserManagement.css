@@ -1,27 +1,38 @@
 .container-user {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 20px auto;
     padding: 20px;
     border: 1px solid #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+.user-table th, 
+.user-table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 16px;
+    color: #333;
+}
+
+.user-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 18px;
+}
+
+.user-table tr:nth-child(even) {
     background-color: #f8f9fa;
-}
-
-.user-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.user-item {
-    background-color: #ffffff;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    margin: 10px 0;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .button-group {
@@ -38,4 +49,26 @@
 .error {
     color: red;
     text-align: center;
+    background-color: #ffebee;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .container-user {
+        padding: 10px;
+    }
+
+    .user-table th, 
+    .user-table td {
+        padding: 0.5rem;
+        font-size: 14px;
+    }
+    
+    .btn-edit, 
+    .btn-delete {
+        width: 40px;
+        height: 40px;
+    }
 }

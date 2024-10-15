@@ -82,13 +82,46 @@ const GestioneUtenti = () => {
     }
   };
 
-  const dialogFooter = (
+  const renderUpdateDialog = () => (
+    <Dialog header="Modifica Utente" visible={dialogVisible} footer={dialogFooter()} onHide={() => setDialogVisible(false)}>
+      <div className="p-grid">
+        <div className="p-col-12">
+          <label>Nome:</label>
+          <InputText value={userToUpdate.nome} onChange={(e) => setUserToUpdate({ ...userToUpdate, nome: e.target.value })} />
+        </div>
+        <div className="p-col-12">
+          <label>Email:</label>
+          <InputText value={userToUpdate.email} onChange={(e) => setUserToUpdate({ ...userToUpdate, email: e.target.value })} />
+        </div>
+        <div className="p-col-12">
+          <label>Senha:</label>
+          <InputText type="password" value={null} onChange={(e) => setUserToUpdate({ ...userToUpdate, password: e.target.value })} />
+        </div>
+        <div className="p-col-12">
+          <label>ID Ruolo:</label>
+          <InputText value={userToUpdate.idRuolo} onChange={(e) => setUserToUpdate({ ...userToUpdate, idRuolo: e.target.value })} />
+        </div>
+        <div className="p-col-12">
+          <label>Attivo:</label>
+          <InputSwitch checked={userToUpdate.attivo} onChange={(e) => setUserToUpdate({ ...userToUpdate, attivo: e.value })} />
+        </div>
+      </div>
+    </Dialog>
+  );
+
+  const renderConfirmDialog = () => (
+    <Dialog header="Conferma Eliminazione" visible={confirmVisible} footer={confirmFooter()} onHide={() => setConfirmVisible(false)}>
+      <p>Sei sicuro di voler eliminare questo utente?</p>
+    </Dialog>
+  );
+
+  const dialogFooter = () => (
     <div>
       <Button label="Salva" icon="pi pi-check" onClick={updateUtente} />
     </div>
   );
 
-  const confirmFooter = (
+  const confirmFooter = () => (
     <div>
       <Button label="No" icon="pi pi-times" onClick={() => setConfirmVisible(false)} />
       <Button label="Sì" icon="pi pi-check" onClick={deleteUtente} />
@@ -101,46 +134,34 @@ const GestioneUtenti = () => {
   return (
     <div className="container-user">
       <h1 className="title">Gestione Utenti</h1>
-      <ul className="user-list">
-        {utenti.map(utente => (
-          <li className="user-item" key={utente.id}>
-            {utente.nome} ({utente.email})
-            <div className="button-group">
-              <Button tooltip="Modifica" icon="pi pi-pencil" onClick={() => openUpdateDialog(utente)} className="btn-edit" />
-              <Button tooltip="Elimina" icon="pi pi-trash" onClick={() => openConfirmDialog(utente.id)} className="btn-delete" />
-            </div>
-          </li>
-        ))}
-      </ul>
+      <table className="user-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          {utenti.map(utente => (
+            <tr className="user-item" key={utente.id}>
+              <td>{utente.id}</td>
+              <td>{utente.nome}</td>
+              <td>{utente.email}</td>
+              <td>
+                <div className="action-buttons">
+                  <Button tooltip="Modifica" icon="pi pi-pencil" onClick={() => openUpdateDialog(utente)} className="btn-edit" />
+                  <Button tooltip="Elimina" icon="pi pi-trash" onClick={() => openConfirmDialog(utente.id)} className="btn-delete" />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-      <Dialog header="Modifica Utente" visible={dialogVisible} footer={dialogFooter} onHide={() => setDialogVisible(false)}>
-        <div className="p-grid">
-          <div className="p-col-12">
-            <label>Nome:</label>
-            <InputText value={userToUpdate.nome} onChange={(e) => setUserToUpdate({ ...userToUpdate, nome: e.target.value })} />
-          </div>
-          <div className="p-col-12">
-            <label>Email:</label>
-            <InputText value={userToUpdate.email} onChange={(e) => setUserToUpdate({ ...userToUpdate, email: e.target.value })} />
-          </div>
-          <div className="p-col-12">
-            <label>Senha:</label>
-            <InputText type="password" value={null} onChange={(e) => setUserToUpdate({ ...userToUpdate, password: e.target.value })} />
-          </div>
-          <div className="p-col-12">
-            <label>ID Ruolo:</label>
-            <InputText value={userToUpdate.idRuolo} onChange={(e) => setUserToUpdate({ ...userToUpdate, idRuolo: e.target.value })} />
-          </div>
-          <div className="p-col-12">
-            <label>Attivo:</label>
-            <InputSwitch checked={userToUpdate.attivo} onChange={(e) => setUserToUpdate({ ...userToUpdate, attivo: e.value })} />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog header="Conferma Eliminazione" visible={confirmVisible} footer={confirmFooter} onHide={() => setConfirmVisible(false)}>
-        <p>Sei sicuro di voler eliminare questo utente?</p>
-      </Dialog>
+      {renderUpdateDialog()}
+      {renderConfirmDialog()}
     </div>
   );
 };
