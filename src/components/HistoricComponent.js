@@ -169,7 +169,7 @@ const HistoricComponent = () => {
 
   // Calculate total orders per day
   const calculateTotalPerDayData = () => {
-    const totals = data.reduce((acc, order) => {
+    const totals = (selectedUsername ? filteredData : data).reduce((acc, order) => {
       const date = order.reservation_date.split('T')[0]; // Get only the date
       if (!acc[date]) {
         acc[date] = 0;
@@ -187,13 +187,13 @@ const HistoricComponent = () => {
   };
 
   useEffect(() => {
-    if (showTotalPerDay && data.length > 0) {
+    if (showTotalPerDay && (data.length > 0 || filteredData.length > 0)) {
       calculateTotalPerDayData();
     }
-  }, [showTotalPerDay, data]);
+  }, [showTotalPerDay, data, filteredData, selectedUsername]);
 
-  // Generate PDF
-  const generatePDF = () => {
+  // Modify the generatePDF function to accept a parameter
+  const generatePDF = (type) => {
     if (!selectedMonth) {
       alert('Per favore, seleziona un mese per generare il PDF.');
       return;
@@ -203,20 +203,20 @@ const HistoricComponent = () => {
     doc.setFont('helvetica');
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('Relazione Mensile degli Ordini', 14, 30); // Changed to Italian
+    doc.text('Relazione Mensile degli Ordini', 14, 30);
 
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Utente: ${selectedUsername || 'Tutti'}`, 14, 45); // Changed to Italian
+    doc.text(`Utente: ${selectedUsername || 'Tutti'}`, 14, 45);
     doc.text(`Mese: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 14, 52);
-    doc.text(`Totale Ordini: ${totalOrders}`, 14, 59); // Changed to Italian
+    doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
 
-    if (showTotalPerDay) {
+    if (type === 'daily') {
       doc.autoTable({
         startY: 70,
-        head: [['Data', 'Totale Ordini']], // Changed to Italian
+        head: [['Data', 'Totale Ordini']],
         body: totalPerDayData.map(item => [
-          formatDateForDisplay(item.date).split(',')[0],
+          formatDateForDisplay(item.date),
           item.totalOrders
         ]),
         styles: { fontSize: 10, cellPadding: 5 },
@@ -226,7 +226,7 @@ const HistoricComponent = () => {
     } else {
       doc.autoTable({
         startY: 70,
-        head: [['Data', 'Tipo di Piatti']], // Changed to Italian
+        head: [['Data', 'Tipo di Piatti']],
         body: filteredData.map(order => [
           formatDateForDisplay(order.reservation_date),
           order.piatti
@@ -242,10 +242,10 @@ const HistoricComponent = () => {
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setTextColor(150);
-      doc.text(`Pagina ${i} di ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' }); // Changed to Italian
+      doc.text(`Pagina ${i} di ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
     }
 
-    doc.save(`${selectedUsername || 'tutti'}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`); // Changed to Italian
+    doc.save(`${selectedUsername || 'tutti'}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`);
   };
 
   const processData = (data) => {
@@ -542,20 +542,25 @@ const HistoricComponent = () => {
             <h3>Rapporto di Amministrazione</h3>
             <div className="pdf-button-section">
               <Button
-                label="Genera PDF"
+                label="Genera PDF con Totali Giornalieri"
                 icon="pi pi-file-pdf"
-                onClick={generatePDF}
-                disabled={!selectedMonth || (!showTotalPerDay && !selectedUsername)}
+                onClick={() => generatePDF('daily')}
+                disabled={!selectedMonth || !showTotalPerDay}
                 className="p-button-lg btn"
               />
-
+              <Button
+                label="Genera PDF con Dettagli Ordini"
+                icon="pi pi-file-pdf"
+                onClick={() => generatePDF('detailed')}
+                disabled={!selectedMonth || !selectedUsername}
+                className="p-button-lg btn"
+              />
               <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
             </div>
             <p>
-              {showTotalPerDay
-                ? "La generazione del PDF è possibile solo quando è selezionato il mese"
-                : "La generazione del PDF è possibile solo quando sono selezionati sia il mese che l'utente"}
+            <p>Per attivare il pulsante di generazione PDF con Dettagli Ordini, seleziona un mese ed un utente.</p>
             </p>
+            <p>Per attivare il pulsante di generazione PDF con Totali Giornalieri, seleziona un mese e il pulsante "Mostra totale per giorno".</p>
           </Card>
         )
       }
