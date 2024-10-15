@@ -61,14 +61,14 @@ const ViewOpenOrders = () => {
   };
 
   const getNames = (users) => {
-    let listNames = [];
-    if (user.ruolo === "Amministratore") {
-      for (let i = 0; i < users.length; i++) {
-        listNames.push(users[i]["username"]);
+    let listNames = new Set();
+    for (let i = 0; i < users.length; i++) {
+      if (user.ruolo === "Amministratore") {
+        listNames.add(users[i]["username"]);
       }
     }
 
-    return listNames;
+    return Array.from(listNames);
   }
 
   const fetchOrders = async () => {
