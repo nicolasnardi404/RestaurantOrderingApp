@@ -53,6 +53,11 @@
   align-items: center;
 }
 
+.total-pdf-card p{
+  margin: 10px auto;
+  text-align: center;
+}
+
 .total-orders {
   font-weight: bold;
   color: var(--primary-color);
