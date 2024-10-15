@@ -139,26 +139,12 @@ function MenuPage() {
     if (Altri) selectedItems.add('Altri');
     if (Dessert) selectedItems.add('Dessert');
 
-    const combinations = validCombinations.find(combination => {
+    const combinations = validCombinations.some(combination => {
       return combination.every(item => selectedItems.has(item));
     });
 
     if (combinations) {
       setCombinationStatus('');
-    } else {
-      // Identifica os itens faltantes
-      let missingItems = [];
-      if (!Primo) missingItems.push('Primo');
-      if (!Secondo) missingItems.push('Secondo');
-      if (!Contorno) missingItems.push('Contorno');
-      if (!PiattoUnico) missingItems.push('Piatto unico');
-
-      console.log(selectedItems.size)
-      console.log(!validCombinations)
-      //Define a mensagem com base nos itens faltantes
-      if (validCombinations && selectedItems.size >= 2) {
-        setCombinationStatus(`Combinazione non valida.`);
-      }
     }
   };
 
@@ -173,7 +159,7 @@ function MenuPage() {
     ['Piatto unico', 'Contorno'],
     ['Piatto unico'],
   ];
-
+  
   const isValidCombination = () => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(cart)
