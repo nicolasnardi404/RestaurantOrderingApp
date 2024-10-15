@@ -1,6 +1,11 @@
-.title {
-    color: #343a40;
-    text-align: center;
+.container-user {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
 }
 
 .user-list {
@@ -22,26 +27,6 @@
 .button-group {
     display: flex;
     gap: 10px;
-    /* Espaço entre os botões */
-}
-
-.button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.button:hover {
-    background-color: #0056b3;
-}
-
-.button:disabled {
-    background-color: #6c757d;
-    cursor: not-allowed;
 }
 
 .loading {
