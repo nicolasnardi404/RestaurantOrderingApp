@@ -368,7 +368,7 @@ function MenuPage() {
         }
       );
 
-      if (response.data == true) {
+      if (response.data === true) {
         setCheckPrenotazione(true);
       } else {
         setCheckPrenotazione(false);
