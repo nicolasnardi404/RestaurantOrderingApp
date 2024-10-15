@@ -23,6 +23,7 @@ function MenuPage() {
   const [sempreDisponibileDishes, setSempreDisponibileDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState({});
+  const [checkPrenotazione, setCheckPrenotazione] = useState(false);
   const [error, setError] = useState('');
   const [combinationStatus, setCombinationStatus] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -35,6 +36,7 @@ function MenuPage() {
 
   useEffect(() => {
     fetchAvailableDates();
+    checkPrenotazionePerGiorno();
     if (selectedDay) {
       fetchDishes();
       setCart({});
@@ -303,6 +305,36 @@ function MenuPage() {
     );
   };
 
+  const checkPrenotazionePerGiorno = async () => {
+    try {
+      const token = getToken();
+      const dataPrenotazione = formatDateforServer(selectedDay);
+      const orderData = {
+        id: user.userId,
+        data: `${dataPrenotazione}`,
+      }
+      const response = await axios.post(
+        'http://localhost:8080/api/prenotazione/checkPrenotazione',
+        orderData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data == true) {
+        setCheckPrenotazione(true);
+      } else {
+        setCheckPrenotazione(false);
+      }
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      setError('Errore durante l\'invio dell\'ordine. Riprova.');
+    }
+  }
+
   const handleSubmit = async () => {
     const dataPrenotazione = formatDateforServer(selectedDay);
     // Verifique se a combinação de pratos é válida
@@ -428,9 +460,19 @@ function MenuPage() {
           minDate={getMinDate()}
           disabledDates={getDisabledDates()}
         />
-        <div className="menu-button-container">
-          <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
-        </div>
+
+        {checkPrenotazione && (
+          <div className='error-message'>
+            <h1>Avviso</h1>
+            <p>avete già fatto la prenotazione per questo giorno</p>
+          </div>
+        )}
+
+        {!checkPrenotazione && (
+          <div className="menu-button-container">
+            <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
+          </div>
+        )}
       </div>
 
       {/* Show error message if orders are closed */}
@@ -442,7 +484,7 @@ function MenuPage() {
       )}
 
       {/* Only render the order form if orders are open */}
-      {selectedDay && (
+      {selectedDay && !checkPrenotazione && (
         <>
           <Card className='combinazioni-card'>
             <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>

@@ -33,7 +33,7 @@
 --- FOCUS ---
 
 [ ] - Ordina pasto
-    - [ ] - Adicionar um filtro para antes de fazer a ordem verificar se a pessoa tem pedidos no dia
+    - [X] - Adicionar um filtro para antes de fazer a ordem verificar se a pessoa tem pedidos no dia
     - [ ] - Adicionar filtro com dropdown para trocar o usuario que o admin vai pedir
-    - [ ] - Ajustar o filtro da pagina
+    - [ ] - Ajustar o filtro da pagina (para piatto unnico e secondo piatto)
 
