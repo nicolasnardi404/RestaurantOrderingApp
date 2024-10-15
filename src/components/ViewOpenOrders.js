@@ -216,13 +216,19 @@ const ViewOpenOrders = () => {
       : [];
 
     let orderDate;
-    if (order.datePiatti && order.datePiatti.includes(",")) {
-      orderDate = new Date(order.datePiatti.split(", ")[0]);
-    } else if (order.datePiatti) {
-      orderDate = new Date(order.datePiatti);
+    if (order.datePiatti) {
+      const dateParts = order.datePiatti.split(" ");
+      const dateString = dateParts.slice(1).join(" ");
+
+      const [day, month, year] = dateString.split("/").map(part => parseInt(part));
+      const fullYear = year < 100 ? 2000 + year : year;
+
+      orderDate = new Date(fullYear, month - 1, day);
     } else {
-      orderDate = new Date(); // Default to current date if datePiatti is undefined
+      orderDate = new Date();
     }
+
+    console.log(orderDate);
 
     const dishesForOrder = await fetchDishesForOrder(orderDate);
 
