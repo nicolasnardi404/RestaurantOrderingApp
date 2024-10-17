@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
 import '../styles/ProfilePage.css';
 
 export default function ProfilePage() {
   const { user, getToken } = useAuth();
   const [selectedDays, setSelectedDays] = useState([]);
   const [hasWarnings, setHasWarnings] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -19,7 +23,6 @@ export default function ProfilePage() {
           }
         });
 
-        // Processa a resposta para definir os dias selecionados
         if (response.data && Array.isArray(response.data)) {
           const alerts = response.data.filter(alert => alert.idUser === user.userId);
           const days = alerts.map(alert => alert.giorno);
@@ -77,6 +80,32 @@ export default function ProfilePage() {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    const token = await getToken();
+    const form = { password: password };
+
+    try {
+      await axios.put(`${apiUrl}/user/updatePassword/${user.userId}`,
+        form, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setShowChangePassword(false);
+      setPassword('');
+    } catch (error) {
+      console.error('Error in update of password:', error);
+      alert('Error in update password. Try again!');
+    }
+  };
+
+  const footerDialog = (
+    <div>
+      <Button label="Salva" icon="pi pi-check" onClick={handleChangePassword} />
+    </div>
+  );
+
   return (
     <div className="profile-page">
       <h1 className="profile-title">Profilo Utente</h1>
@@ -85,6 +114,22 @@ export default function ProfilePage() {
         <p className="profile-detail"><strong>Ruolo:</strong> {user.ruolo}</p>
         <p className="profile-detail"><strong>Giorni di Prenotazione:</strong> {selectedDays.join(', ') || 'Nessuno'}</p>
       </div>
+
+      <Button label="Cambiare la password" onClick={() => setShowChangePassword(true)} className="save-button" />
+
+      <Dialog header="Cambiare Password" visible={showChangePassword} onHide={() => setShowChangePassword(false)} footer={footerDialog}>
+        <form onSubmit={handleChangePassword}>
+          <label>
+            Nuova Password:
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+        </form>
+      </Dialog>
 
       {!hasWarnings ? (
         <form onSubmit={handleSubmit} className="warning-form">
