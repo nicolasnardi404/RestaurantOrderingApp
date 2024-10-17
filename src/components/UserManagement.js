@@ -13,7 +13,7 @@ const GestioneUtenti = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { getToken } = useAuth();
-
+  const apiUrl = process.env.REACT_APP_API_URL;
   const [userToUpdate, setUserToUpdate] = useState({ nome: '', email: '', password: '', idRuolo: '', attivo: false });
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
@@ -26,7 +26,7 @@ const GestioneUtenti = () => {
   const fetchUtenti = async () => {
     try {
       const token = getToken();
-      const response = await axios.get('http://localhost:8080/api/user/readDetails', {
+      const response = await axios.get(`${apiUrl}/user/readDetails`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUtenti(response.data);
@@ -46,7 +46,7 @@ const GestioneUtenti = () => {
     try {
       const { nome, email, password, idRuolo, attivo } = userToUpdate;
       const token = getToken();
-      await axios.put(`http://localhost:8080/api/user/update/${userToUpdate.id}`, {
+      await axios.put(`${apiUrl}/user/update/${userToUpdate.id}`, {
         nome,
         email,
         password,
@@ -71,7 +71,7 @@ const GestioneUtenti = () => {
     if (deleteUserId) {
       try {
         const token = getToken();
-        await axios.delete(`http://localhost:8080/api/user/delete/${deleteUserId}`, {
+        await axios.delete(`${apiUrl}/user/delete/${deleteUserId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchUtenti();

@@ -34,6 +34,7 @@ function MenuPage() {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const navigate = useNavigate();
   const { user, getToken } = useAuth();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -57,7 +58,7 @@ function MenuPage() {
     try {
       const token = getToken();
       const response = await axios.get(
-        `http://localhost:8080/api/prenotazione/readByIdAndData/${user.userId}`,
+        `${apiUrl}/prenotazione/readByIdAndData/${user.userId}`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ function MenuPage() {
 
     try {
       const token = getToken();
-      const response = await axios.get(`http://localhost:8080/api/piatto/readByData/${formDateForServer}`, {
+      const response = await axios.get(`${apiUrl}/piatto/readByData/${formDateForServer}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -106,7 +107,7 @@ function MenuPage() {
   const fetchWeeklyMenu = async () => {
     try {
       const token = getToken();
-      const response = await axios.get('http://localhost:8080/api/piatto/piattoSettimana', {
+      const response = await axios.get(`${apiUrl}/piatto/piattoSettimana`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -122,7 +123,7 @@ function MenuPage() {
   const fetchUsers = async () => {
     try {
       const token = getToken();
-      const response = await axios.get('http://localhost:8080/api/user/read', {
+      const response = await axios.get(`${apiUrl}/user/read`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -358,7 +359,7 @@ function MenuPage() {
         data: `${dataPrenotazione}`,
       }
       const response = await axios.post(
-        'http://localhost:8080/api/prenotazione/checkPrenotazione',
+        `${apiUrl}/prenotazione/checkPrenotazione`,
         orderData,
         {
           headers: {
@@ -396,7 +397,7 @@ function MenuPage() {
       try {
         const token = getToken();
         const response = await axios.post(
-          'http://localhost:8080/api/prenotazione/createWithOrdine',
+          `${apiUrl}/prenotazione/createWithOrdine`,
           orderData,
           {
             headers: {

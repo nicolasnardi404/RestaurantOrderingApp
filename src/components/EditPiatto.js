@@ -35,6 +35,7 @@ function ManagePiatti() {
   const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate(); // Initialize useNavigate
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const tipoPiattoOptions = [
     { label: "Primo", value: "Primo" },
@@ -55,7 +56,7 @@ function ManagePiatti() {
 
   const api = useCallback(
     axios.create({
-      baseURL: "http://localhost:8080/api",
+      baseURL: `${apiUrl}`,
       headers: { Authorization: `Bearer ${token}` },
     }),
     [token]

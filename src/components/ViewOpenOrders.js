@@ -32,6 +32,7 @@ const ViewOpenOrders = () => {
   const { user, getToken } = useAuth();
   const toast = useRef(null);
   const [combinationStatus, setCombinationStatus] = useState("");
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchOrders();
@@ -82,8 +83,8 @@ const ViewOpenOrders = () => {
       }
 
       let url = user && user.ruolo === "Amministratore"
-        ? `http://localhost:8080/api/ordine/ordineByUserIdAdmin`
-        : `http://localhost:8080/api/ordine/ordineByUserId/${user?.userId}`;
+        ? `${apiUrl}/ordine/ordineByUserIdAdmin`
+        : `${apiUrl}/ordine/ordineByUserId/${user?.userId}`;
 
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,7 +114,7 @@ const ViewOpenOrders = () => {
     try {
       const token = getToken();
       const response = await axios.get(
-        "http://localhost:8080/api/piatto/read",
+        `${apiUrl}/piatto/read`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -195,7 +196,7 @@ const ViewOpenOrders = () => {
     try {
       const token = getToken();
       const response = await axios.get(
-        `http://localhost:8080/api/piatto/readByData/${formatDateforServer(date)}`,
+        `${apiUrl}/piatto/readByData/${formatDateforServer(date)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -373,7 +374,7 @@ const ViewOpenOrders = () => {
         try {
           const token = getToken();
           await axios.delete(
-            `http://localhost:8080/api/prenotazione/delete/${idPrenotazione}`,
+            `${apiUrl}/prenotazione/delete/${idPrenotazione}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -427,7 +428,7 @@ const ViewOpenOrders = () => {
 
         const token = getToken();
         const response = await axios.put(
-          `http://localhost:8080/api/ordine/update`,
+          `${apiUrl}/ordine/update`,
           updateData,
           {
             headers: {

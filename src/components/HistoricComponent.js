@@ -68,6 +68,7 @@ const HistoricComponent = () => {
   const ruolo = user.ruolo;
   const [processedData, setProcessedData] = useState(null);
   const [monthlyOverviewData, setMonthlyOverviewData] = useState(null);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     if (ruolo === "Amministratore") {
@@ -82,18 +83,18 @@ const HistoricComponent = () => {
     if (ruolo === "Amministratore") {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
-        url = `http://localhost:8080/api/ordine/readByMese/${monthString}`;
+        url = `${apiUrl}/ordine/readByMese/${monthString}`;
         console.log(monthString)
       } else if (viewMode === 'day' && selectedDate) {
         const dateString = formatDateforServer(selectedDate);
-        url = `http://localhost:8080/api/ordine/ordineByDay/${dateString}`;
+        url = `${apiUrl}/ordine/ordineByDay/${dateString}`;
       } else {
         return; // Do not fetch if no date is selected
       }
     } else {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
-        url = `http://localhost:8080/api/ordine/readByIdAndMese/${monthString}/${user.userId}`;
+        url = `${apiUrl}/ordine/readByIdAndMese/${monthString}/${user.userId}`;
       } else {
         return; // Do not fetch if no date is selected
       }
@@ -155,13 +156,13 @@ const HistoricComponent = () => {
     return `${daysName[dayOfWeek]}. ${day}/${month}/${year}`;
   }
 
-
   const handleViewModeChange = (mode) => {
     setSelectedUsername(null);
     setShowTotalPerDay(null);
     setFilteredData(null);
     setData(null);
     setUsernames(null);
+    setMonthlyOverviewData(false);
     setViewMode(mode);
     setSelectedDate(null); // Reset selected date
     setSelectedMonth(null); // Reset selected month
@@ -536,31 +537,31 @@ const HistoricComponent = () => {
         </Card>
       )}
       {/* The card with the total and the PDF generation button will be visible only for the administrator */}
-      {
-        isAdmin && (
-          <Card className="total-pdf-card" id="rapporto-amministrazione">
-            <h3>Rapporto di Amministrazione</h3>
-            <div className="pdf-button-section">
-              <Button
-                label="Genera PDF con Totali Giornalieri"
-                icon="pi pi-file-pdf"
-                onClick={() => generatePDF('daily')}
-                disabled={!selectedMonth || !showTotalPerDay}
-                className="p-button-lg btn"
-              />
-              <Button
-                label="Genera PDF con Dettagli Ordini"
-                icon="pi pi-file-pdf"
-                onClick={() => generatePDF('detailed')}
-                disabled={!selectedMonth || !selectedUsername}
-                className="p-button-lg btn"
-              />
-              <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
-            </div>
-            <p>Per attivare il pulsante di generazione PDF con Dettagli Ordini, seleziona un mese ed un utente.</p>
-            <p>Per attivare il pulsante di generazione PDF con Totali Giornalieri, seleziona un mese e il pulsante "Mostra totale per giorno".</p>
-          </Card>
-        )
+      {isAdmin && monthlyOverviewData && (
+        <Card className="total-pdf-card" id="rapporto-amministrazione">
+          <h3>Rapporto di Amministrazione</h3>
+          <div className="pdf-button-section">
+            <Button
+              label="Genera PDF con Totali Giornalieri"
+              icon="pi pi-file-pdf"
+              onClick={() => generatePDF('daily')}
+              disabled={!selectedMonth || !showTotalPerDay}
+              className="p-button-lg btn"
+            />
+            <Button
+              label="Genera PDF con Dettagli Ordini"
+              icon="pi pi-file-pdf"
+              onClick={() => generatePDF('detailed')}
+              disabled={!selectedMonth || !selectedUsername}
+              className="p-button-lg btn"
+            />
+
+            <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
+          </div>
+          <p>Per attivare il pulsante di generazione PDF con Dettagli Ordini, seleziona un mese ed un utente.</p>
+          <p>Per attivare il pulsante di generazione PDF con Totali Giornalieri, seleziona un mese e il pulsante "Mostra totale per giorno".</p>
+        </Card>
+      )
       }
       <ScrollTop />
     </div >
