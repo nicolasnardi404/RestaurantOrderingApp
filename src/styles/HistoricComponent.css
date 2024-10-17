@@ -15,6 +15,16 @@
 .p-field {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.total-per-day {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: 40px;
 }
 
 .filter-card {
@@ -72,6 +82,32 @@
   display: flex;
   margin: auto;
 
+}
+
+.p-buttonset {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.data-picker {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.data-picker .label-data-picker {
+  margin-bottom: 13px;
+}
+
+.mesi-giorni {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 h2 {

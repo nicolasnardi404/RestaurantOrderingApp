@@ -220,7 +220,7 @@ const HistoricComponent = () => {
     doc.text(`Mese: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 14, 52);
     doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
 
-    if (type === 'daily') {
+
       doc.autoTable({
         startY: 70,
         head: [['Data', 'Totale Ordini']],
@@ -232,19 +232,6 @@ const HistoricComponent = () => {
         headStyles: { fillColor: [66, 139, 202], textColor: 255 },
         alternateRowStyles: { fillColor: [245, 245, 245] },
       });
-    } else {
-      doc.autoTable({
-        startY: 70,
-        head: [['Data', 'Tipo di Piatti']],
-        body: filteredData.map(order => [
-          formatDateForDisplay(order.reservation_date),
-          order.piatti
-        ]),
-        styles: { fontSize: 10, cellPadding: 5 },
-        headStyles: { fillColor: [66, 139, 202], textColor: 255 },
-        alternateRowStyles: { fillColor: [245, 245, 245] },
-      });
-    }
 
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -343,13 +330,6 @@ const HistoricComponent = () => {
   };
 
 
-  const scrollToBottom = () => {
-    const bottomElement = document.getElementById('rapporto-amministrazione');
-    if (bottomElement) {
-      bottomElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const isDateInPast = (dateString) => {
     const now = new Date();
     const [, datePart] = dateString.split(' ');
@@ -389,10 +369,10 @@ const HistoricComponent = () => {
           {isAdmin ? (
             // Admin view - keep it as is
             <>
-              <div className="view-mode-section">
-                <div className="p-field">
+              <div className="p-field">
+                <div className="p-buttonset">
                   <label>Visualizzazione</label>
-                  <div className="p-buttonset">
+                  <div className='mesi-giorni'>
                     <Button
                       label="Mese"
                       onClick={() => handleViewModeChange('month')}
@@ -405,8 +385,8 @@ const HistoricComponent = () => {
                     />
                   </div>
                 </div>
-                <div className="p-field">
-                  <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
+                <div className='data-picker'>
+                  <label className='label-data-picker' htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
                   <Calendar
                     id="datePicker"
                     value={viewMode === 'month' ? selectedMonth : selectedDate}
@@ -416,20 +396,18 @@ const HistoricComponent = () => {
                     dateFormat={viewMode === 'month' ? "M. mm/yy" : "D. dd/mm/y"}
                   />
                 </div>
-              </div>
-              <div className="input-switch-section">
+              
                 {(selectedDate || selectedMonth) && (
-                  <div className="p-field">
-                    <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
-                    <InputSwitch
-                      id="totalPerDaySwitch"
-                      checked={showTotalPerDay}
-                      onChange={(e) => setShowTotalPerDay(e.value)}
+                  <div className='total-per-day'>
+                    <Button
+                      label={showTotalPerDay ? 'Cambia per dettaglio' : 'Cambia per totale'}
+                      onClick={() => setShowTotalPerDay(!showTotalPerDay)}
+                      className="p-button-primary"
                     />
                   </div>
                 )}
                 {usernames && isAdmin && (
-                  <div className="p-field">
+                  <div className="total-per-day">
                     <label htmlFor="userDropdown">Seleziona Utente</label>
                     <Dropdown
                       id="userDropdown"
@@ -442,12 +420,6 @@ const HistoricComponent = () => {
                   </div>
                 )}
               </div>
-              <Button
-                label="Vai al Rapporto di Amministrazione"
-                icon="pi pi-arrow-down"
-                onClick={scrollToBottom}
-                className="p-button-text"
-              />
             </>
           ) : (
             // User view - only calendar
@@ -466,6 +438,20 @@ const HistoricComponent = () => {
               </div>
             </div>
           )}
+           {isAdmin && monthlyOverviewData && (
+        <div className="total-pdf-card" id="rapporto-amministrazione">
+          <div className="pdf-button-section">
+            <Button
+              label={selectedUsername ? `Genera PDF totali del mese di ${selectedUsername}` : 'Genera PDF totali del mese per tutti '}
+              icon="pi pi-file-pdf"
+              onClick={() => generatePDF('daily')}
+            />
+
+            <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
+          </div>
+        </div>
+      )
+      }
         </Card>
 
         {/* Display of data: different tables for total per day or filtered data */}
@@ -572,33 +558,6 @@ const HistoricComponent = () => {
           </div>
         </Card>
       )}
-      {/* The card with the total and the PDF generation button will be visible only for the administrator */}
-      {isAdmin && monthlyOverviewData && (
-        <Card className="total-pdf-card" id="rapporto-amministrazione">
-          <h3>Rapporto di Amministrazione</h3>
-          <div className="pdf-button-section">
-            <Button
-              label="Genera PDF con Totali Giornalieri"
-              icon="pi pi-file-pdf"
-              onClick={() => generatePDF('daily')}
-              disabled={!selectedMonth || !showTotalPerDay}
-              className="p-button-lg btn"
-            />
-            <Button
-              label="Genera PDF con Dettagli Ordini"
-              icon="pi pi-file-pdf"
-              onClick={() => generatePDF('detailed')}
-              disabled={!selectedMonth || !selectedUsername}
-              className="p-button-lg btn"
-            />
-
-            <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
-          </div>
-          <p>Per attivare il pulsante di generazione PDF con Dettagli Ordini, seleziona un mese ed un utente.</p>
-          <p>Per attivare il pulsante di generazione PDF con Totali Giornalieri, seleziona un mese e il pulsante "Mostra totale per giorno".</p>
-        </Card>
-      )
-      }
       <ScrollTop />
     </div >
   );
