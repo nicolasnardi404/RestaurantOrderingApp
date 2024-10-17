@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Dialog } from 'primereact/dialog';
+import { useNavigate } from 'react-router-dom';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -18,6 +19,7 @@ const GestioneUtenti = () => {
   const [deleteUserId, setDeleteUserId] = useState(null);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [confirmVisible, setConfirmVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUtenti();
@@ -65,6 +67,10 @@ const GestioneUtenti = () => {
   const openConfirmDialog = (idUtente) => {
     setDeleteUserId(idUtente);
     setConfirmVisible(true);
+  };
+
+  const handleRedirect = (path) => {
+    navigate(path);
   };
 
   const deleteUtente = async () => {
@@ -133,7 +139,10 @@ const GestioneUtenti = () => {
 
   return (
     <div className="container-user">
-      <h1 className="title">Gestione Utenti</h1>
+      <div className="div-header">
+        <h1 className="title">Gestione Utenti</h1>
+        <button onClick={() => handleRedirect('/register')} className="pass-button">Registrazione</button>
+      </div>
       <table className="user-table">
         <thead>
           <tr>

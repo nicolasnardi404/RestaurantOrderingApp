@@ -78,7 +78,7 @@ input {
 }
 
 .login-btn {
-    width: 100%;
+    width: 95%;
     padding: 12px; /* Aumenta o padding do botão */
     background-color: #007bff; /* Cor de fundo azul */
     color: white;
@@ -95,4 +95,11 @@ input {
 
 a {
     text-decoration: none;
+}
+
+.rimani-line {
+    display: flex; /* Usar flexbox para melhor controle de layout */
+    align-items: center; /* Centraliza verticalmente */
+    margin: 10px 0; /* Espaçamento superior e inferior */
+    white-space: nowrap; /* Impede que o texto quebre para uma nova linha */
 }

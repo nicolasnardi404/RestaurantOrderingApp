@@ -62,12 +62,13 @@ input {
 }
 
 .register-btn {
-    width: 100%;
+    width: 95%;
     padding: 12px; /* Aumenta o padding do botão */
     background-color: #007bff; /* Cor de fundo azul */
     color: white;
     border: none;
     border-radius: 5px;
+    margin-top: 20px;
     cursor: pointer;
     font-size: 16px; /* Aumenta o tamanho da fonte */
     transition: background-color 0.3s; /* Transição suave */

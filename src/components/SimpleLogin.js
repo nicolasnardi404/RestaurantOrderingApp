@@ -64,14 +64,16 @@ const LoginPage = () => {
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          <label>
-            Rimani connesso
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-          </label>
+          <div className="rimani-line">
+            <label>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              Rimani connesso
+            </label>
+          </div>
 
           <button type="submit" className="login-btn">Accedi</button>
         </form>

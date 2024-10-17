@@ -12,9 +12,6 @@ const AdminPage = () => {
     return (
         <div style={{ padding: '20px' }}>
             <h1>Pagina di Amministrazione</h1>
-            <button onClick={() => handleRedirect('/register')} className="button-admin">
-                Registrazione
-            </button>
             <button onClick={() => handleRedirect('/managepiatti')} className="button-admin">
                 Menu
             </button>

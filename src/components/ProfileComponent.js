@@ -108,14 +108,42 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <h1 className="profile-title">Profilo Utente</h1>
+      <div className="div-header">
+        <h1 className="profile-title">Profilo Utente</h1>
+        <button onClick={() => setShowChangePassword(true)} className="pass-button">Cambiare la password</button>
+      </div>
       <div className="profile-details">
         <p className="profile-detail"><strong>Nome:</strong> {user.nome}</p>
         <p className="profile-detail"><strong>Ruolo:</strong> {user.ruolo}</p>
-        <p className="profile-detail"><strong>Giorni di Prenotazione:</strong> {selectedDays.join(', ') || 'Nessuno'}</p>
       </div>
 
-      <Button label="Cambiare la password" onClick={() => setShowChangePassword(true)} className="save-button" />
+      {hasWarnings && (
+        <div className="update-section">
+          <p className="profile-detail"><strong>Giorni di Prenotazione:</strong> {selectedDays.join(', ') || 'Nessuno'}</p>
+          <button onClick={handleDelete} className="delete-button">Elimina Giorni di Prenotazione</button>
+          <p className="update-message">Hai già fatto giorni di prenotazione. Se desideri aggiornare, elimina prima i precedenti.</p>
+        </div>
+      )}
+
+      {!hasWarnings && (
+        <form onSubmit={handleSubmit} className="warning-form">
+          <h2 className="form-title">Selezionare Giorni di Prenotazione</h2>
+          {daysOfWeek.map((day) => (
+            <div key={day} className="day-checkbox">
+              <label className="profile-detail">
+                <input
+                  type="checkbox"
+                  className="day-input"
+                  checked={selectedDays.includes(day)}
+                  onChange={() => handleChange(day)}
+                />
+                {day}
+              </label>
+            </div>
+          ))}
+          <button type="submit" className="save-button">Salva</button>
+        </form>
+      )}
 
       <Dialog header="Cambiare Password" visible={showChangePassword} onHide={() => setShowChangePassword(false)} footer={footerDialog}>
         <form onSubmit={handleChangePassword}>
@@ -130,32 +158,6 @@ export default function ProfilePage() {
           </label>
         </form>
       </Dialog>
-
-      {!hasWarnings ? (
-        <form onSubmit={handleSubmit} className="warning-form">
-          <h2 className="form-title">Selezionare Giorni di Prenotazione</h2>
-          {daysOfWeek.map((day) => (
-            <div key={day} className="day-checkbox">
-              <label className="day-label">
-                <input
-                  type="checkbox"
-                  className="day-input"
-                  checked={selectedDays.includes(day)}
-                  onChange={() => handleChange(day)}
-                />
-                {day}
-              </label>
-            </div>
-          ))}
-          <button type="submit" className="save-button">Salva</button>
-        </form>
-      ) : (
-        <div className="update-section">
-          <h2 className="update-title">Aggiornare Giorni di Prenotazione</h2>
-          <button onClick={handleDelete} className="delete-button">Elimina Prenotazione Precedenti</button>
-          <p className="update-message">Hai già fatto giorni di prenotazione. Se desideri aggiornare, elimina prima i precedenti.</p>
-        </div>
-      )}
     </div>
   );
 }
