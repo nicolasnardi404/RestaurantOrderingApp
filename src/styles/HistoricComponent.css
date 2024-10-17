@@ -59,8 +59,8 @@
 }
 
 .total-orders {
-  font-weight: bold;
-  color: var(--primary-color);
+  color: #007bff; /* This is a common shade of blue, adjust as needed */
+  font-weight: bold
 }
 
 .p-button-text {

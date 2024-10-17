@@ -503,8 +503,8 @@ const HistoricComponent = () => {
             <thead>
               <tr>
                 <th>Utente</th>
-                {monthlyOverviewData.days.map(({ day, isPast }) => (
-                  <th key={day} style={!isPast ? { color: 'red' } : {}}>
+                {monthlyOverviewData.days.map(({ day }) => (
+                  <th key={day}>
                     {day}
                   </th>
                 ))}
@@ -516,8 +516,10 @@ const HistoricComponent = () => {
                 <tr key={user}>
                   <td>{user}</td>
                   {monthlyOverviewData.days.map(({ day, isPast }) => (
-                    <td key={day} style={!isPast ? { color: 'red' } : {}}>
-                      {monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user] ? 'X' : ''}
+                    <td key={day}>
+                      {monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user] ? (
+                        <span style={!isPast ? { color: 'red', fontWeight: 'bold' } : { fontWeight: 'bold' }}>X</span>
+                      ) : ''}
                     </td>
                   ))}
                   <td>
@@ -529,12 +531,12 @@ const HistoricComponent = () => {
               ))}
               <tr>
                 <td>Totale per giorno</td>
-                {monthlyOverviewData.days.map(({ day, isPast }) => (
-                  <td key={day} style={!isPast ? { color: 'red' } : {}}>
+                {monthlyOverviewData.days.map(({ day }) => (
+                  <td key={day}>
                     {monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0}
                   </td>
                 ))}
-                <td>
+                <td className="grand-total total-orders">
                   {monthlyOverviewData.days.reduce((total, { day }) =>
                     total + (monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0), 0
                   )}
