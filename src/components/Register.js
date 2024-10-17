@@ -12,11 +12,12 @@ const RegisterPage = () => {
   const attivo = true;
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/register", {
+      const response = await axios.post(`${apiUrl}/register`, {
         nome,
         email,
         password,

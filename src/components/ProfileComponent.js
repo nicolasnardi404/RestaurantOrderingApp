@@ -7,12 +7,13 @@ export default function ProfilePage() {
   const { user, getToken } = useAuth();
   const [selectedDays, setSelectedDays] = useState([]);
   const [hasWarnings, setHasWarnings] = useState(false);
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
         const token = await getToken();
-        const response = await axios.get(`http://localhost:8080/api/avviso/readById/${user.userId}`, {
+        const response = await axios.get(`${apiUrl}/avviso/readById/${user.userId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -50,7 +51,7 @@ export default function ProfilePage() {
     };
 
     try {
-      await axios.post('http://localhost:8080/api/avviso/create', data, {
+      await axios.post(`${apiUrl}/avviso/create`, data, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -64,7 +65,7 @@ export default function ProfilePage() {
   const handleDelete = async () => {
     const token = await getToken();
     try {
-      await axios.delete(`http://localhost:8080/api/avviso/delete/${user.userId}`, {
+      await axios.delete(`${apiUrl}/avviso/delete/${user.userId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

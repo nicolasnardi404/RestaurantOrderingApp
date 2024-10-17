@@ -23,6 +23,7 @@ const AllOrderOfDayComponent = () => {
   const [loading, setLoading] = useState(true);
   const { user, getToken } = useAuth(); // Use the useAuth hook to get the getToken function
   const role = user.ruolo;
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     fetchDailyOrders(selectedDate);
@@ -34,7 +35,7 @@ const AllOrderOfDayComponent = () => {
     try {
       const dateString = formatCalendarData(date);
       const token = getToken(); // Get the token
-      const response = await axios.get(`http://localhost:8080/api/ordine/ordineByDay/${dateString}`, {
+      const response = await axios.get(`${apiUrl}/ordine/ordineByDay/${dateString}`, {
         headers: {
           Authorization: `Bearer ${token}` // Add the token to the request headers
         }
@@ -54,7 +55,7 @@ const AllOrderOfDayComponent = () => {
       try {
         const dateString = formatCalendarData(date);
         const token = getToken();
-        const response = await axios.get(`http://localhost:8080/api/ordine/totalPiattoByDay/${dateString}`, {
+        const response = await axios.get(`${apiUrl}/ordine/totalPiattoByDay/${dateString}`, {
           headers: {
             Authorization: `Bearer ${token}` // Add the token to the request headers
           }

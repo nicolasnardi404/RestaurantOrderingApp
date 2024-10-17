@@ -12,12 +12,13 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false); // Novo estado para manter-se conectado
   const navigate = useNavigate();
   const { login } = useAuth();
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
+      const response = await axios.post(`${apiUrl}/login`, {
         email,
         password
       });

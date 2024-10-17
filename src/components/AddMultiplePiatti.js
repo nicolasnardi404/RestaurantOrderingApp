@@ -18,7 +18,8 @@ const AddMultiplePiatti = () => {
     const toast = useRef(null);
     const { getToken } = useAuth();
     const token = getToken();
-
+    const apiUrl = process.env.REACT_APP_API_URL;
+    
     const tipoPiattoOptions = [
         { label: "Primo", value: "Primo" },
         { label: "Secondo", value: "Secondo" },
@@ -50,7 +51,7 @@ const AddMultiplePiatti = () => {
 
         try {
             const api = axios.create({
-                baseURL: "http://localhost:8080/api",
+                baseURL: `${apiUrl}`,
                 headers: { Authorization: `Bearer ${token}` },
             });
 
