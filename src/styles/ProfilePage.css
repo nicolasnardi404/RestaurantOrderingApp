@@ -99,3 +99,20 @@
   color: #000000;
   /* Cor do texto da mensagem de atualização */
 }
+
+.change-password-button {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.change-password-form {
+  margin-top: 10px;
+}
+
+.change-password-form input {
+  margin-right: 10px;
+}
