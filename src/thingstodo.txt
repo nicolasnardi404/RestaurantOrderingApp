@@ -1,7 +1,7 @@
 [ ] - admin
     - [X] - gestire utente (crea, reset password, modifica, elimina);
-    - [ ] - aggiungere ordine per tutti utenti
-    - [ ] - puoi aggiungere piatti nel passato
+    - [X] - aggiungere ordine per tutti utenti
+    - [X] - puoi aggiungere piatti nel passato
 
 [X] - remove register from login
 
@@ -17,16 +17,16 @@
     - [X] - cambiare parole in inglese
 
 [ ] - Menu
-    - [ ] - apri cuando aggiungere Menu
-    - [ ] - Optizoni - non puo ordinare Secondo e Piatto Unico ed Piu de 3
-    - [ ] - bottoni in itali
-    - [ ] - show giorni senza ordini - solo i giorni selezionati dall'utente
+    - [X] - apri cuando aggiungere Menu
+    - [X] - Optizoni - non puo ordinare Secondo e Piatto Unico ed Piu de 3
+    - [X] - bottoni in itali
+    - [X] - show giorni senza ordini - solo i giorni selezionati dall'utente
 
 [X] - Ordine del giorno 
     - [X] - cambiare Ordini Detaggli Venerdi(11-11-2024)
 
 [ ] - Profilo Utente
-    - [ ] - cambiare password
+    - [ ] - cambiare password UTENTE
     - [X] - GIORNO PRENATOZIONE -no avviso
 
 
@@ -34,6 +34,6 @@
 
 [ ] - Ordina pasto
     - [X] - Adicionar um filtro para antes de fazer a ordem verificar se a pessoa tem pedidos no dia
-    - [ ] - Adicionar filtro com dropdown para trocar o usuario que o admin vai pedir
-    - [ ] - Ajustar o filtro da pagina (para piatto unnico e secondo piatto)
+    - [X] - Adicionar filtro com dropdown para trocar o usuario que o admin vai pedir
+    - [X] - Ajustar o filtro da pagina (para piatto unnico e secondo piatto)
 

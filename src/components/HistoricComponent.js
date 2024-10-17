@@ -21,6 +21,22 @@ import { ScrollTop } from 'primereact/scrolltop';
 // Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
+const isDayInPast = (day, currentMonth, currentYear) => {
+  const now = new Date();
+  const today = now.getDate();
+  const currentHour = now.getHours();
+  const currentMinutes = now.getMinutes();
+
+  if (now.getMonth() !== currentMonth || now.getFullYear() !== currentYear) {
+    return now > new Date(currentYear, currentMonth, day);
+  }
+
+  if (day < today) return true;
+  if (day > today) return false;
+  // If it's today, return true (past) if it's 10:30 or later
+  return currentHour > 10 || (currentHour === 10 && currentMinutes >= 30);
+};
+
 const processMonthlyOverviewData = (data) => {
   const monthData = {};
   const usernames = new Set();
@@ -41,7 +57,10 @@ const processMonthlyOverviewData = (data) => {
   });
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const days = Array.from({ length: daysInMonth }, (_, i) => ({
+    day: i + 1,
+    isPast: isDayInPast(i + 1, month, year)
+  }));
 
   return {
     days: days,
@@ -145,16 +164,6 @@ const HistoricComponent = () => {
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('it-IT', options);
   };
-
-  const formatDate = (date) => {
-    date = new Date(date);
-    let dayOfWeek = date.getDay();
-    let daysName = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${daysName[dayOfWeek]}. ${day}/${month}/${year}`;
-  }
 
   const handleViewModeChange = (mode) => {
     setSelectedUsername(null);
@@ -295,18 +304,17 @@ const HistoricComponent = () => {
   const generateExcel = () => {
     if (!monthlyOverviewData) return;
 
-    // Create a new workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
     // Add header row
-    XLSX.utils.sheet_add_aoa(ws, [['Utente', ...monthlyOverviewData.days, 'Totale']], { origin: 'A1' });
+    XLSX.utils.sheet_add_aoa(ws, [['Utente', ...monthlyOverviewData.days.map(d => d.day), 'Totale']], { origin: 'A1' });
 
     // Add data rows
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
-      monthlyOverviewData.days.forEach(day => {
+      monthlyOverviewData.days.forEach(({ day }) => {
         if (monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]) {
           rowData.push('X');
           userTotal++;
@@ -320,7 +328,7 @@ const HistoricComponent = () => {
 
     const monthlyTotalRow = ['Totale del mese'];
     let grandTotal = 0;
-    monthlyOverviewData.days.forEach(day => {
+    monthlyOverviewData.days.forEach(({ day }) => {
       const dayTotal = monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0;
       grandTotal += dayTotal;
       monthlyTotalRow.push(dayTotal);
@@ -495,7 +503,11 @@ const HistoricComponent = () => {
             <thead>
               <tr>
                 <th>Utente</th>
-                {monthlyOverviewData.days.map(day => <th key={day}>{day}</th>)}
+                {monthlyOverviewData.days.map(({ day, isPast }) => (
+                  <th key={day} style={!isPast ? { color: 'red' } : {}}>
+                    {day}
+                  </th>
+                ))}
                 <th>Totale</th>
               </tr>
             </thead>
@@ -503,13 +515,13 @@ const HistoricComponent = () => {
               {monthlyOverviewData.users.map(user => (
                 <tr key={user}>
                   <td>{user}</td>
-                  {monthlyOverviewData.days.map(day => (
-                    <td key={day}>
+                  {monthlyOverviewData.days.map(({ day, isPast }) => (
+                    <td key={day} style={!isPast ? { color: 'red' } : {}}>
                       {monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user] ? 'X' : ''}
                     </td>
                   ))}
                   <td>
-                    {monthlyOverviewData.days.filter(day =>
+                    {monthlyOverviewData.days.filter(({ day }) =>
                       monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]
                     ).length}
                   </td>
@@ -517,13 +529,13 @@ const HistoricComponent = () => {
               ))}
               <tr>
                 <td>Totale per giorno</td>
-                {monthlyOverviewData.days.map(day => (
-                  <td key={day}>
+                {monthlyOverviewData.days.map(({ day, isPast }) => (
+                  <td key={day} style={!isPast ? { color: 'red' } : {}}>
                     {monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0}
                   </td>
                 ))}
                 <td>
-                  {monthlyOverviewData.days.reduce((total, day) =>
+                  {monthlyOverviewData.days.reduce((total, { day }) =>
                     total + (monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0), 0
                   )}
                 </td>

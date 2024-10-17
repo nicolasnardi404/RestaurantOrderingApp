@@ -27,14 +27,14 @@ export default function UserMenu() {
 
   const getMenuItems = () => {
     const commonItems = [
-      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' },
-      { label: 'Ordina Pasto', icon: 'shopping-cart', path: '/menu' },
       { label: 'Ordini Aperti', icon: 'list', path: '/open-orders' },
+      { label: 'Prenota Piatto', icon: 'shopping-cart', path: '/menu' },
+      { label: 'Controllo Consegna', icon: 'book', path: '/day-order' },
       { label: 'Storico', icon: 'calendar', path: '/historic' },
     ];
 
     const amministratoreItems = [
-      { label: 'Pagina di Admin', icon: 'cog', path: '/admin' }
+      { label: 'Admin', icon: 'cog', path: '/admin' }
     ];
 
     return user && user.ruolo === 'Amministratore'
