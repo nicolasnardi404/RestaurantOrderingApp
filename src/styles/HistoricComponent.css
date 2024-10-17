@@ -58,6 +58,11 @@
   text-align: center;
 }
 
+.future-date {
+  color: green;
+  font-weight: bold;
+}
+
 .total-orders {
   color: #007bff; /* This is a common shade of blue, adjust as needed */
   font-weight: bold

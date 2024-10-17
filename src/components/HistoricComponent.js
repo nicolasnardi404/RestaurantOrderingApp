@@ -103,7 +103,6 @@ const HistoricComponent = () => {
       if (viewMode === 'month' && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `${apiUrl}/ordine/readByMese/${monthString}`;
-        console.log(monthString)
       } else if (viewMode === 'day' && selectedDate) {
         const dateString = formatDateforServer(selectedDate);
         url = `${apiUrl}/ordine/ordineByDay/${dateString}`;
@@ -351,6 +350,33 @@ const HistoricComponent = () => {
     }
   };
 
+  const isDateInPast = (dateString) => {
+    const now = new Date();
+    const [, datePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/');
+    
+    // Create date using the full year (assuming 20xx for the year)
+    const reservationDate = new Date(2000 + parseInt(year), parseInt(month) - 1, parseInt(day));
+    
+    if (isNaN(reservationDate.getTime())) {
+      console.error('Invalid date:', dateString);
+      return false; // Treat invalid dates as future dates
+    }
+
+    if (reservationDate.toDateString() === now.toDateString()) {
+      // For the current day, check if it's before or after 10:30
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+      const cutoffTime = 10 * 60 + 30; // 10:30
+      return currentTime >= cutoffTime;
+    }
+
+    return reservationDate < now;
+  };
+
+  const rowClassName = (rowData) => {
+    return isDateInPast(rowData.reservation_date) ? '' : 'future-date';
+  };
+
   return (
     <div className="historic-container">
       <div className="card-row">
@@ -447,8 +473,6 @@ const HistoricComponent = () => {
           {showTotalPerDay ? (
             <DataTable
               value={totalPerDayData}
-              paginator
-              rows={10}
               className="p-datatable-responsive"
               emptyMessage="Nessun ordine trovato"
             >
@@ -467,28 +491,26 @@ const HistoricComponent = () => {
           ) : (
             <DataTable
               value={filteredData}
-              paginator
-              rows={10}
+            
               className="p-datatable-responsive"
               emptyMessage="Nessun ordine trovato"
+              rowClassName={rowClassName}
             >
-              {/* Display of data different for admin and employee */}
               {isAdmin && (
                 <Column
                   field="username"
-                  header="Nome Utente" // Changed to Italian
+                  header="Nome Utente"
                   sortable
                 />
               )}
               <Column
                 field="reservation_date"
-                header="Data Prenotazione" // Changed to Italian
-                body={(rowData) => rowData.reservation_date}
+                header="Data Prenotazione"
                 sortable
               />
               <Column
                 field="piatti"
-                header="Tipo di Piatti" // Changed to Italian
+                header="Tipo di Piatti"
                 sortable
               />
             </DataTable>
@@ -583,3 +605,11 @@ const HistoricComponent = () => {
 }
 
 export default HistoricComponent;
+
+// Add this CSS to your stylesheet (e.g., HistoricComponent.css)
+/*
+.future-date {
+  color: green;
+  font-weight: bold;
+}
+*/
