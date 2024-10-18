@@ -41,7 +41,7 @@ const AllOrderOfDayComponent = () => {
           headers: {
             Authorization: `Bearer ${token}`, // Add the token to the request headers
           },
-        },
+        }
       );
       setDailyOrders(response.data);
     } catch (error) {
@@ -64,7 +64,7 @@ const AllOrderOfDayComponent = () => {
             headers: {
               Authorization: `Bearer ${token}`, // Add the token to the request headers
             },
-          },
+          }
         );
         setDailySummary(response.data);
       } catch (error) {
@@ -163,7 +163,7 @@ const AllOrderOfDayComponent = () => {
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
         doc.internal.pageSize.height - 10,
-        { align: "center" },
+        { align: "center" }
       );
     }
 
@@ -189,7 +189,6 @@ const AllOrderOfDayComponent = () => {
           value={selectedDate}
           onChange={handleDateChange}
           locale="it"
-          showIcon
         />
       </div>
 
@@ -199,8 +198,6 @@ const AllOrderOfDayComponent = () => {
       >
         <DataTable
           value={dailyOrders}
-          paginator
-          rows={10}
           loading={loading}
           emptyMessage="Nessun ordine per questo giorno."
           className="p-datatable-responsive"
@@ -245,7 +242,7 @@ const AllOrderOfDayComponent = () => {
                       <td>{piatto.nome}</td>
                       <td>{piatto.quantita}</td>
                     </tr>
-                  )),
+                  ))
                 )}
               </tbody>
             </table>
@@ -259,7 +256,6 @@ const AllOrderOfDayComponent = () => {
             label="Genera PDF"
             icon="pi pi-file-pdf"
             onClick={generatePDF}
-            className="p-button-lg btn"
           />
         </div>
       )}
