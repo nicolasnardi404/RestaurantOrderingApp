@@ -58,7 +58,7 @@ const ViewOpenOrders = () => {
         (order) =>
           order &&
           order.username &&
-          order.username.toLowerCase().includes(lowercasedFilter),
+          order.username.toLowerCase().includes(lowercasedFilter)
       );
       setFilteredOrders(filtered);
     }
@@ -81,7 +81,7 @@ const ViewOpenOrders = () => {
       const token = getToken();
       if (!token) {
         setError(
-          "Nessun token di autenticazione valido trovato. Effettua nuovamente il login.",
+          "Nessun token di autenticazione valido trovato. Effettua nuovamente il login."
         );
         setLoading(false);
         return;
@@ -126,7 +126,7 @@ const ViewOpenOrders = () => {
     } catch (error) {
       console.error("Error fetching available dishes:", error);
       setError(
-        "Impossibile recuperare i piatti disponibili. Alcune funzionalità potrebbero essere limitate.",
+        "Impossibile recuperare i piatti disponibili. Alcune funzionalità potrebbero essere limitate."
       );
     }
   };
@@ -153,7 +153,7 @@ const ViewOpenOrders = () => {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-          }),
+          })
         )
         .join(", ");
     }
@@ -166,7 +166,7 @@ const ViewOpenOrders = () => {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-          }),
+          })
         )
         .join(", ");
     }
@@ -202,13 +202,13 @@ const ViewOpenOrders = () => {
         `${apiUrl}/piatto/readByData/${formatDateforServer(date)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        },
+        }
       );
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching dishes for date:", error);
       setError(
-        "Impossibile recuperare i piatti per la data dell'ordine. Alcune funzionalità potrebbero essere limitate",
+        "Impossibile recuperare i piatti per la data dell'ordine. Alcune funzionalità potrebbero essere limitate"
       );
       return [];
     }
@@ -241,7 +241,7 @@ const ViewOpenOrders = () => {
     if (!Array.isArray(dishesForOrder)) {
       console.error("Dishes for order is not an array:", dishesForOrder);
       setError(
-        "Impossibile recuperare i piatti per la data dell'ordine. Riprova.",
+        "Impossibile recuperare i piatti per la data dell'ordine. Riprova."
       );
       return;
     }
@@ -261,25 +261,25 @@ const ViewOpenOrders = () => {
         Secondo:
           dishesById[
             selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Secondo",
+              (id) => dishesById[id]?.tipo_piatto === "Secondo"
             )
           ] || null,
         Contorno:
           dishesById[
             selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Contorno",
+              (id) => dishesById[id]?.tipo_piatto === "Contorno"
             )
           ] || null,
         "Piatto unico":
           dishesById[
             selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Piatto unico",
+              (id) => dishesById[id]?.tipo_piatto === "Piatto unico"
             )
           ] || null,
         Complement:
           dishesById[
             selectedDishes.find(
-              (id) => dishesById[id]?.tipo_piatto === "Dessert",
+              (id) => dishesById[id]?.tipo_piatto === "Dessert"
             )
           ] || null,
         Altri:
@@ -322,14 +322,14 @@ const ViewOpenOrders = () => {
   const isValidCombination = (selectedDishes) => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(selectedDishes).filter(
-      (type) => selectedDishes[type] !== null && type !== "Altri",
+      (type) => selectedDishes[type] !== null && type !== "Altri"
     );
 
     // Verifica se a combinação é válida sem considerar "Altri"
     const isValid = validCombinations.some(
       (combination) =>
         combination.length === selectedTypes.length &&
-        combination.every((type) => selectedTypes.includes(type)),
+        combination.every((type) => selectedTypes.includes(type))
     );
 
     return isValid;
@@ -340,7 +340,7 @@ const ViewOpenOrders = () => {
       setCombinationStatus("");
     } else {
       const selectedTypes = Object.keys(currentSelection).filter(
-        (type) => currentSelection[type] !== null,
+        (type) => currentSelection[type] !== null
       );
       let missingItems = [];
       if (
@@ -361,11 +361,11 @@ const ViewOpenOrders = () => {
 
       if (missingItems.length === 0) {
         setCombinationStatus(
-          "Combinazione non valida. Seleziona una combinazione valida di piatti.",
+          "Combinazione non valida. Seleziona una combinazione valida di piatti."
         );
       } else {
         setCombinationStatus(
-          `Add ${missingItems.join(" or ")} to complete a valid combination`,
+          `Add ${missingItems.join(" or ")} to complete a valid combination`
         );
       }
     }
@@ -376,6 +376,8 @@ const ViewOpenOrders = () => {
       message: "Sei sicuro di voler eliminare questo piatto?",
       header: "Conferma eliminazione",
       icon: "pi pi-exclamation-triangle",
+      acceptClassName: "p-button-danger",
+      className: "custom-confirm-dialog",
       accept: async () => {
         try {
           const token = getToken();
@@ -383,12 +385,12 @@ const ViewOpenOrders = () => {
             `${apiUrl}/prenotazione/delete/${idPrenotazione}`,
             {
               headers: { Authorization: `Bearer ${token}` },
-            },
+            }
           );
           setOrders((prevOrders) =>
             prevOrders.filter(
-              (order) => order.idPrenotazione !== idPrenotazione,
-            ),
+              (order) => order.idPrenotazione !== idPrenotazione
+            )
           );
           toast.current.show({
             severity: "success",
@@ -441,7 +443,7 @@ const ViewOpenOrders = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
 
         setShowEditDialog(false);
@@ -453,7 +455,7 @@ const ViewOpenOrders = () => {
       }
     } else {
       setError(
-        "La combinazione selezionata non è valida. Assicurati di scegliere una combinazione corretta di piatti.",
+        "La combinazione selezionata non è valida. Assicurati di scegliere una combinazione corretta di piatti."
       );
     }
   };
@@ -481,6 +483,7 @@ const ViewOpenOrders = () => {
         <Column field="piatti" header="Piatti" />
         <Column field="tipo_piatti" header="Combinazione" />
         <Column
+          className="action-column"
           body={actionTemplate}
           header="Azioni"
           style={{ width: "150px" }}
@@ -537,7 +540,7 @@ const ViewOpenOrders = () => {
               "Contorno",
               "Piatto unico",
               "Dessert",
-              "Altri",
+              "Pane/Grissini",
             ].map((mealType) => (
               <div key={mealType} className="p-field">
                 <label htmlFor={mealType}>{mealType}</label>
@@ -545,13 +548,13 @@ const ViewOpenOrders = () => {
                   id={mealType}
                   value={editingOrder.selectedDishes[mealType]}
                   options={editingOrder.availableDishes.filter(
-                    (dish) => dish.tipo_piatto === mealType,
+                    (dish) => dish.tipo_piatto === mealType
                   )}
                   onChange={(e) => handleDropdownChange(mealType, e.value)}
                   optionLabel="nome"
-                  placeholder={`=== SELEZIONA ===`}
-                  className="w-full md:w-14rem"
+                  placeholder={`= SELEZIONA =`}
                   showClear
+                  className="dropdown-user"
                 />
               </div>
             ))}
@@ -563,6 +566,7 @@ const ViewOpenOrders = () => {
               label="Aggiorna ordine"
               onClick={handleUpdateOrder}
               disabled={!isValidCombination(editingOrder.selectedDishes)}
+              className="btn-update"
             />
           </div>
         )}
