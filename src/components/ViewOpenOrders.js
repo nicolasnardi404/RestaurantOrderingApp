@@ -4,8 +4,8 @@ import { Column } from "primereact/column";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { UseDataLocal } from '../util/UseDataLocal';
-import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
+import { UseDataLocal } from "../util/UseDataLocal";
+import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { Dropdown } from "primereact/dropdown";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
@@ -54,8 +54,11 @@ const ViewOpenOrders = () => {
   const filterOrders = () => {
     if (user && user.ruolo === "Amministratore") {
       const lowercasedFilter = usernameFilter.toLowerCase();
-      const filtered = orders.filter(order =>
-        order && order.username && order.username.toLowerCase().includes(lowercasedFilter)
+      const filtered = orders.filter(
+        (order) =>
+          order &&
+          order.username &&
+          order.username.toLowerCase().includes(lowercasedFilter),
       );
       setFilteredOrders(filtered);
     }
@@ -70,21 +73,24 @@ const ViewOpenOrders = () => {
     }
 
     return Array.from(listNames);
-  }
+  };
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const token = getToken();
       if (!token) {
-        setError("Nessun token di autenticazione valido trovato. Effettua nuovamente il login.");
+        setError(
+          "Nessun token di autenticazione valido trovato. Effettua nuovamente il login.",
+        );
         setLoading(false);
         return;
       }
 
-      let url = user && user.ruolo === "Amministratore"
-        ? `${apiUrl}/ordine/ordineByUserIdAdmin`
-        : `${apiUrl}/ordine/ordineByUserId/${user?.userId}`;
+      let url =
+        user && user.ruolo === "Amministratore"
+          ? `${apiUrl}/ordine/ordineByUserIdAdmin`
+          : `${apiUrl}/ordine/ordineByUserId/${user?.userId}`;
 
       const response = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -113,17 +119,14 @@ const ViewOpenOrders = () => {
   const fetchAvailableDishes = async () => {
     try {
       const token = getToken();
-      const response = await axios.get(
-        `${apiUrl}/piatto/read`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await axios.get(`${apiUrl}/piatto/read`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setAvailableDishes(response.data);
     } catch (error) {
       console.error("Error fetching available dishes:", error);
       setError(
-        "Impossibile recuperare i piatti disponibili. Alcune funzionalità potrebbero essere limitate."
+        "Impossibile recuperare i piatti disponibili. Alcune funzionalità potrebbero essere limitate.",
       );
     }
   };
@@ -150,7 +153,7 @@ const ViewOpenOrders = () => {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-          })
+          }),
         )
         .join(", ");
     }
@@ -163,7 +166,7 @@ const ViewOpenOrders = () => {
             year: "numeric",
             month: "2-digit",
             day: "2-digit",
-          })
+          }),
         )
         .join(", ");
     }
@@ -199,13 +202,13 @@ const ViewOpenOrders = () => {
         `${apiUrl}/piatto/readByData/${formatDateforServer(date)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       console.error("Error fetching dishes for date:", error);
       setError(
-        "Impossibile recuperare i piatti per la data dell'ordine. Alcune funzionalità potrebbero essere limitate"
+        "Impossibile recuperare i piatti per la data dell'ordine. Alcune funzionalità potrebbero essere limitate",
       );
       return [];
     }
@@ -221,7 +224,9 @@ const ViewOpenOrders = () => {
       const dateParts = order.datePiatti.split(" ");
       const dateString = dateParts.slice(1).join(" ");
 
-      const [day, month, year] = dateString.split("/").map(part => parseInt(part));
+      const [day, month, year] = dateString
+        .split("/")
+        .map((part) => parseInt(part));
       const fullYear = year < 100 ? 2000 + year : year;
 
       orderDate = new Date(fullYear, month - 1, day);
@@ -235,7 +240,9 @@ const ViewOpenOrders = () => {
 
     if (!Array.isArray(dishesForOrder)) {
       console.error("Dishes for order is not an array:", dishesForOrder);
-      setError("Impossibile recuperare i piatti per la data dell'ordine. Riprova.");
+      setError(
+        "Impossibile recuperare i piatti per la data dell'ordine. Riprova.",
+      );
       return;
     }
 
@@ -249,37 +256,35 @@ const ViewOpenOrders = () => {
       selectedDishes: {
         Primo:
           dishesById[
-          selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Primo")
+            selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Primo")
           ] || null,
         Secondo:
           dishesById[
-          selectedDishes.find(
-            (id) => dishesById[id]?.tipo_piatto === "Secondo"
-          )
+            selectedDishes.find(
+              (id) => dishesById[id]?.tipo_piatto === "Secondo",
+            )
           ] || null,
         Contorno:
           dishesById[
-          selectedDishes.find(
-            (id) => dishesById[id]?.tipo_piatto === "Contorno"
-          )
+            selectedDishes.find(
+              (id) => dishesById[id]?.tipo_piatto === "Contorno",
+            )
           ] || null,
         "Piatto unico":
           dishesById[
-          selectedDishes.find(
-            (id) => dishesById[id]?.tipo_piatto === "Piatto unico"
-          )
+            selectedDishes.find(
+              (id) => dishesById[id]?.tipo_piatto === "Piatto unico",
+            )
           ] || null,
-        "Complement":
+        Complement:
           dishesById[
-          selectedDishes.find(
-            (id) => dishesById[id]?.tipo_piatto === "Dessert"
-          )
+            selectedDishes.find(
+              (id) => dishesById[id]?.tipo_piatto === "Dessert",
+            )
           ] || null,
-        "Altri":
+        Altri:
           dishesById[
-          selectedDishes.find(
-            (id) => dishesById[id]?.tipo_piatto === "Altri"
-          )
+            selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Altri")
           ] || null,
       },
       reservationDate: orderDate,
@@ -305,25 +310,26 @@ const ViewOpenOrders = () => {
   };
 
   const validCombinations = [
-    ['Primo', 'Secondo', 'Contorno'],
-    ['Primo', 'Piatto unico', 'Contorno'],
-    ['Primo', 'Contorno'],
-    ['Primo', 'Contorno', 'Complement'],
-    ['Secondo', 'Contorno'],
-    ['Piatto unico', 'Contorno'],
-    ['Piatto unico'],
+    ["Primo", "Secondo", "Contorno"],
+    ["Primo", "Piatto unico", "Contorno"],
+    ["Primo", "Contorno"],
+    ["Primo", "Contorno", "Complement"],
+    ["Secondo", "Contorno"],
+    ["Piatto unico", "Contorno"],
+    ["Piatto unico"],
   ];
 
   const isValidCombination = (selectedDishes) => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
-    const selectedTypes = Object.keys(selectedDishes)
-      .filter((type) => selectedDishes[type] !== null && type !== 'Altri');
+    const selectedTypes = Object.keys(selectedDishes).filter(
+      (type) => selectedDishes[type] !== null && type !== "Altri",
+    );
 
     // Verifica se a combinação é válida sem considerar "Altri"
     const isValid = validCombinations.some(
       (combination) =>
         combination.length === selectedTypes.length &&
-        combination.every((type) => selectedTypes.includes(type))
+        combination.every((type) => selectedTypes.includes(type)),
     );
 
     return isValid;
@@ -334,7 +340,7 @@ const ViewOpenOrders = () => {
       setCombinationStatus("");
     } else {
       const selectedTypes = Object.keys(currentSelection).filter(
-        (type) => currentSelection[type] !== null
+        (type) => currentSelection[type] !== null,
       );
       let missingItems = [];
       if (
@@ -355,11 +361,11 @@ const ViewOpenOrders = () => {
 
       if (missingItems.length === 0) {
         setCombinationStatus(
-          "Combinazione non valida. Seleziona una combinazione valida di piatti."
+          "Combinazione non valida. Seleziona una combinazione valida di piatti.",
         );
       } else {
         setCombinationStatus(
-          `Add ${missingItems.join(" or ")} to complete a valid combination`
+          `Add ${missingItems.join(" or ")} to complete a valid combination`,
         );
       }
     }
@@ -377,12 +383,12 @@ const ViewOpenOrders = () => {
             `${apiUrl}/prenotazione/delete/${idPrenotazione}`,
             {
               headers: { Authorization: `Bearer ${token}` },
-            }
+            },
           );
           setOrders((prevOrders) =>
             prevOrders.filter(
-              (order) => order.idPrenotazione !== idPrenotazione
-            )
+              (order) => order.idPrenotazione !== idPrenotazione,
+            ),
           );
           toast.current.show({
             severity: "success",
@@ -435,7 +441,7 @@ const ViewOpenOrders = () => {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         setShowEditDialog(false);
@@ -447,7 +453,7 @@ const ViewOpenOrders = () => {
       }
     } else {
       setError(
-        "La combinazione selezionata non è valida. Assicurati di scegliere una combinazione corretta di piatti."
+        "La combinazione selezionata non è valida. Assicurati di scegliere una combinazione corretta di piatti.",
       );
     }
   };
@@ -464,13 +470,21 @@ const ViewOpenOrders = () => {
           className="w-full md:w-14rem"
         />
       </div>
-      <DataTable value={filteredOrders} loading={loading} responsiveLayout="scroll">
+      <DataTable
+        value={filteredOrders}
+        loading={loading}
+        responsiveLayout="scroll"
+      >
         <Column field="idPrenotazione" header="ID" />
         <Column field="username" header="Username" />
         <Column field="datePiatti" header="Data Prenotazione" />
         <Column field="piatti" header="Piatti" />
         <Column field="tipo_piatti" header="Combinazione" />
-        <Column body={actionTemplate} header="Azioni" style={{ width: "150px" }} />
+        <Column
+          body={actionTemplate}
+          header="Azioni"
+          style={{ width: "150px" }}
+        />
       </DataTable>
     </div>
   );
@@ -481,7 +495,11 @@ const ViewOpenOrders = () => {
       <Column field="datePiatti" header="Data Prenotazione" />
       <Column field="piatti" header="Piatti" />
       <Column field="tipo_piatti" header="Combinazione" />
-      <Column body={actionTemplate} header="Azioni" style={{ width: "150px" }} />
+      <Column
+        body={actionTemplate}
+        header="Azioni"
+        style={{ width: "150px" }}
+      />
     </DataTable>
   );
 
@@ -494,7 +512,9 @@ const ViewOpenOrders = () => {
           <h2>I tuoi ordini aperti</h2>
         </div>
         {error && <div className="error-message">{error}</div>}
-        {user && user.ruolo === "Amministratore" ? renderAdminTable() : renderUserTable()}
+        {user && user.ruolo === "Amministratore"
+          ? renderAdminTable()
+          : renderUserTable()}
       </Card>
 
       <Dialog
@@ -506,27 +526,35 @@ const ViewOpenOrders = () => {
         {editingOrder && (
           <div>
             <div className="p-field">
-              <label>Data Prenotazione: <span>{formatDate(editingOrder.reservationDate)}</span></label>
+              <label>
+                Data Prenotazione:{" "}
+                <span>{formatDate(editingOrder.reservationDate)}</span>
+              </label>
             </div>
-            {["Primo", "Secondo", "Contorno", "Piatto unico", "Dessert", "Altri"].map(
-              (mealType) => (
-                <div key={mealType} className="p-field">
-                  <label htmlFor={mealType}>{mealType}</label>
-                  <Dropdown
-                    id={mealType}
-                    value={editingOrder.selectedDishes[mealType]}
-                    options={editingOrder.availableDishes.filter(
-                      (dish) => dish.tipo_piatto === mealType
-                    )}
-                    onChange={(e) => handleDropdownChange(mealType, e.value)}
-                    optionLabel="nome"
-                    placeholder={`=== SELEZIONA ===`}
-                    className="w-full md:w-14rem"
-                    showClear
-                  />
-                </div>
-              )
-            )}
+            {[
+              "Primo",
+              "Secondo",
+              "Contorno",
+              "Piatto unico",
+              "Dessert",
+              "Altri",
+            ].map((mealType) => (
+              <div key={mealType} className="p-field">
+                <label htmlFor={mealType}>{mealType}</label>
+                <Dropdown
+                  id={mealType}
+                  value={editingOrder.selectedDishes[mealType]}
+                  options={editingOrder.availableDishes.filter(
+                    (dish) => dish.tipo_piatto === mealType,
+                  )}
+                  onChange={(e) => handleDropdownChange(mealType, e.value)}
+                  optionLabel="nome"
+                  placeholder={`=== SELEZIONA ===`}
+                  className="w-full md:w-14rem"
+                  showClear
+                />
+              </div>
+            ))}
             {combinationStatus && (
               <div className="combination-status">{combinationStatus}</div>
             )}

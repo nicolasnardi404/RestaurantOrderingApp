@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
-import { useNavigate } from 'react-router-dom';
-import '../util/addLocale';
-import axios from 'axios';
-import formatDateforServer from '../util/formatDateForServer';
-import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
-import { UseDataLocal } from '../util/UseDataLocal';
-import { useAuth } from '../context/AuthContext';
-import '../styles/DisplayMenu.css';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { Card } from 'primereact/card';
+import React, { useState, useEffect } from "react";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import { useNavigate } from "react-router-dom";
+import "../util/addLocale";
+import axios from "axios";
+import formatDateforServer from "../util/formatDateForServer";
+import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
+import { UseDataLocal } from "../util/UseDataLocal";
+import { useAuth } from "../context/AuthContext";
+import "../styles/DisplayMenu.css";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Card } from "primereact/card";
 
 function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [availableDates, setAvailableDates] = useState([]); // Set default to current date
   const [showMenu, setShowMenu] = useState(false);
   const [dishes, setDishes] = useState([]);
-  const [observazioni, setObservazioni] = useState(''); // Campo para observações
+  const [observazioni, setObservazioni] = useState(""); // Campo para observações
   const [sempreDisponibileDishes, setSempreDisponibileDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [cart, setCart] = useState({});
   const [checkPrenotazione, setCheckPrenotazione] = useState(false);
-  const [error, setError] = useState('');
-  const [combinationStatus, setCombinationStatus] = useState('');
+  const [error, setError] = useState("");
+  const [combinationStatus, setCombinationStatus] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [weeklyMenu, setWeeklyMenu] = useState([]);
@@ -44,12 +44,12 @@ function MenuPage() {
     if (selectedDay) {
       fetchDishes();
       setCart({});
-      setCombinationStatus('');
+      setCombinationStatus("");
     }
   }, [selectedDay]);
 
   useEffect(() => {
-    if (user.ruolo === 'Amministratore') {
+    if (user.ruolo === "Amministratore") {
       fetchUsers();
     }
   }, [user.ruolo]);
@@ -61,21 +61,21 @@ function MenuPage() {
         `${apiUrl}/prenotazione/readByIdAndData/${user.userId}`,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       const dates = response.data;
-      const availableDates = dates.map(date => new Date(date));
+      const availableDates = dates.map((date) => new Date(date));
       setAvailableDates(availableDates);
 
       if (!selectedDay) {
         setSelectedDay(availableDates[0]);
       }
     } catch (error) {
-      console.error('Error fetching available dates:', error);
+      console.error("Error fetching available dates:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,21 +86,26 @@ function MenuPage() {
 
     try {
       const token = getToken();
-      const response = await axios.get(`${apiUrl}/piatto/readByData/${formDateForServer}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `${apiUrl}/piatto/readByData/${formDateForServer}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       // Preencha dishes com todos os pratos retornados pela API
       const allDishes = response.data;
 
       setDishes(allDishes);
-      setSempreDisponibileDishes(allDishes.filter((dish) => dish.sempreDisponibile === 1));
-      setError('');
+      setSempreDisponibileDishes(
+        allDishes.filter((dish) => dish.sempreDisponibile === 1),
+      );
+      setError("");
     } catch (error) {
-      console.error('Error fetching dishes:', error);
-      setError('Failed to fetch dishes. Please try again.');
+      console.error("Error fetching dishes:", error);
+      setError("Failed to fetch dishes. Please try again.");
     }
   };
 
@@ -115,8 +120,8 @@ function MenuPage() {
 
       setWeeklyMenu(response.data);
     } catch (error) {
-      console.error('Error fetching weekly menu:', error);
-      setError('Failed to fetch weekly menu. Please try again.');
+      console.error("Error fetching weekly menu:", error);
+      setError("Failed to fetch weekly menu. Please try again.");
     }
   };
 
@@ -130,7 +135,7 @@ function MenuPage() {
       });
       setUsers(response.data);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     }
   };
 
@@ -153,47 +158,49 @@ function MenuPage() {
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Dessert } = currentCart;
+    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Dessert } =
+      currentCart;
 
     const selectedItems = new Set();
-    if (Primo) selectedItems.add('Primo');
-    if (Secondo) selectedItems.add('Secondo');
-    if (Contorno) selectedItems.add('Contorno');
-    if (PiattoUnico) selectedItems.add('Piatto unico');
-    if (Altri) selectedItems.add('Altri');
-    if (Dessert) selectedItems.add('Dessert');
+    if (Primo) selectedItems.add("Primo");
+    if (Secondo) selectedItems.add("Secondo");
+    if (Contorno) selectedItems.add("Contorno");
+    if (PiattoUnico) selectedItems.add("Piatto unico");
+    if (Altri) selectedItems.add("Altri");
+    if (Dessert) selectedItems.add("Dessert");
 
-    const combinations = validCombinations.some(combination => {
-      return combination.every(item => selectedItems.has(item));
+    const combinations = validCombinations.some((combination) => {
+      return combination.every((item) => selectedItems.has(item));
     });
 
     if (combinations) {
-      setCombinationStatus('');
+      setCombinationStatus("");
     }
   };
 
   const validCombinations = [
-    ['Primo', 'Secondo', 'Contorno'],
-    ['Primo', 'Piatto unico', 'Contorno'],
-    ['Primo', 'Secondo'],
-    ['Primo', 'Piatto unico'],
-    ['Primo', 'Contorno'],
-    ['Primo', 'Contorno', 'Dessert'],
-    ['Secondo', 'Contorno'],
-    ['Piatto unico', 'Contorno'],
-    ['Piatto unico'],
+    ["Primo", "Secondo", "Contorno"],
+    ["Primo", "Piatto unico", "Contorno"],
+    ["Primo", "Secondo"],
+    ["Primo", "Piatto unico"],
+    ["Primo", "Contorno"],
+    ["Primo", "Contorno", "Dessert"],
+    ["Secondo", "Contorno"],
+    ["Piatto unico", "Contorno"],
+    ["Piatto unico"],
   ];
 
   const isValidCombination = () => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
-    const selectedTypes = Object.keys(cart)
-      .filter((type) => cart[type] !== null && type !== 'Altri');
+    const selectedTypes = Object.keys(cart).filter(
+      (type) => cart[type] !== null && type !== "Altri",
+    );
 
     // Verifica se a combinação é válida sem considerar "Altri"
     const isValid = validCombinations.some(
       (combination) =>
         combination.length === selectedTypes.length &&
-        combination.every((type) => selectedTypes.includes(type))
+        combination.every((type) => selectedTypes.includes(type)),
     );
 
     return isValid;
@@ -204,9 +211,9 @@ function MenuPage() {
     setShowUserDropdown(false);
     // Reset the cart and other related states when changing user
     setCart({});
-    setCombinationStatus('');
-    setError('');
-    setObservazioni('');
+    setCombinationStatus("");
+    setError("");
+    setObservazioni("");
   };
 
   const toggleUserDropdown = () => {
@@ -236,20 +243,22 @@ function MenuPage() {
 
   const renderOrderMenu = () => (
     <div className="order-menu">
-      {['Primo', 'Secondo', 'Contorno', 'Piatto unico', 'Altri', 'Dessert'].map((mealType) => (
-        <div key={mealType} className="menu-category">
-          <h3>{mealType === 'Altri' ? 'Pane/Grissini' : mealType}</h3>
-          <Dropdown
-            value={cart[mealType]}
-            options={getFilteredDishes(mealType)}
-            onChange={(e) => handleDropdownChange(mealType, e.value)}
-            optionLabel="nome"
-            placeholder={`=== SELEZIONA ===`}
-            className="w-full md:w-14rem"
-            showClear
-          />
-        </div>
-      ))}
+      {["Primo", "Secondo", "Contorno", "Piatto unico", "Altri", "Dessert"].map(
+        (mealType) => (
+          <div key={mealType} className="menu-category">
+            <h3>{mealType === "Altri" ? "Pane/Grissini" : mealType}</h3>
+            <Dropdown
+              value={cart[mealType]}
+              options={getFilteredDishes(mealType)}
+              onChange={(e) => handleDropdownChange(mealType, e.value)}
+              optionLabel="nome"
+              placeholder={`=== SELEZIONA ===`}
+              className="w-full md:w-14rem"
+              showClear
+            />
+          </div>
+        ),
+      )}
 
       <div className="observazioni">
         <h3>Observazioni</h3>
@@ -264,25 +273,24 @@ function MenuPage() {
   );
 
   const renderFullMenuList = () => {
-    const daysOfWeek = [
-      'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì'
-    ];
+    const daysOfWeek = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì"];
 
     const getDishesByDay = (day) => {
       return weeklyMenu.filter(
-        (dish) => dish.dayOfWeek === day && dish.sempreDisponibile === 0
+        (dish) => dish.dayOfWeek === day && dish.sempreDisponibile === 0,
       );
     };
 
     const getSempreDisponibileDishesByType = (mealType) => {
       return weeklyMenu.filter(
-        (dish) => dish.nome_tipo === mealType && dish.sempreDisponibile === 1
+        (dish) => dish.nome_tipo === mealType && dish.sempreDisponibile === 1,
       );
     };
 
     const getSempreDisponibilePiattoUnico = () => {
       return weeklyMenu.filter(
-        (dish) => dish.nome_tipo === 'Piatto unico' && dish.sempreDisponibile === 1
+        (dish) =>
+          dish.nome_tipo === "Piatto unico" && dish.sempreDisponibile === 1,
       );
     };
 
@@ -304,9 +312,24 @@ function MenuPage() {
               return (
                 <tr key={day}>
                   <td>{day}</td>
-                  <td>{dishesForDay.filter(dish => dish.nome_tipo === 'Primo').map(dish => dish.nome_piatto).join(', ')}</td>
-                  <td>{dishesForDay.filter(dish => dish.nome_tipo === 'Secondo').map(dish => dish.nome_piatto).join(', ')}</td>
-                  <td>{dishesForDay.filter(dish => dish.nome_tipo === 'Contorno').map(dish => dish.nome_piatto).join(', ')}</td>
+                  <td>
+                    {dishesForDay
+                      .filter((dish) => dish.nome_tipo === "Primo")
+                      .map((dish) => dish.nome_piatto)
+                      .join(", ")}
+                  </td>
+                  <td>
+                    {dishesForDay
+                      .filter((dish) => dish.nome_tipo === "Secondo")
+                      .map((dish) => dish.nome_piatto)
+                      .join(", ")}
+                  </td>
+                  <td>
+                    {dishesForDay
+                      .filter((dish) => dish.nome_tipo === "Contorno")
+                      .map((dish) => dish.nome_piatto)
+                      .join(", ")}
+                  </td>
                 </tr>
               );
             })}
@@ -324,9 +347,21 @@ function MenuPage() {
           </thead>
           <tbody>
             <tr>
-              <td>{getSempreDisponibileDishesByType('Primo').map(dish => dish.nome_piatto).join(', ')}</td>
-              <td>{getSempreDisponibileDishesByType('Secondo').map(dish => dish.nome_piatto).join(', ')}</td>
-              <td>{getSempreDisponibileDishesByType('Contorno').map(dish => dish.nome_piatto).join(', ')}</td>
+              <td>
+                {getSempreDisponibileDishesByType("Primo")
+                  .map((dish) => dish.nome_piatto)
+                  .join(", ")}
+              </td>
+              <td>
+                {getSempreDisponibileDishesByType("Secondo")
+                  .map((dish) => dish.nome_piatto)
+                  .join(", ")}
+              </td>
+              <td>
+                {getSempreDisponibileDishesByType("Contorno")
+                  .map((dish) => dish.nome_piatto)
+                  .join(", ")}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -357,16 +392,16 @@ function MenuPage() {
       const orderData = {
         id: user.userId,
         data: `${dataPrenotazione}`,
-      }
+      };
       const response = await axios.post(
         `${apiUrl}/prenotazione/checkPrenotazione`,
         orderData,
         {
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.data === true) {
@@ -375,10 +410,10 @@ function MenuPage() {
         setCheckPrenotazione(false);
       }
     } catch (error) {
-      console.error('Error submitting order:', error);
-      setError('Errore durante l\'invio dell\'ordine. Riprova.');
+      console.error("Error submitting order:", error);
+      setError("Errore durante l'invio dell'ordine. Riprova.");
     }
-  }
+  };
 
   const handleSubmit = async () => {
     const dataPrenotazione = formatDateforServer(selectedDay);
@@ -401,39 +436,41 @@ function MenuPage() {
           orderData,
           {
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         if (response.status === 200 || response.status === 201) {
           setShowSuccessModal(true);
         } else {
-          throw new Error('Failed to submit order');
+          throw new Error("Failed to submit order");
         }
       } catch (error) {
-        console.error('Error submitting order:', error);
-        setError('Errore durante l\'invio dell\'ordine. Riprova.');
+        console.error("Error submitting order:", error);
+        setError("Errore durante l'invio dell'ordine. Riprova.");
       } finally {
         setIsSubmitting(false);
       }
     } else {
-      setError('Combinazione non valida. Seleziona una combinazione valida di piatti.');
+      setError(
+        "Combinazione non valida. Seleziona una combinazione valida di piatti.",
+      );
     }
   };
 
   const handleGoToOpenOrders = () => {
     setShowSuccessModal(false);
-    navigate('/open-orders');
+    navigate("/open-orders");
   };
 
   const handleBackToMenu = () => {
     setShowSuccessModal(false);
     setSelectedDay(null);
     setCart({});
-    setCombinationStatus('');
-    setError('');
+    setCombinationStatus("");
+    setError("");
   };
 
   const handleViewFullMenu = async () => {
@@ -449,8 +486,16 @@ function MenuPage() {
       modal
       footer={
         <div>
-          <Button label="Vai agli Ordini Aperti" onClick={handleGoToOpenOrders} className="p-button-primary" />
-          <Button label="Torna al Menu" onClick={handleBackToMenu} className="p-button-secondary" />
+          <Button
+            label="Vai agli Ordini Aperti"
+            onClick={handleGoToOpenOrders}
+            className="p-button-primary"
+          />
+          <Button
+            label="Torna al Menu"
+            onClick={handleBackToMenu}
+            className="p-button-secondary"
+          />
         </div>
       }
     >
@@ -499,13 +544,11 @@ function MenuPage() {
   };
 
   return (
-    <div className='container-menu'>
+    <div className="container-menu">
       <h1>Ordina Pasto</h1>
-      {user.ruolo === 'Amministratore' && renderUserSelection()}
-      <p className='user-selection-text'>
-        {selectedUser
-          ? `Ordine per: ${selectedUser.nome}`
-          : ""}
+      {user.ruolo === "Amministratore" && renderUserSelection()}
+      <p className="user-selection-text">
+        {selectedUser ? `Ordine per: ${selectedUser.nome}` : ""}
       </p>
       <div className="date-selection">
         <Calendar
@@ -518,7 +561,7 @@ function MenuPage() {
         />
 
         {checkPrenotazione && (
-          <div className='error-message'>
+          <div className="error-message">
             <h1>Avviso</h1>
             <p>avete già fatto la prenotazione per questo giorno</p>
           </div>
@@ -526,7 +569,11 @@ function MenuPage() {
 
         {!checkPrenotazione && (
           <div className="menu-button-container">
-            <Button label="Visualizza il menu della settimana" onClick={handleViewFullMenu} className="menu-button" />
+            <Button
+              label="Visualizza il menu della settimana"
+              onClick={handleViewFullMenu}
+              className="menu-button"
+            />
           </div>
         )}
       </div>
@@ -542,12 +589,22 @@ function MenuPage() {
       {/* Only render the order form if orders are open */}
       {selectedDay && !checkPrenotazione && (
         <>
-          <Card className='combinazioni-card'>
-            <h4> <span className='text-bold'>Opzione 1</span> - Primo / Secondo o Piatto Unico/ Contorno; <span className='text-bold'>Opzione 2</span> - Primo/ Contorno/ Yogurt o Frutta; <span className='text-bold'>Opzione 3</span> - Secondo o Piatto Unico / Contorno; <span className='text-bold'>Opzione 4</span> - Piatto unico;</h4>
+          <Card className="combinazioni-card">
+            <h4>
+              {" "}
+              <span className="text-bold">Opzione 1</span> - Primo / Secondo o
+              Piatto Unico/ Contorno;{" "}
+              <span className="text-bold">Opzione 2</span> - Primo/ Contorno/
+              Yogurt o Frutta; <span className="text-bold">Opzione 3</span> -
+              Secondo o Piatto Unico / Contorno;{" "}
+              <span className="text-bold">Opzione 4</span> - Piatto unico;
+            </h4>
           </Card>
 
           {renderOrderMenu()}
-          {combinationStatus && <div className="combination-status">{combinationStatus}</div>}
+          {combinationStatus && (
+            <div className="combination-status">{combinationStatus}</div>
+          )}
           {error && <div className="error-message">{error}</div>}
           <Button
             label="Invia Ordine"
@@ -560,7 +617,7 @@ function MenuPage() {
 
       <Dialog
         visible={showMenu}
-        style={{ width: '80vw' }}
+        style={{ width: "80vw" }}
         onHide={() => setShowMenu(false)}
       >
         {renderFullMenuList()}

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from '../context/AuthContext';
-import Logo from '../assets/logoNetSurf.png';
+import { useAuth } from "../context/AuthContext";
+import Logo from "../assets/logoNetSurf.png";
 import "../styles/LoginStyle.css";
 
 const LoginPage = () => {
@@ -20,7 +20,7 @@ const LoginPage = () => {
     try {
       const response = await axios.post(`${apiUrl}/login`, {
         email,
-        password
+        password,
       });
 
       const token = response.data.token;
@@ -28,7 +28,7 @@ const LoginPage = () => {
       // Passar o valor de rememberMe para a função de login
       login(token, rememberMe);
 
-      navigate('/open-orders');
+      navigate("/open-orders");
     } catch (error) {
       setErrorMessage("Accesso non riuscito. Controlla le tue credenziali.");
       console.error("There was an error logging in!", error);
@@ -75,7 +75,9 @@ const LoginPage = () => {
             </label>
           </div>
 
-          <button type="submit" className="login-btn">Accedi</button>
+          <button type="submit" className="login-btn">
+            Accedi
+          </button>
         </form>
       </div>
     </div>

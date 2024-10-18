@@ -22,12 +22,12 @@
   margin-top: 20px;
 }
 
-.p-datatable .p-datatable-thead>tr>th {
+.p-datatable .p-datatable-thead > tr > th {
   background-color: var(--primary-color);
   color: white;
 }
 
-.p-datatable .p-datatable-tbody>tr:nth-child(even) {
+.p-datatable .p-datatable-tbody > tr:nth-child(even) {
   background-color: #f8f9fa;
 }
 
@@ -112,7 +112,6 @@
   padding: 8px;
 }
 
-
 .btn-edit:hover {
   background-color: darkgreen;
   /* Verde mais escuro no hover */
@@ -127,7 +126,7 @@
 }
 
 .btn-delete:hover {
-background-color: darkred;
+  background-color: darkred;
 }
 
 h1 {
@@ -141,8 +140,8 @@ h1 {
     padding: 10px;
   }
 
-  .p-datatable .p-datatable-thead>tr>th,
-  .p-datatable .p-datatable-tbody>tr>td {
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
     padding: 0.5rem;
   }
 

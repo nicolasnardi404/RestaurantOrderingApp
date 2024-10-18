@@ -1,23 +1,23 @@
-import React from 'react';
-import { AuthProvider } from './context/AuthContext';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import ReactDOM from 'react-dom/client'; // Import atualizado
+import React from "react";
+import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ReactDOM from "react-dom/client"; // Import atualizado
 
 // Importação das páginas
 import LogIn from "./pages/LogIn";
 import Menu from "./pages/Menu";
 import Historic from "./pages/Historic";
-import RegisterPage from './pages/Register';
+import RegisterPage from "./pages/Register";
 import OpenOrders from "./pages/OpenOrders";
 import MyApp from "./_app";
 import CRUDPiatti from "./pages/CRUDPiatti";
 import AllOrderOfDay from "./pages/AllOrderOfDay";
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
-import MultiplePiatti from './pages/MultiplePiatti';
-import ProfilePage from './pages/ProfilePage';
-import AdminPage from './pages/Admin';
-import UserManagement from './pages/User';
+import MultiplePiatti from "./pages/MultiplePiatti";
+import ProfilePage from "./pages/ProfilePage";
+import AdminPage from "./pages/Admin";
+import UserManagement from "./pages/User";
 
 // Componente principal App
 export default function App() {
@@ -27,7 +27,11 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LogIn />} />
 
-          <Route element={<ProtectedRoute allowedRoles={['Amministratore', 'Dipendente']} />}>
+          <Route
+            element={
+              <ProtectedRoute allowedRoles={["Amministratore", "Dipendente"]} />
+            }
+          >
             <Route path="/menu" element={<Menu />} />
             <Route path="/open-orders" element={<OpenOrders />} />
             <Route path="/day-order" element={<AllOrderOfDay />} />
@@ -35,7 +39,7 @@ export default function App() {
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={['Amministratore']} />}>
+          <Route element={<ProtectedRoute allowedRoles={["Amministratore"]} />}>
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/register" element={<RegisterPage />} />
@@ -50,5 +54,5 @@ export default function App() {
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(<App />);

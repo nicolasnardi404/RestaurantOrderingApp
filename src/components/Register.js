@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Logo from '../assets/logoNetSurf.png';
+import Logo from "../assets/logoNetSurf.png";
 import "../styles/RegisterStyle.css";
 
 const RegisterPage = () => {
@@ -22,9 +22,9 @@ const RegisterPage = () => {
         email,
         password,
         idRuolo,
-        attivo
+        attivo,
       });
-      navigate('/open-orders');
+      navigate("/open-orders");
     } catch (error) {
       setErrorMessage("Registrazione fallita. Riprova.");
       console.error("Errore durante la registrazione:", error);
@@ -70,7 +70,9 @@ const RegisterPage = () => {
 
           {errorMessage && <p className="error-message">{errorMessage}</p>}
 
-          <button type="submit" className="register-btn">Registrati</button>
+          <button type="submit" className="register-btn">
+            Registrati
+          </button>
         </form>
       </div>
     </div>

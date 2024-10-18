@@ -9,7 +9,6 @@
   flex-direction: column;
   justify-content: space-between;
   margin-bottom: 20px;
-
 }
 
 .p-field {
@@ -41,13 +40,13 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-} 
+}
 
 .input-switch-section {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-} 
+}
 
 .total-pdf-card {
   display: flex;
@@ -63,7 +62,7 @@
   align-items: center;
 }
 
-.total-pdf-card p{
+.total-pdf-card p {
   margin: 10px auto;
   text-align: center;
 }
@@ -75,13 +74,12 @@
 
 .total-orders {
   color: #007bff; /* This is a common shade of blue, adjust as needed */
-  font-weight: bold
+  font-weight: bold;
 }
 
 .p-button-text {
   display: flex;
   margin: auto;
-
 }
 
 .p-buttonset {

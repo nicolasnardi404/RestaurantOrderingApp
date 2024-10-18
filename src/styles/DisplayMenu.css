@@ -51,7 +51,7 @@ body {
   font-weight: bold;
 }
 
-.container-menu p{
+.container-menu p {
   font-size: 1.2rem;
 }
 
@@ -60,30 +60,30 @@ body {
   margin-bottom: 15px;
 }
 
-.user-selection{
+.user-selection {
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 0px;
 }
-.user-selection-text{
+.user-selection-text {
   margin-bottom: 10px;
   margin-top: 0px;
 }
 
-.user-selection-button{
+.user-selection-button {
   margin-bottom: 10px;
 }
 
-.user-selection-dropdown{
+.user-selection-dropdown {
   margin-bottom: 0px;
 }
 
-.user-selection{
+.user-selection {
   margin-bottom: 10px;
 }
 
-.error-message{
+.error-message {
   background-color: #f8f9fa;
   border-radius: 8px;
   overflow: hidden;
@@ -95,7 +95,7 @@ body {
   align-items: center;
 }
 
-.error-message h1{
+.error-message h1 {
   color: red;
   margin: 10px 0;
   font-weight: bold;
@@ -155,22 +155,22 @@ body {
   align-items: center;
 }
 
-.combinazioni-card{
+.combinazioni-card {
   height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: none;
-  padding: 40px 0px ;
+  padding: 40px 0px;
   max-width: 95%;
 }
 
-.combinazioni-card h4{
+.combinazioni-card h4 {
   font-size: 0.8em;
   padding: 0;
 }
 
-.text-bold{
+.text-bold {
   color: black;
   font-weight: 700;
 }
