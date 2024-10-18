@@ -25,8 +25,6 @@ export default function PrenotazionePerPersonaComponent({ idUser }) {
           data: data.dataPrenotazione,
           order: `${item.tipo_piatti}`,
         }))}
-        paginator
-        rows={5}
         rowsPerPageOptions={[5, 10, 25, 50]}
         tableStyle={{ minWidth: "50rem" }}
       >
