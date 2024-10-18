@@ -44,12 +44,12 @@ const processMonthlyOverviewData = (data) => {
 
   data.forEach((item) => {
     const [, day, monthStr, yearStr] = item.reservation_date.match(
-      /(\d{2})\/(\d{2})\/(\d{2})/,
+      /(\d{2})\/(\d{2})\/(\d{2})/
     );
     const date = new Date(
       2000 + parseInt(yearStr),
       parseInt(monthStr) - 1,
-      parseInt(day),
+      parseInt(day)
     );
     year = date.getFullYear();
     month = date.getMonth();
@@ -136,7 +136,7 @@ const HistoricComponent = () => {
         uniqueUsernames.map((username) => ({
           label: username,
           value: username,
-        })),
+        }))
       );
       processData(response.data);
     } catch (error) {
@@ -157,7 +157,7 @@ const HistoricComponent = () => {
   const filterData = () => {
     if (selectedUsername) {
       setFilteredData(
-        data.filter((item) => item.username === selectedUsername),
+        data.filter((item) => item.username === selectedUsername)
       );
     } else {
       setFilteredData(data);
@@ -202,18 +202,18 @@ const HistoricComponent = () => {
         acc[date]++;
         return acc;
       },
-      {},
+      {}
     );
 
     const totalPerDayArray = Object.entries(totals).map(
       ([date, totalOrders]) => ({
         date,
         totalOrders,
-      }),
+      })
     );
 
     setTotalPerDayData(
-      totalPerDayArray.sort((a, b) => a.date.localeCompare(b.date)),
+      totalPerDayArray.sort((a, b) => a.date.localeCompare(b.date))
     );
   };
 
@@ -242,7 +242,7 @@ const HistoricComponent = () => {
     doc.text(
       `Mese: ${selectedMonth.toLocaleString("it-IT", { month: "long", year: "numeric" })}`,
       14,
-      52,
+      52
     );
     doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
 
@@ -267,12 +267,12 @@ const HistoricComponent = () => {
         `Pagina ${i} di ${pageCount}`,
         doc.internal.pageSize.width / 2,
         doc.internal.pageSize.height - 10,
-        { align: "center" },
+        { align: "center" }
       );
     }
 
     doc.save(
-      `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`,
+      `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`
     );
   };
 
@@ -329,7 +329,7 @@ const HistoricComponent = () => {
     XLSX.utils.sheet_add_aoa(
       ws,
       [["Utente", ...monthlyOverviewData.days.map((d) => d.day), "Totale"]],
-      { origin: "A1" },
+      { origin: "A1" }
     );
 
     // Add data rows
@@ -371,7 +371,7 @@ const HistoricComponent = () => {
     // Generate Excel file
     XLSX.writeFile(
       wb,
-      `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`,
+      `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`
     );
   };
 
@@ -384,7 +384,7 @@ const HistoricComponent = () => {
     const reservationDate = new Date(
       2000 + parseInt(year),
       parseInt(month) - 1,
-      parseInt(day),
+      parseInt(day)
     );
 
     if (isNaN(reservationDate.getTime())) {
@@ -416,82 +416,76 @@ const HistoricComponent = () => {
             </>
           )}
           {isAdmin ? (
-            // Admin view - keep it as is
-            <>
-              <div className="p-field">
-                <div className="p-buttonset">
-                  <label>Visualizzazione</label>
-                  <div className="mesi-giorni">
-                    <Button
-                      label="Mese"
-                      onClick={() => handleViewModeChange("month")}
-                      className={
-                        viewMode === "month"
-                          ? "p-button-primary"
-                          : "p-button-secondary"
-                      }
-                    />
-                    <Button
-                      label="Giorno"
-                      onClick={() => handleViewModeChange("day")}
-                      className={
-                        viewMode === "day"
-                          ? "p-button-primary"
-                          : "p-button-secondary"
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="data-picker">
-                  <label className="label-data-picker" htmlFor="datePicker">
-                    {viewMode === "month"
-                      ? "Seleziona Mese"
-                      : "Seleziona Giorno"}
-                  </label>
-                  <Calendar
-                    id="datePicker"
-                    value={viewMode === "month" ? selectedMonth : selectedDate}
-                    onChange={(e) =>
+            <div className="p-field">
+              <div className="p-buttonset">
+                <label>Visualizzazione</label>
+                <div className="mesi-giorni">
+                  <Button
+                    label="Mese"
+                    onClick={() => handleViewModeChange("month")}
+                    className={
                       viewMode === "month"
-                        ? setSelectedMonth(e.value)
-                        : setSelectedDate(e.value)
+                        ? "p-button-primary"
+                        : "p-button-secondary"
                     }
-                    view={viewMode === "month" ? "month" : "date"}
-                    locale="it"
-                    dateFormat={
-                      viewMode === "month" ? "M. mm/yy" : "D. dd/mm/y"
+                  />
+                  <Button
+                    label="Giorno"
+                    onClick={() => handleViewModeChange("day")}
+                    className={
+                      viewMode === "day"
+                        ? "p-button-primary"
+                        : "p-button-secondary"
                     }
                   />
                 </div>
-
-                {(selectedDate || selectedMonth) && (
-                  <div className="total-per-day">
-                    <Button
-                      label={
-                        showTotalPerDay
-                          ? "Cambia per dettaglio"
-                          : "Cambia per totale"
-                      }
-                      onClick={() => setShowTotalPerDay(!showTotalPerDay)}
-                      className="p-button-primary"
-                    />
-                  </div>
-                )}
-                {usernames && isAdmin && (
-                  <div className="total-per-day">
-                    <label htmlFor="userDropdown">Seleziona Utente</label>
-                    <Dropdown
-                      id="userDropdown"
-                      value={selectedUsername}
-                      options={usernames}
-                      onChange={(e) => setSelectedUsername(e.value)}
-                      placeholder="Tutti gli utenti"
-                      showClear
-                    />
-                  </div>
-                )}
               </div>
-            </>
+              <div className="data-picker">
+                <label className="label-data-picker" htmlFor="datePicker">
+                  {viewMode === "month" ? "Seleziona Mese" : "Seleziona Giorno"}
+                </label>
+                <Calendar
+                  id="datePicker"
+                  value={viewMode === "month" ? selectedMonth : selectedDate}
+                  onChange={(e) =>
+                    viewMode === "month"
+                      ? setSelectedMonth(e.value)
+                      : setSelectedDate(e.value)
+                  }
+                  view={viewMode === "month" ? "month" : "date"}
+                  locale="it"
+                  dateFormat={viewMode === "month" ? "M. mm/yy" : "D. dd/mm/y"}
+                />
+              </div>
+
+              {(selectedDate || selectedMonth) && (
+                <div className="total-per-day">
+                  <Button
+                    label={
+                      showTotalPerDay
+                        ? "Cambia per dettaglio"
+                        : "Cambia per totale"
+                    }
+                    onClick={() => setShowTotalPerDay(!showTotalPerDay)}
+                    className="p-button-primary"
+                  />
+                </div>
+              )}
+              {usernames && isAdmin && (
+                <div className="dropdown-user-group">
+                  <label htmlFor="userDropdown">Seleziona Utente</label>
+                  <Dropdown
+                    id="userDropdown"
+                    value={selectedUsername}
+                    options={usernames}
+                    onChange={(e) => setSelectedUsername(e.value)}
+                    placeholder="Tutti gli utenti"
+                    showClear
+                    className="dropdown-user"
+                  />
+                </div>
+              )}
+            </div>
           ) : (
             // User view - only calendar
             <div className="user-view-section">
@@ -617,7 +611,7 @@ const HistoricComponent = () => {
                       monthlyOverviewData.days.filter(
                         ({ day }) =>
                           monthlyOverviewData.data[day] &&
-                          monthlyOverviewData.data[day][user],
+                          monthlyOverviewData.data[day][user]
                       ).length
                     }
                   </td>
@@ -639,7 +633,7 @@ const HistoricComponent = () => {
                       (monthlyOverviewData.data[day]
                         ? Object.keys(monthlyOverviewData.data[day]).length
                         : 0),
-                    0,
+                    0
                   )}
                 </td>
               </tr>
@@ -651,7 +645,7 @@ const HistoricComponent = () => {
               {showTotalPerDay
                 ? totalPerDayData.reduce(
                     (sum, item) => sum + item.totalOrders,
-                    0,
+                    0
                   )
                 : totalOrders}
             </h3>
