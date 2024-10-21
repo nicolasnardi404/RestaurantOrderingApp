@@ -59,7 +59,7 @@ function ManagePiatti() {
       baseURL: `${apiUrl}`,
       headers: { Authorization: `Bearer ${token}` },
     }),
-    [token],
+    [token]
   );
 
   useEffect(() => {
@@ -124,7 +124,7 @@ function ManagePiatti() {
       } else {
         response = await api.put(
           `/piatto/update/${editingPiatto.id_piatto}`,
-          piattoToSave,
+          piattoToSave
         );
       }
 
@@ -135,7 +135,7 @@ function ManagePiatti() {
         "Success",
         isNewPiatto
           ? "Piatto created successfully"
-          : "Piatto updated successfully",
+          : "Piatto updated successfully"
       );
     } catch (error) {
       console.error("Error saving piatto:", error);
@@ -153,7 +153,7 @@ function ManagePiatti() {
       await api.delete(`/piatto/delete/${deleteId}`);
       fetchWeeklyPiatti();
       setWeeklyPiatti((prevPiatti) =>
-        prevPiatti.filter((piatto) => piatto.id_piatto !== deleteId),
+        prevPiatti.filter((piatto) => piatto.id_piatto !== deleteId)
       );
       showToast("success", "Success", "Piatto deleted successfully");
     } catch (error) {
@@ -228,13 +228,6 @@ function ManagePiatti() {
       </div>
     </div>
   );
-
-  const DisplayData = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${day}/${month}/${year}`;
-  };
 
   const disponibileBodyTemplate = (rowData) => {
     return <span>{rowData.sempreDisponibile === 1 ? "Yes" : "No"}</span>;
@@ -323,7 +316,7 @@ function ManagePiatti() {
                     nome_tipo: e.value,
                     idTipoPiatto:
                       tipoPiattoOptions.findIndex(
-                        (option) => option.value === e.value,
+                        (option) => option.value === e.value
                       ) + 1,
                   })
                 }
@@ -339,14 +332,14 @@ function ManagePiatti() {
                 value={editingPiatto.data ? new Date(editingPiatto.data) : null}
                 onChange={(e) => {
                   const selectedDate = e.value ?? null;
-                  const formatCalendar = DisplayData(selectedDate);
+                  const formatCalendar = formatDateforServer(selectedDate);
 
                   setEditingPiatto({
                     ...editingPiatto,
                     data: formatCalendar,
                   });
                 }}
-                dateFormat="D. dd/mm/y"
+                dateFormat="dd/mm/y"
               />
             </div>
             <div className="p-field">
