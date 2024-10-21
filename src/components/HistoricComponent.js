@@ -43,13 +43,11 @@ const processMonthlyOverviewData = (data) => {
   let year, month;
 
   data.forEach((item) => {
-    const [, day, monthStr, yearStr] = item.reservation_date.match(
-      /(\d{2})-(\d{2})-(\d{2})/
-    );
+    const [yearStr, monthStr, dayStr] = item.reservation_date.split("-");
     const date = new Date(
-      2000 + parseInt(yearStr),
+      parseInt(yearStr),
       parseInt(monthStr) - 1,
-      parseInt(day)
+      parseInt(dayStr)
     );
 
     year = date.getFullYear();
@@ -60,7 +58,7 @@ const processMonthlyOverviewData = (data) => {
     if (!monthData[dayOfMonth]) {
       monthData[dayOfMonth] = {};
     }
-    monthData[dayOfMonth] = { ...monthData[dayOfMonth], [item.username]: "X" };
+    monthData[dayOfMonth][item.username] = "X";
   });
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
