@@ -343,24 +343,6 @@ function MenuPage() {
                       .map((dish) => dish.nome_piatto)
                       .join(", ")}
                   </td>
-                  <td>
-                    {dishesForDay
-                      .filter((dish) => dish.nome_tipo === "Primo")
-                      .map((dish) => dish.nome_piatto)
-                      .join(", ")}
-                  </td>
-                  <td>
-                    {dishesForDay
-                      .filter((dish) => dish.nome_tipo === "Secondo")
-                      .map((dish) => dish.nome_piatto)
-                      .join(", ")}
-                  </td>
-                  <td>
-                    {dishesForDay
-                      .filter((dish) => dish.nome_tipo === "Contorno")
-                      .map((dish) => dish.nome_piatto)
-                      .join(", ")}
-                  </td>
                 </tr>
               );
             })}
@@ -542,16 +524,6 @@ function MenuPage() {
       modal
       footer={
         <div>
-          <Button
-            label="Vai agli Ordini Aperti"
-            onClick={handleGoToOpenOrders}
-            className="p-button-primary"
-          />
-          <Button
-            label="Torna al Menu"
-            onClick={handleBackToMenu}
-            className="p-button-secondary"
-          />
           <Button
             label="Vai agli Ordini Aperti"
             onClick={handleGoToOpenOrders}

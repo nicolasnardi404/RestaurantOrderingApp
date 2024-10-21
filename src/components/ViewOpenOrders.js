@@ -219,25 +219,7 @@ const ViewOpenOrders = () => {
       ? order.idPiatti.split(", ").map((id) => parseInt(id))
       : [];
 
-    let orderDate;
-    if (order.datePiatti) {
-      const dateParts = order.datePiatti.split(" ");
-      const dateString = dateParts.slice(1).join(" ");
-
-      const [day, month, year] = dateString
-        .split("/")
-        .map((part) => parseInt(part));
-      const fullYear = year < 100 ? 2000 + year : year;
-
-      orderDate = new Date(fullYear, month - 1, day);
-    } else {
-      orderDate = new Date();
-    }
-
-    console.log(orderDate);
-
-    const dishesForOrder = await fetchDishesForOrder(orderDate);
-
+    const dishesForOrder = await fetchDishesForOrder(order.datePiatti);
     if (!Array.isArray(dishesForOrder)) {
       console.error("Dishes for order is not an array:", dishesForOrder);
       setError(
@@ -287,7 +269,7 @@ const ViewOpenOrders = () => {
             selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Altri")
           ] || null,
       },
-      reservationDate: orderDate,
+      reservationDate: order.datePiatti,
       availableDishes: dishesForOrder,
       idOrdine: order.idOrdine || "",
       idPrenotazione: order.idPrenotazione, // Ensure this is included
@@ -312,8 +294,10 @@ const ViewOpenOrders = () => {
   const validCombinations = [
     ["Primo", "Secondo", "Contorno"],
     ["Primo", "Piatto unico", "Contorno"],
+    ["Primo", "Secondo"],
+    ["Primo", "Piatto unico"],
     ["Primo", "Contorno"],
-    ["Primo", "Contorno", "Complement"],
+    ["Primo", "Contorno", "Dessert"],
     ["Secondo", "Contorno"],
     ["Piatto unico", "Contorno"],
     ["Piatto unico"],
@@ -335,39 +319,25 @@ const ViewOpenOrders = () => {
     return isValid;
   };
 
-  const checkCombination = (currentSelection) => {
-    if (isValidCombination(currentSelection)) {
-      setCombinationStatus("");
-    } else {
-      const selectedTypes = Object.keys(currentSelection).filter(
-        (type) => currentSelection[type] !== null
-      );
-      let missingItems = [];
-      if (
-        !selectedTypes.includes("Primo") &&
-        !selectedTypes.includes("Piatto unico")
-      )
-        missingItems.push("Primo or Piatto unico");
-      if (
-        !selectedTypes.includes("Secondo") &&
-        !selectedTypes.includes("Piatto unico")
-      )
-        missingItems.push("Secondo or Piatto unico");
-      if (
-        !selectedTypes.includes("Contorno") &&
-        !selectedTypes.includes("Piatto unico")
-      )
-        missingItems.push("Contorno");
+  const checkCombination = (currentCart) => {
+    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Dessert } =
+      currentCart;
 
-      if (missingItems.length === 0) {
-        setCombinationStatus(
-          "Combinazione non valida. Seleziona una combinazione valida di piatti."
-        );
-      } else {
-        setCombinationStatus(
-          `Add ${missingItems.join(" or ")} to complete a valid combination`
-        );
-      }
+    const selectedItems = new Set();
+    if (Primo) selectedItems.add("Primo");
+    if (Secondo) selectedItems.add("Secondo");
+    if (Contorno) selectedItems.add("Contorno");
+    if (PiattoUnico) selectedItems.add("Piatto unico");
+    if (Altri) selectedItems.add("Altri");
+    if (Dessert) selectedItems.add("Dessert");
+
+    const combinations = validCombinations.some((combination) => {
+      return combination.every((item) => selectedItems.has(item));
+    });
+
+    if (combinations) {
+      setCombinationStatus("");
+      setCombinationStatus("");
     }
   };
 
@@ -530,7 +500,7 @@ const ViewOpenOrders = () => {
           <div>
             <div className="p-field">
               <label>
-                Data Prenotazione:{" "}
+                Data Prenotazione:
                 <span>{formatDate(editingOrder.reservationDate)}</span>
               </label>
             </div>
@@ -547,9 +517,15 @@ const ViewOpenOrders = () => {
                 <Dropdown
                   id={mealType}
                   value={editingOrder.selectedDishes[mealType]}
-                  options={editingOrder.availableDishes.filter(
-                    (dish) => dish.tipo_piatto === mealType
-                  )}
+                  options={
+                    mealType === "Pane/Grissini"
+                      ? editingOrder.availableDishes.filter(
+                          (dish) => dish.tipo_piatto === "Altri"
+                        )
+                      : editingOrder.availableDishes.filter(
+                          (dish) => dish.tipo_piatto === mealType
+                        )
+                  }
                   onChange={(e) => handleDropdownChange(mealType, e.value)}
                   optionLabel="nome"
                   placeholder={`= SELEZIONA =`}
