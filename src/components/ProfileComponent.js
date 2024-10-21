@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
-import '../styles/ProfilePage.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
+import "../styles/ProfilePage.css";
 
 export default function ProfilePage() {
   const { user, getToken } = useAuth();
   const [selectedDays, setSelectedDays] = useState([]);
   const [hasWarnings, setHasWarnings] = useState(false);
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -17,31 +17,36 @@ export default function ProfilePage() {
     const fetchAlerts = async () => {
       try {
         const token = await getToken();
-        const response = await axios.get(`${apiUrl}/avviso/readById/${user.userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await axios.get(
+          `${apiUrl}/avviso/readById/${user.userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
 
         if (response.data && Array.isArray(response.data)) {
-          const alerts = response.data.filter(alert => alert.idUser === user.userId);
-          const days = alerts.map(alert => alert.giorno);
+          const alerts = response.data.filter(
+            (alert) => alert.idUser === user.userId,
+          );
+          const days = alerts.map((alert) => alert.giorno);
           setSelectedDays(days);
           setHasWarnings(days.length > 0);
         }
       } catch (error) {
-        console.error('Errore nel recupero degli giorni prenotazione:', error);
+        console.error("Errore nel recupero degli giorni prenotazione:", error);
       }
     };
 
     fetchAlerts();
   }, [getToken, user.userId]);
 
-  const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì'];
+  const daysOfWeek = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì"];
 
   const handleChange = (day) => {
     setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
     );
   };
 
@@ -50,18 +55,18 @@ export default function ProfilePage() {
     const token = await getToken();
     const data = {
       idUser: user.userId,
-      alerts: selectedDays
+      alerts: selectedDays,
     };
 
     try {
       await axios.post(`${apiUrl}/avviso/create`, data, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setHasWarnings(true);
     } catch (error) {
-      console.error('Errore nella creazione degli giorni prenotazione:', error);
+      console.error("Errore nella creazione degli giorni prenotazione:", error);
     }
   };
 
@@ -70,13 +75,13 @@ export default function ProfilePage() {
     try {
       await axios.delete(`${apiUrl}/avviso/delete/${user.userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setSelectedDays([]);
       setHasWarnings(false);
     } catch (error) {
-      console.error('Errore nella cancellazione giorni prenotazione:', error);
+      console.error("Errore nella cancellazione giorni prenotazione:", error);
     }
   };
 
@@ -86,17 +91,16 @@ export default function ProfilePage() {
     const form = { password: password };
 
     try {
-      await axios.put(`${apiUrl}/user/updatePassword/${user.userId}`,
-        form, {
+      await axios.put(`${apiUrl}/user/updatePassword/${user.userId}`, form, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setShowChangePassword(false);
-      setPassword('');
+      setPassword("");
     } catch (error) {
-      console.error('Error in update of password:', error);
-      alert('Error in update password. Try again!');
+      console.error("Error in update of password:", error);
+      alert("Error in update password. Try again!");
     }
   };
 
@@ -108,16 +112,68 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page">
-      <h1 className="profile-title">Profilo Utente</h1>
+      <div className="div-header">
+        <h1 className="profile-title">Profilo Utente</h1>
+        <button
+          onClick={() => setShowChangePassword(true)}
+          className="pass-button"
+        >
+          Cambiare la password
+        </button>
+      </div>
       <div className="profile-details">
-        <p className="profile-detail"><strong>Nome:</strong> {user.nome}</p>
-        <p className="profile-detail"><strong>Ruolo:</strong> {user.ruolo}</p>
-        <p className="profile-detail"><strong>Giorni di Prenotazione:</strong> {selectedDays.join(', ') || 'Nessuno'}</p>
+        <p className="profile-detail">
+          <strong>Nome:</strong> {user.nome}
+        </p>
+        <p className="profile-detail">
+          <strong>Ruolo:</strong> {user.ruolo}
+        </p>
       </div>
 
-      <Button label="Cambiare la password" onClick={() => setShowChangePassword(true)} className="save-button" />
+      {hasWarnings && (
+        <div className="update-section">
+          <p className="profile-detail">
+            <strong>Giorni di Prenotazione:</strong>{" "}
+            {selectedDays.join(", ") || "Nessuno"}
+          </p>
+          <button onClick={handleDelete} className="delete-button">
+            Elimina Giorni di Prenotazione
+          </button>
+          <p className="update-message">
+            Hai già fatto giorni di prenotazione. Se desideri aggiornare,
+            elimina prima i precedenti.
+          </p>
+        </div>
+      )}
 
-      <Dialog header="Cambiare Password" visible={showChangePassword} onHide={() => setShowChangePassword(false)} footer={footerDialog}>
+      {!hasWarnings && (
+        <form onSubmit={handleSubmit} className="warning-form">
+          <h2 className="form-title">Selezionare Giorni di Prenotazione</h2>
+          {daysOfWeek.map((day) => (
+            <div key={day} className="day-checkbox">
+              <label className="profile-detail">
+                <input
+                  type="checkbox"
+                  className="day-input"
+                  checked={selectedDays.includes(day)}
+                  onChange={() => handleChange(day)}
+                />
+                {day}
+              </label>
+            </div>
+          ))}
+          <button type="submit" className="save-button">
+            Salva
+          </button>
+        </form>
+      )}
+
+      <Dialog
+        header="Cambiare Password"
+        visible={showChangePassword}
+        onHide={() => setShowChangePassword(false)}
+        footer={footerDialog}
+      >
         <form onSubmit={handleChangePassword}>
           <label>
             Nuova Password:
@@ -130,32 +186,6 @@ export default function ProfilePage() {
           </label>
         </form>
       </Dialog>
-
-      {!hasWarnings ? (
-        <form onSubmit={handleSubmit} className="warning-form">
-          <h2 className="form-title">Selezionare Giorni di Prenotazione</h2>
-          {daysOfWeek.map((day) => (
-            <div key={day} className="day-checkbox">
-              <label className="day-label">
-                <input
-                  type="checkbox"
-                  className="day-input"
-                  checked={selectedDays.includes(day)}
-                  onChange={() => handleChange(day)}
-                />
-                {day}
-              </label>
-            </div>
-          ))}
-          <button type="submit" className="save-button">Salva</button>
-        </form>
-      ) : (
-        <div className="update-section">
-          <h2 className="update-title">Aggiornare Giorni di Prenotazione</h2>
-          <button onClick={handleDelete} className="delete-button">Elimina Prenotazione Precedenti</button>
-          <p className="update-message">Hai già fatto giorni di prenotazione. Se desideri aggiornare, elimina prima i precedenti.</p>
-        </div>
-      )}
     </div>
   );
 }

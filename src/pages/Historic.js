@@ -4,14 +4,11 @@ import { Column } from "primereact/column";
 import HistoricComponent from "../components/HistoricComponent";
 import UserMenu from "../components/UserMenu";
 
-
 export default function Historic() {
-
-
   return (
     <div>
-        <UserMenu />
-        <HistoricComponent />
+      <UserMenu />
+      <HistoricComponent />
     </div>
   );
 }

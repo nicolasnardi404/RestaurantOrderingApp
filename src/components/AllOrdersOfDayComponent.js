@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar } from 'primereact/calendar';
-import { Card } from 'primereact/card';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
-import { UseDataLocal } from '../util/UseDataLocal';
-import '../util/addLocale';
-import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
-import axios from 'axios';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import '../styles/AllOrderOfDayComponent.css';
-import { useAuth } from '../context/AuthContext'; // Import useAuth
-import { formatCalendarData } from '../util/FormatCalendarData';
+import React, { useState, useEffect } from "react";
+import { Calendar } from "primereact/calendar";
+import { Card } from "primereact/card";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Button } from "primereact/button";
+import { UseDataLocal } from "../util/UseDataLocal";
+import "../util/addLocale";
+import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
+import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import "../styles/AllOrderOfDayComponent.css";
+import { useAuth } from "../context/AuthContext"; // Import useAuth
+import { formatCalendarData } from "../util/FormatCalendarData";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -35,14 +35,17 @@ const AllOrderOfDayComponent = () => {
     try {
       const dateString = formatCalendarData(date);
       const token = getToken(); // Get the token
-      const response = await axios.get(`${apiUrl}/ordine/ordineByDay/${dateString}`, {
-        headers: {
-          Authorization: `Bearer ${token}` // Add the token to the request headers
+      const response = await axios.get(
+        `${apiUrl}/ordine/ordineByDay/${dateString}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add the token to the request headers
+          },
         }
-      });
+      );
       setDailyOrders(response.data);
     } catch (error) {
-      console.error('Error fetching daily orders:', error);
+      console.error("Error fetching daily orders:", error);
       setDailyOrders([]);
     } finally {
       setLoading(false);
@@ -51,18 +54,21 @@ const AllOrderOfDayComponent = () => {
 
   const fetchDailySummary = async (date) => {
     setLoading(true);
-    if (role === 'Amministratore') {
+    if (role === "Amministratore") {
       try {
         const dateString = formatCalendarData(date);
         const token = getToken();
-        const response = await axios.get(`${apiUrl}/ordine/totalPiattoByDay/${dateString}`, {
-          headers: {
-            Authorization: `Bearer ${token}` // Add the token to the request headers
+        const response = await axios.get(
+          `${apiUrl}/ordine/totalPiattoByDay/${dateString}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add the token to the request headers
+            },
           }
-        });
+        );
         setDailySummary(response.data);
       } catch (error) {
-        console.error('Error fetching daily summary:', error);
+        console.error("Error fetching daily summary:", error);
         setDailySummary([]);
       } finally {
         setLoading(false);
@@ -80,7 +86,7 @@ const AllOrderOfDayComponent = () => {
     // Add title
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('Rapporto giornaliero sugli ordini', 14, 20);
+    doc.text("Rapporto giornaliero sugli ordini", 14, 20);
 
     // Add report info
     doc.setFontSize(12);
@@ -89,11 +95,15 @@ const AllOrderOfDayComponent = () => {
     doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
     // Add detailed orders table
-    const detailedOrdersBody = dailyOrders.map(order => [order.username, order.piatti, order.observazioni]);
+    const detailedOrdersBody = dailyOrders.map((order) => [
+      order.username,
+      order.piatti,
+      order.observazioni,
+    ]);
 
     doc.autoTable({
       startY: 45,
-      head: [['User', 'Dishes Ordered', 'Observazioni']],
+      head: [["User", "Dishes Ordered", "Observazioni"]],
       body: detailedOrdersBody,
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
@@ -106,16 +116,21 @@ const AllOrderOfDayComponent = () => {
     // Add summary table
     const summaryTableBody = [];
 
-    dailySummary.forEach(entry => {
+    dailySummary.forEach((entry) => {
       entry.piatti.forEach((piatto, piattoIndex) => {
         if (piattoIndex === 0) {
           // Adding the "tipo_piatto" and "quantita_totale" row
-          summaryTableBody.push([entry.tipo_piatto, entry.tipo_quantita, '', '']);
+          summaryTableBody.push([
+            entry.tipo_piatto,
+            entry.tipo_quantita,
+            "",
+            "",
+          ]);
           // Adding the dish and quantity for the first piatto
-          summaryTableBody.push(['', '', piatto.nome, piatto.quantita]);
+          summaryTableBody.push(["", "", piatto.nome, piatto.quantita]);
         } else {
           // Adding subsequent piatti rows without the tipo_piatto and quantita_totale
-          summaryTableBody.push(['', '', piatto.nome, piatto.quantita]);
+          summaryTableBody.push(["", "", piatto.nome, piatto.quantita]);
         }
       });
     });
@@ -123,13 +138,15 @@ const AllOrderOfDayComponent = () => {
     // Draw the summary table with conditional row styles
     doc.autoTable({
       startY: summaryTableStartY,
-      head: [['Tipo di Piatto', 'Quantità Totale', 'Nome del Piatto', 'Quantità']],
+      head: [
+        ["Tipo di Piatto", "Quantità Totale", "Nome del Piatto", "Quantità"],
+      ],
       body: summaryTableBody,
       styles: { fontSize: 10, cellPadding: 5 },
       headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
       rowStyles: (row, data) => {
         // Check if it's a "tipo_piatto" row (not empty in first column)
-        if (row.data[0] !== '') {
+        if (row.data[0] !== "") {
           return { fillColor: [220, 220, 220] }; // Changed to (220, 220, 220)
         }
         return { fillColor: [255, 255, 255] }; // White for the piatto rows
@@ -146,7 +163,7 @@ const AllOrderOfDayComponent = () => {
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
         doc.internal.pageSize.height - 10,
-        { align: 'center' }
+        { align: "center" }
       );
     }
 
@@ -162,7 +179,7 @@ const AllOrderOfDayComponent = () => {
     const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
     const day = String(date.getDate()).padStart(2, "0");
     return `${daysName[dayOfWeek]}. ${day}/${month}/${year}`;
-  }
+  };
 
   return (
     <div className="all-order-of-day">
@@ -172,15 +189,15 @@ const AllOrderOfDayComponent = () => {
           value={selectedDate}
           onChange={handleDateChange}
           locale="it"
-          showIcon
         />
       </div>
 
-      <Card title={`Ordini Dettagliati per ${DisplayData(selectedDate)}`} className="details-card">
+      <Card
+        title={`Ordini Dettagliati per ${DisplayData(selectedDate)}`}
+        className="details-card"
+      >
         <DataTable
           value={dailyOrders}
-          paginator
-          rows={10}
           loading={loading}
           emptyMessage="Nessun ordine per questo giorno."
           className="p-datatable-responsive"
@@ -193,8 +210,11 @@ const AllOrderOfDayComponent = () => {
         </DataTable>
       </Card>
 
-      {role === 'Amministratore' && (
-        <Card title={`Riepilogo per ${DisplayData(selectedDate)}`} className="summary-card">
+      {role === "Amministratore" && (
+        <Card
+          title={`Riepilogo per ${DisplayData(selectedDate)}`}
+          className="summary-card"
+        >
           <div>
             <table className="summary-table">
               <thead>
@@ -206,33 +226,36 @@ const AllOrderOfDayComponent = () => {
                 </tr>
               </thead>
               <tbody>
-                {dailySummary.map((entry, index) => (
+                {dailySummary.map((entry, index) =>
                   entry.piatti.map((piatto, piattoIndex) => (
                     <tr key={`${index}-${piattoIndex}`}>
                       {piattoIndex === 0 && (
                         <>
-                          <td rowSpan={entry.piatti.length}>{entry.tipo_piatto}</td>
-                          <td rowSpan={entry.piatti.length}>{entry.tipo_quantita}</td>
+                          <td rowSpan={entry.piatti.length}>
+                            {entry.tipo_piatto}
+                          </td>
+                          <td rowSpan={entry.piatti.length}>
+                            {entry.tipo_quantita}
+                          </td>
                         </>
                       )}
                       <td>{piatto.nome}</td>
                       <td>{piatto.quantita}</td>
                     </tr>
                   ))
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </Card>
       )}
 
-      {role === 'Amministratore' && (
+      {role === "Amministratore" && (
         <div className="pdf-button-section">
           <Button
             label="Genera PDF"
             icon="pi pi-file-pdf"
             onClick={generatePDF}
-            className="p-button-lg btn"
           />
         </div>
       )}

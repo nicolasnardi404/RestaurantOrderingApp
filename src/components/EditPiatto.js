@@ -7,16 +7,16 @@ import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { ConfirmDialog } from "primereact/confirmdialog";
-import { UseDataLocal } from '../util/UseDataLocal';
-import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
+import { UseDataLocal } from "../util/UseDataLocal";
+import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import "../styles/EditPiatto.css";
-import '../util/addLocale';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
-import { formatCalendarData } from '../util/FormatCalendarData'
+import "../util/addLocale";
+import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+import { formatCalendarData } from "../util/FormatCalendarData";
 import formatDateforServer from "../util/formatDateForServer";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
@@ -59,7 +59,7 @@ function ManagePiatti() {
       baseURL: `${apiUrl}`,
       headers: { Authorization: `Bearer ${token}` },
     }),
-    [token]
+    [token],
   );
 
   useEffect(() => {
@@ -82,7 +82,7 @@ function ManagePiatti() {
     }
   };
 
-  const filteredPiatti = weeklyPiatti.filter(piatto => {
+  const filteredPiatti = weeklyPiatti.filter((piatto) => {
     const matchesDay = selectedDay ? piatto.dayOfWeek === selectedDay : true;
     const matchesDisponibile = piatto.sempreDisponibile === disponibileFilter;
     return matchesDay && matchesDisponibile;
@@ -124,7 +124,7 @@ function ManagePiatti() {
       } else {
         response = await api.put(
           `/piatto/update/${editingPiatto.id_piatto}`,
-          piattoToSave
+          piattoToSave,
         );
       }
 
@@ -135,7 +135,7 @@ function ManagePiatti() {
         "Success",
         isNewPiatto
           ? "Piatto created successfully"
-          : "Piatto updated successfully"
+          : "Piatto updated successfully",
       );
     } catch (error) {
       console.error("Error saving piatto:", error);
@@ -152,7 +152,9 @@ function ManagePiatti() {
     try {
       await api.delete(`/piatto/delete/${deleteId}`);
       fetchWeeklyPiatti();
-      setWeeklyPiatti(prevPiatti => prevPiatti.filter(piatto => piatto.id_piatto !== deleteId));
+      setWeeklyPiatti((prevPiatti) =>
+        prevPiatti.filter((piatto) => piatto.id_piatto !== deleteId),
+      );
       showToast("success", "Success", "Piatto deleted successfully");
     } catch (error) {
       console.error("Error deleting piatto:", error);
@@ -177,10 +179,12 @@ function ManagePiatti() {
   const actionTemplate = (rowData) => {
     return (
       <div className="action-buttons">
-        <Button className="btn-edit"
+        <Button
+          className="btn-edit"
           onClick={() => editPiatto(rowData)}
           icon="pi pi-pencil"
-          tooltip="Modifica Piattoo" />
+          tooltip="Modifica Piattoo"
+        />
         <Button
           className="btn-delete"
           onClick={() => deletePiatto(rowData.id_piatto)}
@@ -230,7 +234,7 @@ function ManagePiatti() {
     const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
     const day = String(date.getDate()).padStart(2, "0");
     return `${day}/${month}/${year}`;
-  }
+  };
 
   const disponibileBodyTemplate = (rowData) => {
     return <span>{rowData.sempreDisponibile === 1 ? "Yes" : "No"}</span>;
@@ -259,7 +263,7 @@ function ManagePiatti() {
       <Button
         label="Aggiungi il Menu per Giorno"
         icon="pi pi-plus"
-        onClick={() => navigate('/add-multiple-piatti')} // Navigate to the new page
+        onClick={() => navigate("/add-multiple-piatti")} // Navigate to the new page
         className="p-button-secondary add-multiple-piatto-button"
       />
       <DataTable
@@ -319,7 +323,7 @@ function ManagePiatti() {
                     nome_tipo: e.value,
                     idTipoPiatto:
                       tipoPiattoOptions.findIndex(
-                        (option) => option.value === e.value
+                        (option) => option.value === e.value,
                       ) + 1,
                   })
                 }

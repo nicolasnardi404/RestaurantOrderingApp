@@ -1,4 +1,3 @@
-
 export const formatCalendarData = (date) => {
   if (!(date instanceof Date)) {
     throw new Error("Invalid date object");

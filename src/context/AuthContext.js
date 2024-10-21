@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
@@ -23,7 +23,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const token =
+      sessionStorage.getItem("token") || localStorage.getItem("token");
     if (checkTokenValidity(token)) {
       const decodedToken = jwtDecode(token);
       setUser({
@@ -48,9 +49,9 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (rememberMe) {
-        localStorage.setItem('token', token);
+        localStorage.setItem("token", token);
       } else {
-        sessionStorage.setItem('token', token);
+        sessionStorage.setItem("token", token);
       }
     } else {
       console.error("Token expired or invalid");
@@ -58,13 +59,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
     setUser(null);
   };
 
   const getToken = () => {
-    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const token =
+      sessionStorage.getItem("token") || localStorage.getItem("token");
     return checkTokenValidity(token) ? token : null;
   };
 
@@ -82,7 +84,7 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

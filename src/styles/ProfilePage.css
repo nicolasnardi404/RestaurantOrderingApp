@@ -49,7 +49,7 @@
 }
 
 .day-checkbox {
-  display: flex;
+  display: inline-flex;
   /* Flexbox para alinhar checkbox e texto */
   align-items: center;
   /* Alinha verticalmente */
@@ -58,7 +58,8 @@
 }
 
 .save-button,
-.delete-button {
+.delete-button,
+.pass-button {
   padding: 10px;
   /* Espaço interno do botão */
   border-radius: 5px;
@@ -93,6 +94,24 @@
 .delete-button:hover {
   background-color: #c82333;
   /* Cor do botão quando o mouse está sobre ele */
+}
+
+.pass-button {
+  background-color: var(--primary-color);
+  /* Cor de fundo verde */
+  color: white;
+  /* Cor do texto do botão */
+}
+
+.pass-button:hover {
+  background-color: #0491aa;
+  /* Cor do botão quando o mouse está sobre ele */
+}
+
+.div-header {
+  display: flex;
+  align-items: center; /* Allinea verticalmente al centro */
+  justify-content: space-between; /* Spazia gli elementi in modo uniforme */
 }
 
 .update-message {

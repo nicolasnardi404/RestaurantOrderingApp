@@ -1,98 +1,107 @@
 body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  max-height: 100vh;
 }
 
 .container {
-    width: 100%;
-    max-width: 400px; /* Ajuste o tamanho máximo para garantir que caiba na tela */
-    margin: 100px auto; /* Centraliza a caixa no meio da tela */
-    background-color: #ffffff; /* Cor de fundo da caixa de login */
-    padding: 0; /* Remova o padding para evitar invasão de espaço */
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra mais suave */
+  width: 100%;
+  max-width: 400px; /* Ajuste o tamanho máximo para garantir que caiba na tela */
+  margin: 100px auto; /* Centraliza a caixa no meio da tela */
+  background-color: #ffffff; /* Cor de fundo da caixa de login */
+  padding: 0; /* Remova o padding para evitar invasão de espaço */
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra mais suave */
 }
 
 header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #007bff; /* Cor mais vibrante para o cabeçalho */
-    padding: 15px; /* Aumenta o padding do cabeçalho */
-    border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007bff; /* Cor mais vibrante para o cabeçalho */
+  padding: 15px; /* Aumenta o padding do cabeçalho */
+  border-radius: 10px 10px 0 0;
 }
 
 .logo {
-    height: 40px; /* Ajuste a altura do logo */
+  height: 40px; /* Ajuste a altura do logo */
 }
 
 .register-btn-inLog {
-    background-color: #007bff; /* Botão branco */
-    color: #ffffff; /* Texto azul */
-    border: 2px solid #007bff; /* Bordas azuis */
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s; /* Transição suave */
+  background-color: #007bff; /* Botão branco */
+  color: #ffffff; /* Texto azul */
+  border: 2px solid #007bff; /* Bordas azuis */
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    color 0.3s; /* Transição suave */
 }
 
 .register-btn-inLog:hover {
-    background-color: #007bff; /* Cor de fundo ao passar o mouse */
-    color: white; /* Texto branco ao passar o mouse */
+  background-color: #007bff; /* Cor de fundo ao passar o mouse */
+  color: white; /* Texto branco ao passar o mouse */
 }
 
 .login-box {
-    padding: 30px; /* Aumenta o espaçamento interno */
-    background-color: #ffffff; /* Cor de fundo branca para a caixa de login */
-    border-radius: 0 0 10px 10px;
+  padding: 30px; /* Aumenta o espaçamento interno */
+  background-color: #ffffff; /* Cor de fundo branca para a caixa de login */
+  border-radius: 0 0 10px 10px;
 }
 
 label {
-    display: block;
-    margin: 15px 0 5px;
-    font-weight: bold; /* Texto em negrito */
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: bold; /* Texto em negrito */
 }
 
 input {
-    width: calc(100% - 20px);
-    padding: 12px; /* Aumenta o padding para mais conforto */
-    margin-bottom: 15px; /* Aumenta o espaçamento entre inputs */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px; /* Aumenta o tamanho da fonte */
+  width: calc(100% - 20px);
+  padding: 12px; /* Aumenta o padding para mais conforto */
+  margin-bottom: 15px; /* Aumenta o espaçamento entre inputs */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px; /* Aumenta o tamanho da fonte */
 }
 
 .error-message {
-    color: red; /* Cor da mensagem de erro */
-    margin-top: 10px; /* Espaçamento acima da mensagem de erro */
+  color: red; /* Cor da mensagem de erro */
+  margin-top: 10px; /* Espaçamento acima da mensagem de erro */
 }
 
 .register-msg {
-    font-size: 14px;
-    color: #555;
-    margin: 20px 0; /* Ajusta o espaçamento acima e abaixo */
-    text-align: center; /* Centraliza a mensagem de registro */
+  font-size: 14px;
+  color: #555;
+  margin: 20px 0; /* Ajusta o espaçamento acima e abaixo */
+  text-align: center; /* Centraliza a mensagem de registro */
 }
 
 .login-btn {
-    width: 100%;
-    padding: 12px; /* Aumenta o padding do botão */
-    background-color: #007bff; /* Cor de fundo azul */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px; /* Aumenta o tamanho da fonte */
-    transition: background-color 0.3s; /* Transição suave */
+  width: 95%;
+  padding: 12px; /* Aumenta o padding do botão */
+  background-color: #007bff; /* Cor de fundo azul */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px; /* Aumenta o tamanho da fonte */
+  transition: background-color 0.3s; /* Transição suave */
 }
 
 .login-btn:hover {
-    background-color: #0056b3; /* Cor mais escura ao passar o mouse */
+  background-color: #0056b3; /* Cor mais escura ao passar o mouse */
 }
 
 a {
-    text-decoration: none;
+  text-decoration: none;
+}
+
+.rimani-line {
+  display: flex; /* Usar flexbox para melhor controle de layout */
+  align-items: center; /* Centraliza verticalmente */
+  margin: 10px 0; /* Espaçamento superior e inferior */
+  white-space: nowrap; /* Impede que o texto quebre para uma nova linha */
 }

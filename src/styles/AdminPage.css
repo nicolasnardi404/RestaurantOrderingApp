@@ -1,28 +1,28 @@
 .admin-container {
-    padding: 20px;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    text-align: center;
-    min-height: 100vh;
+  padding: 20px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  text-align: center;
+  min-height: 100vh;
 }
 
 .admin-title {
-    margin-bottom: 20px;
-    font-size: 24px;
+  margin-bottom: 20px;
+  font-size: 24px;
 }
 
 .button-admin {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: var(--primary-color);
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
 }
 
 .button-admin:hover {
-    background-color: #1f6f9f;
+  background-color: #1f6f9f;
 }

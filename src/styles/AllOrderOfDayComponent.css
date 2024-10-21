@@ -1,11 +1,15 @@
 .all-order-of-day {
-  max-width: 600px;
+  max-width: 80%;
   margin: 0 auto;
   padding: 20px;
 }
 
 .date-selector {
-  margin-bottom: 20px;
+  margin: 20px auto;
+  max-width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .summary-card {
@@ -28,17 +32,13 @@
   justify-content: center;
 }
 
-.btn {
-  font-size: 1.2em;
-  padding: 0.5em 1em;
-}
-
 .summary-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.summary-table th, .summary-table td {
+.summary-table th,
+.summary-table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;

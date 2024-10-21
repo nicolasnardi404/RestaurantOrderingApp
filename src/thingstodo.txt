@@ -1,39 +1,28 @@
-[ ] - admin
-    - [X] - gestire utente (crea, reset password, modifica, elimina);
-    - [ ] - aggiungere ordine per tutti utenti
-    - [ ] - puoi aggiungere piatti nel passato
 
-[X] - remove register from login
+MENU
+    [ ] - AVISSO de menu nao atualizado para aquele dia
 
-[X] - Historic
-    - [X] - cambia stile grafico
-    - [X] - excel
-    - [X] - cambia bottoni per tutti
+ORDINE APERTA
+    [ ] - AVISSO ORDEM FECHA DEPOIS DAS 10 30
+    [ ] - ORGANIZAR ORDEM DI PIATTI (primo,secondo...)
 
+HISTORICO DE ORDERS
+    [ ] - SEARCH botton
+    [ ] - DATA NO PDF TA ERRADA
+    [ ] - ATUALIZAR LIETURA DAS NOVAS DATAS JSON
+    [ ] - LINHAS NO ARQUIVO DE excel
 
-[X] - Modifica Ordine
-    - [X] - cambia SELECT
-    - [X] - cambiare data per giorno piu data
-    - [X] - cambiare parole in inglese
+TUTTIL GLI ORDINE
+    [ ] - ORGANIZAR ORDEM DI PIATTI (primo,secondo...)
+    [ ] - CHANGE COLOR FOR THE ORDER QUE AINDA PODEM SER MUDADAS
 
-[ ] - Menu
-    - [ ] - apri cuando aggiungere Menu
-    - [ ] - Optizoni - non puo ordinare Secondo e Piatto Unico ed Piu de 3
-    - [ ] - bottoni in itali
-    - [ ] - show giorni senza ordini - solo i giorni selezionati dall'utente
-
-[X] - Ordine del giorno 
-    - [X] - cambiare Ordini Detaggli Venerdi(11-11-2024)
-
-[ ] - Profilo Utente
-    - [ ] - cambiare password
-    - [X] - GIORNO PRENATOZIONE -no avviso
+---- REVISAR STYLE DE TODAS PAGINAS ANTES DE APRESENTAR
 
 
---- FOCUS ---
 
-[ ] - Ordina pasto
-    - [X] - Adicionar um filtro para antes de fazer a ordem verificar se a pessoa tem pedidos no dia
-    - [ ] - Adicionar filtro com dropdown para trocar o usuario que o admin vai pedir
-    - [ ] - Ajustar o filtro da pagina (para piatto unnico e secondo piatto)
+
+
+
+
+
 

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import useAuth
-import Logo from '../assets/logoNetSurf.png';
-import '../styles/UserMenu.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import useAuth
+import Logo from "../assets/logoNetSurf.png";
+import "../styles/UserMenu.css";
 
 export default function UserMenu() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -16,28 +16,28 @@ export default function UserMenu() {
       setIsMobile(window.innerWidth < 768);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   const getMenuItems = () => {
     const commonItems = [
-      { label: 'Tutti gli Ordini del Giorno', icon: 'book', path: '/day-order' },
-      { label: 'Ordina Pasto', icon: 'shopping-cart', path: '/menu' },
-      { label: 'Ordini Aperti', icon: 'list', path: '/open-orders' },
-      { label: 'Storico', icon: 'calendar', path: '/historic' },
+      { label: "Ordini Aperti", icon: "list", path: "/open-orders" },
+      { label: "Prenota Piatto", icon: "shopping-cart", path: "/menu" },
+      { label: "Controllo Consegna", icon: "book", path: "/day-order" },
+      { label: "Storico", icon: "calendar", path: "/historic" },
     ];
 
     const amministratoreItems = [
-      { label: 'Pagina di Admin', icon: 'cog', path: '/admin' }
+      { label: "Admin", icon: "cog", path: "/admin" },
     ];
 
-    return user && user.ruolo === 'Amministratore'
+    return user && user.ruolo === "Amministratore"
       ? [...commonItems, ...amministratoreItems]
       : commonItems;
   };
@@ -47,12 +47,18 @@ export default function UserMenu() {
   // Novo render para o dropdown de perfil e logout
   const renderProfileDropdown = () => (
     <div className="profile-dropdown">
-      <button className="profile-button" onClick={() => setDropdownVisible(!dropdownVisible)}>
+      <button
+        className="profile-button"
+        onClick={() => setDropdownVisible(!dropdownVisible)}
+      >
         <i className="pi pi-user"></i> {user.nome}
       </button>
       {dropdownVisible && (
         <div className="dropdown-menu">
-          <button className="dropdown-item" onClick={() => navigate('/profile')}>
+          <button
+            className="dropdown-item"
+            onClick={() => navigate("/profile")}
+          >
             <i className="pi pi-user"></i> Profilo
           </button>
           <button className="dropdown-item" onClick={handleLogout}>
@@ -65,7 +71,10 @@ export default function UserMenu() {
 
   const renderMobileMenu = () => (
     <div className="user-menu-wrapper">
-      <button className="menu-toggle" onClick={() => setVisibleLeft(!visibleLeft)}>
+      <button
+        className="menu-toggle"
+        onClick={() => setVisibleLeft(!visibleLeft)}
+      >
         <i className="pi pi-bars"></i> Menu
       </button>
       {visibleLeft && (
