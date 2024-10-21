@@ -65,13 +65,13 @@ const GestioneUtenti = () => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        },
+        }
       );
       fetchUtenti();
       setDialogVisible(false);
     } catch (err) {
       setError(
-        err.response?.data?.message || "Errore nell'aggiornamento dell'utente",
+        err.response?.data?.message || "Errore nell'aggiornamento dell'utente"
       );
     }
   };
@@ -104,10 +104,11 @@ const GestioneUtenti = () => {
     <Dialog
       header="Modifica Utente"
       visible={dialogVisible}
+      style={{ width: "70%" }}
       footer={dialogFooter()}
       onHide={() => setDialogVisible(false)}
     >
-      <div className="p-grid">
+      <div className="user-management-dialog">
         <div className="p-col-12">
           <label>Nome:</label>
           <InputText
