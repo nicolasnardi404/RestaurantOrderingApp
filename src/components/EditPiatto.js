@@ -18,6 +18,7 @@ import "../util/addLocale";
 import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
 import { formatCalendarData } from "../util/FormatCalendarData";
 import formatDateforServer from "../util/formatDateForServer";
+import { Checkbox } from "primereact/checkbox";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -42,8 +43,8 @@ function ManagePiatti() {
     { label: "Secondo", value: "Secondo" },
     { label: "Contorno", value: "Contorno" },
     { label: "Piatto unico", value: "Piatto unico" },
-    { label: "Complement", value: "Complement" },
-    { label: "Altri", value: "Altri" },
+    { label: "Dessert", value: "Dessert" },
+    { label: "Pane/Grissini", value: "Pane/Grissini" },
   ];
 
   const dayOptions = [
@@ -257,12 +258,10 @@ function ManagePiatti() {
         label="Aggiungi il Menu per Giorno"
         icon="pi pi-plus"
         onClick={() => navigate("/add-multiple-piatti")} // Navigate to the new page
-        className="p-button-secondary add-multiple-piatto-button"
+        className="p-button-primary add-piatto-button"
       />
       <DataTable
         value={filteredPiatti}
-        paginator
-        rows={10}
         globalFilter={globalFilter}
         header={header}
       >
@@ -285,77 +284,97 @@ function ManagePiatti() {
       <Dialog
         header={isNewPiatto ? "Aggiungi un nuovo piatto" : "Modifica piatto"}
         visible={showDialog}
-        style={{ width: "50vw" }}
+        style={{ width: "80vw" }}
         modal
         onHide={() => setShowDialog(false)}
       >
         {editingPiatto && (
-          <div>
-            <div className="p-field">
-              <label htmlFor="nome_piatto">Nome Piatto</label>
-              <InputText
-                id="nome_piatto"
-                value={editingPiatto.nome_piatto}
-                onChange={(e) =>
-                  setEditingPiatto({
-                    ...editingPiatto,
-                    nome_piatto: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="p-field">
-              <label htmlFor="nome_tipo">Tipo Piatto</label>
-              <Dropdown
-                id="nome_tipo"
-                value={editingPiatto.nome_tipo}
-                options={tipoPiattoOptions}
-                onChange={(e) =>
-                  setEditingPiatto({
-                    ...editingPiatto,
-                    nome_tipo: e.value,
-                    idTipoPiatto:
-                      tipoPiattoOptions.findIndex(
-                        (option) => option.value === e.value
-                      ) + 1,
-                  })
-                }
-                placeholder="Seleziona un tipo"
-                optionLabel="label"
-              />
-            </div>
-            <div className="p-field">
-              <label htmlFor="data">Data</label>
-              <Calendar
-                id="data"
-                locale="it"
-                value={editingPiatto.data ? new Date(editingPiatto.data) : null}
-                onChange={(e) => {
-                  const selectedDate = e.value ?? null;
-                  const formatCalendar = formatDateforServer(selectedDate);
+          <div className="edit-piatto-form">
+            <div className="p-grid">
+              <div className="p-col">
+                <div className="p-field">
+                  <label htmlFor="nome_piatto">Nome Piatto</label>
+                  <InputText
+                    id="nome_piatto"
+                    value={editingPiatto.nome_piatto}
+                    onChange={(e) =>
+                      setEditingPiatto({
+                        ...editingPiatto,
+                        nome_piatto: e.target.value,
+                      })
+                    }
+                    placeholder="Inserisci il nome del piatto"
+                  />
+                </div>
+              </div>
+              <div className="p-col">
+                <div className="p-field">
+                  <label htmlFor="nome_tipo">Tipo Piatto</label>
+                  <Dropdown
+                    id="nome_tipo"
+                    className="dropdown-tipo-piatto"
+                    value={editingPiatto.nome_tipo}
+                    options={tipoPiattoOptions}
+                    onChange={(e) =>
+                      setEditingPiatto({
+                        ...editingPiatto,
+                        nome_tipo: e.value,
+                        idTipoPiatto:
+                          tipoPiattoOptions.findIndex(
+                            (option) => option.value === e.value
+                          ) + 1,
+                      })
+                    }
+                    placeholder="Seleziona un tipo"
+                    optionLabel="label"
+                  />
+                </div>
+              </div>
+              <div className="p-col">
+                <div className="p-field">
+                  <label htmlFor="data">Data</label>
+                  <Calendar
+                    className="calendar-data"
+                    id="data"
+                    locale="it"
+                    value={
+                      editingPiatto.data ? new Date(editingPiatto.data) : null
+                    }
+                    onChange={(e) => {
+                      const selectedDate = e.value ?? null;
+                      const formatCalendar = DisplayData(selectedDate);
 
-                  setEditingPiatto({
-                    ...editingPiatto,
-                    data: formatCalendar,
-                  });
-                }}
-                dateFormat="dd/mm/y"
-              />
+                      setEditingPiatto({
+                        ...editingPiatto,
+                        data: formatCalendar,
+                      });
+                    }}
+                    dateFormat="D. dd/mm/y"
+                    placeholder="Seleziona una data"
+                  />
+                </div>
+              </div>
+              <div className="p-col">
+                <div className="sempre-disponibile">
+                  <label>Sempre Disponibile</label>
+                  <div className="p-field-checkbox">
+                    <Checkbox
+                      inputId="sempreDisponibile"
+                      checked={editingPiatto.sempreDisponibile}
+                      onChange={(e) =>
+                        setEditingPiatto({
+                          ...editingPiatto,
+                          sempreDisponibile: e.checked,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="p-field">
-              <label htmlFor="sempreDisponibile">Disponibile</label>
-              <InputSwitch
-                id="sempreDisponibile"
-                checked={editingPiatto.sempreDisponibile}
-                onChange={(e) =>
-                  setEditingPiatto({
-                    ...editingPiatto,
-                    sempreDisponibile: e.value,
-                  })
-                }
-              />
+            <div className="p-dialog-footer">
+              <Button label="Salva" icon="pi pi-check" onClick={savePiatto} />
             </div>
-            <Button label="Salva" icon="pi pi-check" onClick={savePiatto} />
           </div>
         )}
       </Dialog>

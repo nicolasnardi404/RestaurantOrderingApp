@@ -1,14 +1,15 @@
 import React, { useState, useRef } from "react";
-import { Button, Dropdown } from "primereact";
+import { Button } from "primereact/button";
+import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
-import "../styles/AddMultiplePiatti.css";
 import { formatCalendarData } from "../util/FormatCalendarData";
 import { Calendar } from "primereact/calendar";
 import "../util/addLocale";
+import "../styles/AddMultiplePiatti.css";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -47,7 +48,7 @@ const AddMultiplePiatti = () => {
         showToast(
           "error",
           "Errore di validazione",
-          `Il nome del piatto è obbligatorio per la riga ${i + 1}`,
+          `Il nome del piatto è obbligatorio per la riga ${i + 1}`
         );
         return false;
       }
@@ -92,77 +93,92 @@ const AddMultiplePiatti = () => {
 
   return (
     <div className="add-multiple-piatti">
+      <h2>Aggiungi Piatti del giorno</h2>
       <Toast ref={toast} />
-      <h1>Aggiungi Piatti del giorno</h1>
-      <div className="p-field">
-        <label htmlFor="commonDate">Data</label>
-        <Calendar
-          id="commonDate"
-          value={commonDate}
-          onChange={(e) => setCommonDate(e.value)}
-          locale="it"
-          dateFormat="D. dd/mm/y" // Set the date format to day-month-year
-          className="custom-calendar" // Add a custom class for styling
-        />
+      <div className="content-wrapper">
+        <div className="date-picker">
+          <div className="p-field">
+            <Calendar
+              id="commonDate"
+              value={commonDate}
+              onChange={(e) => setCommonDate(e.value)}
+              locale="it"
+              dateFormat="D. dd/mm/y"
+              className="w-full"
+            />
+          </div>
+        </div>
+        <div className="p-datatable p-component">
+          <div className="p-datatable-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome Piatto</th>
+                  <th>Tipo Piatto</th>
+                  <th>Azione</th>
+                </tr>
+              </thead>
+              <tbody>
+                {piatti.map((piatto, index) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        type="text"
+                        value={piatto.nome_piatto}
+                        onChange={(e) => {
+                          const updatedPiatti = [...piatti];
+                          updatedPiatti[index].nome_piatto = e.target.value;
+                          setPiatti(updatedPiatti);
+                        }}
+                        className="input-nome-piatto"
+                      />
+                    </td>
+                    <td>
+                      <Dropdown
+                        value={piatto.nome_tipo}
+                        options={tipoPiattoOptions}
+                        onChange={(e) => {
+                          const updatedPiatti = [...piatti];
+                          updatedPiatti[index].nome_tipo = e.value;
+                          updatedPiatti[index].idTipoPiatto =
+                            tipoPiattoOptions.findIndex(
+                              (option) => option.value === e.value
+                            ) + 1;
+                          setPiatti(updatedPiatti);
+                        }}
+                        placeholder="Seleziona un tipo"
+                        optionLabel="label"
+                        className="dropdown-tipo-piatto"
+                      />
+                    </td>
+                    <td>
+                      <Button
+                        icon="pi pi-trash"
+                        className="button-danger-delete"
+                        onClick={() => removePiatto(index)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="button-container">
+          <Button
+            label="Aggiungi un altro piatto"
+            icon="pi pi-plus"
+            onClick={addPiatto}
+            className="p-button-primary"
+          />
+          <Button
+            label="Salva tutto"
+            icon="pi pi-check"
+            onClick={savePiatti}
+            className="p-button-primary"
+          />
+        </div>
       </div>
-      <table className="p-table">
-        <thead>
-          <tr>
-            <th>Nome Piatto</th>
-            <th>Tipo Piatto</th>
-            <th>Azione</th> {/* New column for actions */}
-          </tr>
-        </thead>
-        <tbody>
-          {piatti.map((piatto, index) => (
-            <tr key={index}>
-              <td>
-                <input
-                  type="text"
-                  value={piatto.nome_piatto}
-                  onChange={(e) => {
-                    const updatedPiatti = [...piatti];
-                    updatedPiatti[index].nome_piatto = e.target.value;
-                    setPiatti(updatedPiatti);
-                  }}
-                />
-              </td>
-              <td>
-                <Dropdown
-                  className="weekday-selection"
-                  value={piatto.nome_tipo}
-                  options={tipoPiattoOptions}
-                  onChange={(e) => {
-                    const updatedPiatti = [...piatti];
-                    updatedPiatti[index].nome_tipo = e.value;
-                    updatedPiatti[index].idTipoPiatto =
-                      tipoPiattoOptions.findIndex(
-                        (option) => option.value === e.value,
-                      ) + 1;
-                    setPiatti(updatedPiatti);
-                  }}
-                  placeholder="Seleziona un tipo"
-                  optionLabel="label"
-                />
-              </td>
-              <td>
-                <Button
-                  icon="pi pi-trash" // Use the trash bin icon
-                  className="custom-remove-btn" // Add danger styling for red color
-                  onClick={() => removePiatto(index)} // Remove button for each row
-                />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <Button
-        label="Aggiungi un altro piatto"
-        icon="pi pi-plus"
-        onClick={addPiatto}
-        className="p-button-primary"
-      />
-      <Button label="Salva tutto" icon="pi pi-check" onClick={savePiatti} />
     </div>
   );
 };
