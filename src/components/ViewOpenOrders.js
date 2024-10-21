@@ -506,6 +506,66 @@ const ViewOpenOrders = () => {
     </DataTable>
   );
 
+  const renderEditDialog = () => {
+    if (!editingOrder) return null;
+
+    const mealTypes = [
+      "Primo",
+      "Secondo",
+      "Contorno",
+      "Piatto unico",
+      "Dessert",
+      "Pane/Grissini",
+    ];
+
+    const tableData = mealTypes.map((mealType) => ({
+      mealType,
+      dropdown: (
+        <Dropdown
+          value={editingOrder.selectedDishes[mealType]}
+          options={editingOrder.availableDishes.filter(
+            (dish) => dish.tipo_piatto === mealType
+          )}
+          onChange={(e) => handleDropdownChange(mealType, e.value)}
+          optionLabel="nome"
+          placeholder="= SELEZIONA ="
+          showClear
+          className="w-full"
+        />
+      ),
+    }));
+
+    return (
+      <div>
+        <div className="p-field mb-4">
+          <label className="font-bold">
+            Data Prenotazione: {formatDate(editingOrder.reservationDate)}
+          </label>
+        </div>
+        <DataTable value={tableData} className="p-datatable-sm">
+          <Column field="mealType" header="Tipo Pasto" />
+          <Column
+            field="dropdown"
+            header="Selezione"
+            body={(rowData) => rowData.dropdown}
+          />
+        </DataTable>
+        {combinationStatus && (
+          <div className="combination-status mt-3">{combinationStatus}</div>
+        )}
+        {error && <div className="error-message mt-3">{error}</div>}
+        <div className="flex justify-content-end mt-4">
+          <Button
+            label="Aggiorna ordine"
+            onClick={handleUpdateOrder}
+            disabled={!isValidCombination(editingOrder.selectedDishes)}
+            className="edit-button"
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="view-open-orders">
       <Toast ref={toast} />
@@ -523,53 +583,11 @@ const ViewOpenOrders = () => {
       <Dialog
         header="Modifica ordine"
         visible={showEditDialog}
-        style={{ width: "50vw" }}
+        style={{ width: "60vw" }}
         onHide={() => setShowEditDialog(false)}
+        footer={null}
       >
-        {editingOrder && (
-          <div>
-            <div className="p-field">
-              <label>
-                Data Prenotazione:{" "}
-                <span>{formatDate(editingOrder.reservationDate)}</span>
-              </label>
-            </div>
-            {[
-              "Primo",
-              "Secondo",
-              "Contorno",
-              "Piatto unico",
-              "Dessert",
-              "Pane/Grissini",
-            ].map((mealType) => (
-              <div key={mealType} className="p-field">
-                <label htmlFor={mealType}>{mealType}</label>
-                <Dropdown
-                  id={mealType}
-                  value={editingOrder.selectedDishes[mealType]}
-                  options={editingOrder.availableDishes.filter(
-                    (dish) => dish.tipo_piatto === mealType
-                  )}
-                  onChange={(e) => handleDropdownChange(mealType, e.value)}
-                  optionLabel="nome"
-                  placeholder={`= SELEZIONA =`}
-                  showClear
-                  className="dropdown-user"
-                />
-              </div>
-            ))}
-            {combinationStatus && (
-              <div className="combination-status">{combinationStatus}</div>
-            )}
-            {error && <div className="error-message">{error}</div>}
-            <Button
-              label="Aggiorna ordine"
-              onClick={handleUpdateOrder}
-              disabled={!isValidCombination(editingOrder.selectedDishes)}
-              className="btn-update"
-            />
-          </div>
-        )}
+        {renderEditDialog()}
       </Dialog>
     </div>
   );

@@ -150,6 +150,13 @@ h1 {
   color: var(--primary-color);
 }
 
+.edit-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .view-open-orders {
