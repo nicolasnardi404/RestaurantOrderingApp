@@ -219,7 +219,25 @@ const ViewOpenOrders = () => {
       ? order.idPiatti.split(", ").map((id) => parseInt(id))
       : [];
 
-    const dishesForOrder = await fetchDishesForOrder(order.datePiatti);
+    let orderDate;
+    if (order.datePiatti) {
+      const dateParts = order.datePiatti.split(" ");
+      const dateString = dateParts.slice(1).join(" ");
+
+      const [day, month, year] = dateString
+        .split("/")
+        .map((part) => parseInt(part));
+      const fullYear = year < 100 ? 2000 + year : year;
+
+      orderDate = new Date(fullYear, month - 1, day);
+    } else {
+      orderDate = new Date();
+    }
+
+    console.log(orderDate);
+
+    const dishesForOrder = await fetchDishesForOrder(orderDate);
+
     if (!Array.isArray(dishesForOrder)) {
       console.error("Dishes for order is not an array:", dishesForOrder);
       setError(
@@ -269,10 +287,10 @@ const ViewOpenOrders = () => {
             selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Altri")
           ] || null,
       },
-      reservationDate: order.datePiatti,
+      reservationDate: orderDate,
       availableDishes: dishesForOrder,
       idOrdine: order.idOrdine || "",
-      idPrenotazione: order.idPrenotazione,
+      idPrenotazione: order.idPrenotazione, // Ensure this is included
     };
 
     setEditingOrder(editingOrderData);
@@ -294,20 +312,20 @@ const ViewOpenOrders = () => {
   const validCombinations = [
     ["Primo", "Secondo", "Contorno"],
     ["Primo", "Piatto unico", "Contorno"],
-    ["Primo", "Secondo"],
-    ["Primo", "Piatto unico"],
     ["Primo", "Contorno"],
-    ["Primo", "Contorno", "Dessert"],
+    ["Primo", "Contorno", "Complement"],
     ["Secondo", "Contorno"],
     ["Piatto unico", "Contorno"],
     ["Piatto unico"],
   ];
 
   const isValidCombination = (selectedDishes) => {
+    // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(selectedDishes).filter(
       (type) => selectedDishes[type] !== null && type !== "Altri"
     );
 
+    // Verifica se a combinação é válida sem considerar "Altri"
     const isValid = validCombinations.some(
       (combination) =>
         combination.length === selectedTypes.length &&
@@ -317,24 +335,39 @@ const ViewOpenOrders = () => {
     return isValid;
   };
 
-  const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Dessert } =
-      currentCart;
-
-    const selectedItems = new Set();
-    if (Primo) selectedItems.add("Primo");
-    if (Secondo) selectedItems.add("Secondo");
-    if (Contorno) selectedItems.add("Contorno");
-    if (PiattoUnico) selectedItems.add("Piatto unico");
-    if (Altri) selectedItems.add("Altri");
-    if (Dessert) selectedItems.add("Dessert");
-
-    const combinations = validCombinations.some((combination) => {
-      return combination.every((item) => selectedItems.has(item));
-    });
-
-    if (combinations) {
+  const checkCombination = (currentSelection) => {
+    if (isValidCombination(currentSelection)) {
       setCombinationStatus("");
+    } else {
+      const selectedTypes = Object.keys(currentSelection).filter(
+        (type) => currentSelection[type] !== null
+      );
+      let missingItems = [];
+      if (
+        !selectedTypes.includes("Primo") &&
+        !selectedTypes.includes("Piatto unico")
+      )
+        missingItems.push("Primo or Piatto unico");
+      if (
+        !selectedTypes.includes("Secondo") &&
+        !selectedTypes.includes("Piatto unico")
+      )
+        missingItems.push("Secondo or Piatto unico");
+      if (
+        !selectedTypes.includes("Contorno") &&
+        !selectedTypes.includes("Piatto unico")
+      )
+        missingItems.push("Contorno");
+
+      if (missingItems.length === 0) {
+        setCombinationStatus(
+          "Combinazione non valida. Seleziona una combinazione valida di piatti."
+        );
+      } else {
+        setCombinationStatus(
+          `Add ${missingItems.join(" or ")} to complete a valid combination`
+        );
+      }
     }
   };
 
@@ -384,31 +417,37 @@ const ViewOpenOrders = () => {
   const handleUpdateOrder = async () => {
     if (isValidCombination(editingOrder.selectedDishes)) {
       try {
+        // Filter out null or undefined dishes and get their IDs
         const selectedDishIds = Object.values(editingOrder.selectedDishes)
           .filter((dish) => dish !== null && dish !== undefined)
           .map((dish) => dish.id);
 
+        // Get all idOrdine values
         const idOrdineArray = editingOrder.idOrdine
           .split(", ")
           .map((id) => parseInt(id));
 
         const updateData = {
           idPrenotazione: editingOrder.idPrenotazione,
-          dataPrenotazione: formatDateforServer(editingOrder.reservationDate),
+          dataPrenotazione: formatCalendarData(editingOrder.reservationDate),
           idPiatto: selectedDishIds,
           idOrdine: idOrdineArray,
         };
 
         const token = getToken();
-        await axios.put(`${apiUrl}/ordine/update`, updateData, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.put(
+          `${apiUrl}/ordine/update`,
+          updateData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         setShowEditDialog(false);
-        await fetchOrders();
+        await fetchOrders(); // Refresh the orders after update
         alert("Ordine aggiornato con successo.");
       } catch (error) {
         console.error("Error updating order:", error);
@@ -428,7 +467,7 @@ const ViewOpenOrders = () => {
           value={usernameFilter}
           options={users}
           onChange={(e) => setUsernameFilter(e.value)}
-          optionLabel="nome"
+          optionLabel="nome" // Assuming 'nome' is the key for display
           placeholder="Seleziona utente"
           className="w-full md:w-14rem"
         />
@@ -544,8 +583,9 @@ const ViewOpenOrders = () => {
       <Dialog
         header="Modifica ordine"
         visible={showEditDialog}
-        style={{ width: "80vw" }}
+        style={{ width: "60vw" }}
         onHide={() => setShowEditDialog(false)}
+        footer={null}
       >
         {renderEditDialog()}
       </Dialog>

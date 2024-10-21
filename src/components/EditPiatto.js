@@ -342,7 +342,7 @@ function ManagePiatti() {
                     }
                     onChange={(e) => {
                       const selectedDate = e.value ?? null;
-                      const formatCalendar = DisplayData(selectedDate);
+                      const formatCalendar = formatDateforServer(selectedDate);
 
                       setEditingPiatto({
                         ...editingPiatto,
