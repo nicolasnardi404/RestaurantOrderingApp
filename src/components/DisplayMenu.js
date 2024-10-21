@@ -45,7 +45,6 @@ function MenuPage() {
       fetchDishes();
       setCart({});
       setCombinationStatus("");
-      setCombinationStatus("");
     }
   }, [selectedDay]);
 
@@ -62,7 +61,6 @@ function MenuPage() {
         `${apiUrl}/prenotazione/readByIdAndData/${user.userId}`,
         {
           headers: {
-            "Content-Type": "application/json",
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
@@ -109,8 +107,6 @@ function MenuPage() {
       );
       setError("");
     } catch (error) {
-      console.error("Error fetching dishes:", error);
-      setError("Failed to fetch dishes. Please try again.");
       console.error("Error fetching dishes:", error);
       setError("Failed to fetch dishes. Please try again.");
     }
@@ -367,26 +363,6 @@ function MenuPage() {
               </td>
               <td>
                 {getSempreDisponibileDishesByType("Secondo")
-                  .map((dish) => dish.nome_piatto)
-                  .join(", ")}
-              </td>
-              <td>
-                {getSempreDisponibileDishesByType("Contorno")
-                  .map((dish) => dish.nome_piatto)
-                  .join(", ")}
-              </td>
-              <td>
-                {getSempreDisponibileDishesByType("Primo")
-                  .map((dish) => dish.nome_piatto)
-                  .join(", ")}
-              </td>
-              <td>
-                {getSempreDisponibileDishesByType("Secondo")
-                  .map((dish) => dish.nome_piatto)
-                  .join(", ")}
-              </td>
-              <td>
-                {getSempreDisponibileDishesByType("Contorno")
                   .map((dish) => dish.nome_piatto)
                   .join(", ")}
               </td>

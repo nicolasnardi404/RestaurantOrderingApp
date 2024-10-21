@@ -32,6 +32,8 @@ const ViewOpenOrders = () => {
   const { user, getToken } = useAuth();
   const toast = useRef(null);
   const [combinationStatus, setCombinationStatus] = useState("");
+  const [displayDialog, setDisplayDialog] = useState(false);
+  const [idPrenotazione, setIdPrenotazione] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -304,6 +306,7 @@ const ViewOpenOrders = () => {
   ];
 
   const isValidCombination = (selectedDishes) => {
+    console.log("selected dishes" + JSON.stringify(selectedDishes));
     const selectedTypes = Object.keys(selectedDishes).filter(
       (type) => selectedDishes[type] !== null && type !== "Altri"
     );
@@ -338,47 +341,43 @@ const ViewOpenOrders = () => {
     }
   };
 
-  const handleCancelOrder = async (idPrenotazione) => {
-    confirmDialog({
-      message: "Sei sicuro di voler eliminare questo piatto?",
-      header: "Conferma eliminazione",
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
-      className: "custom-confirm-dialog",
-      accept: async () => {
-        try {
-          const token = getToken();
-          await axios.delete(
-            `${apiUrl}/prenotazione/delete/${idPrenotazione}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          setOrders((prevOrders) =>
-            prevOrders.filter(
-              (order) => order.idPrenotazione !== idPrenotazione
-            )
-          );
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Ordine cancellato con successo.",
-            life: 3000,
-          });
-        } catch (error) {
-          console.error("Error cancelling order:", error);
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Impossibile annullare l'ordine. Riprova.",
-            life: 3000,
-          });
-        }
-      },
-      reject: () => {
-        // Optional: Add any logic for when the user rejects the cancellation
-      },
-    });
+  const handleCancelOrder = (id) => {
+    setIdPrenotazione(id);
+    setDisplayDialog(true);
+  };
+
+  const confirmCancelOrder = async () => {
+    try {
+      const token = getToken();
+      await axios.delete(`${apiUrl}/prenotazione/delete/${idPrenotazione}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setOrders((prevOrders) =>
+        prevOrders.filter((order) => order.idPrenotazione !== idPrenotazione)
+      );
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Ordine cancellato con successo.",
+        life: 3000,
+      });
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Impossibile annullare l'ordine. Riprova.",
+        life: 3000,
+      });
+    } finally {
+      setDisplayDialog(false);
+      setIdPrenotazione(null);
+    }
+  };
+
+  const cancelDialog = () => {
+    setDisplayDialog(false);
+    setIdPrenotazione(null);
   };
 
   const handleUpdateOrder = async () => {
@@ -476,25 +475,28 @@ const ViewOpenOrders = () => {
       "Contorno",
       "Piatto unico",
       "Dessert",
-      "Pane/Grissini",
+      "Altri",
     ];
 
-    const tableData = mealTypes.map((mealType) => ({
-      mealType,
-      dropdown: (
-        <Dropdown
-          value={editingOrder.selectedDishes[mealType]}
-          options={editingOrder.availableDishes.filter(
-            (dish) => dish.tipo_piatto === mealType
-          )}
-          onChange={(e) => handleDropdownChange(mealType, e.value)}
-          optionLabel="nome"
-          placeholder="= SELEZIONA ="
-          showClear
-          className="w-full"
-        />
-      ),
-    }));
+    const tableData = mealTypes.map((mealType) => {
+      return {
+        mealType,
+        dropdown: (
+          <Dropdown
+            value={editingOrder.selectedDishes[mealType]}
+            options={editingOrder.availableDishes.filter(
+              (dish) => dish.tipo_piatto === mealType
+            )}
+            {...console.log("MealType:" + [mealType])}
+            onChange={(e) => handleDropdownChange(mealType, e.value)}
+            optionLabel="nome"
+            placeholder="= SELEZIONA ="
+            showClear
+            className="w-full"
+          />
+        ),
+      };
+    });
 
     return (
       <div>
@@ -548,6 +550,26 @@ const ViewOpenOrders = () => {
         onHide={() => setShowEditDialog(false)}
       >
         {renderEditDialog()}
+      </Dialog>
+
+      <Dialog
+        visible={displayDialog}
+        style={{ width: "450px" }}
+        header="Conferma eliminazione"
+        modal
+        footer={
+          <div>
+            <Button label="No" icon="pi pi-times" onClick={cancelDialog} />
+            <Button
+              label="Sì"
+              icon="pi pi-check"
+              onClick={confirmCancelOrder}
+            />
+          </div>
+        }
+        onHide={cancelDialog}
+      >
+        <p>Sei sicuro di voler eliminare questa prenotazione?</p>
       </Dialog>
     </div>
   );
