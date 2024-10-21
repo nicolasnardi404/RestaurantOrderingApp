@@ -3,31 +3,16 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Card } from "primereact/card";
 import { useNavigate } from "react-router-dom";
-import "../util/addLocale";
 import axios from "axios";
 import formatDateforServer from "../util/formatDateForServer";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { useAuth } from "../context/AuthContext";
-import "../styles/DisplayMenu.css";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Card } from "primereact/card";
-import React, { useState, useEffect } from "react";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
-import { useNavigate } from "react-router-dom";
 import "../util/addLocale";
-import axios from "axios";
-import formatDateforServer from "../util/formatDateForServer";
-import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
-import { UseDataLocal } from "../util/UseDataLocal";
-import { useAuth } from "../context/AuthContext";
 import "../styles/DisplayMenu.css";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Card } from "primereact/card";
 
 function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(null);
@@ -287,22 +272,6 @@ function MenuPage() {
           </div>
         )
       )}
-      {["Primo", "Secondo", "Contorno", "Piatto unico", "Altri", "Dessert"].map(
-        (mealType) => (
-          <div key={mealType} className="menu-category">
-            <h3>{mealType === "Altri" ? "Pane/Grissini" : mealType}</h3>
-            <Dropdown
-              value={cart[mealType]}
-              options={getFilteredDishes(mealType)}
-              onChange={(e) => handleDropdownChange(mealType, e.value)}
-              optionLabel="nome"
-              placeholder={`=== SELEZIONA ===`}
-              className="w-full md:w-14rem"
-              showClear
-            />
-          </div>
-        )
-      )}
 
       <div className="observazioni">
         <h3>Observazioni</h3>
@@ -494,231 +463,233 @@ function MenuPage() {
       setError("Errore durante l'invio dell'ordine. Riprova.");
     }
   };
-}
 
-const handleSubmit = async () => {
-  const dataPrenotazione = formatDateforServer(selectedDay);
-  // Verifique se a combinação de pratos é válida
-  if (isValidCombination()) {
-    setIsSubmitting(true);
-    const idPiatto = Object.values(cart).map((dish) => dish.id);
+  const handleSubmit = async () => {
+    const dataPrenotazione = formatDateforServer(selectedDay);
+    // Verifique se a combinação de pratos é válida
+    if (isValidCombination()) {
+      setIsSubmitting(true);
+      const idPiatto = Object.values(cart).map((dish) => dish.id);
 
-    const orderData = {
-      idUser: selectedUser ? selectedUser.id : user.userId,
-      dataPrenotazione: `${dataPrenotazione}`,
-      idPiatto: idPiatto,
-      observazioni: observazioni,
-    };
+      const orderData = {
+        idUser: selectedUser ? selectedUser.id : user.userId,
+        dataPrenotazione: `${dataPrenotazione}`,
+        idPiatto: idPiatto,
+        observazioni: observazioni,
+      };
 
-    try {
-      const token = getToken();
-      const response = await axios.post(
-        `${apiUrl}/prenotazione/createWithOrdine`,
-        orderData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      try {
+        const token = getToken();
+        const response = await axios.post(
+          `${apiUrl}/prenotazione/createWithOrdine`,
+          orderData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200 || response.status === 201) {
+          setShowSuccessModal(true);
+        } else {
+          throw new Error("Failed to submit order");
+          throw new Error("Failed to submit order");
         }
-      );
-
-      if (response.status === 200 || response.status === 201) {
-        setShowSuccessModal(true);
-      } else {
-        throw new Error("Failed to submit order");
-        throw new Error("Failed to submit order");
+      } catch (error) {
+        console.error("Error submitting order:", error);
+        setError("Errore durante l'invio dell'ordine. Riprova.");
+        console.error("Error submitting order:", error);
+        setError("Errore durante l'invio dell'ordine. Riprova.");
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error("Error submitting order:", error);
-      setError("Errore durante l'invio dell'ordine. Riprova.");
-      console.error("Error submitting order:", error);
-      setError("Errore durante l'invio dell'ordine. Riprova.");
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      setError(
+        "Combinazione non valida. Seleziona una combinazione valida di piatti."
+      );
     }
-  } else {
-    setError(
-      "Combinazione non valida. Seleziona una combinazione valida di piatti."
-    );
-  }
-};
+  };
 
-const handleGoToOpenOrders = () => {
-  setShowSuccessModal(false);
-  navigate("/open-orders");
-  navigate("/open-orders");
-};
+  const handleGoToOpenOrders = () => {
+    setShowSuccessModal(false);
+    navigate("/open-orders");
+    navigate("/open-orders");
+  };
 
-const handleBackToMenu = () => {
-  setShowSuccessModal(false);
-  setSelectedDay(null);
-  setCart({});
-  setCombinationStatus("");
-  setError("");
-  setCombinationStatus("");
-  setError("");
-};
+  const handleBackToMenu = () => {
+    setShowSuccessModal(false);
+    setSelectedDay(null);
+    setCart({});
+    setCombinationStatus("");
+    setError("");
+    setCombinationStatus("");
+    setError("");
+  };
 
-const handleViewFullMenu = async () => {
-  await fetchWeeklyMenu();
-  setShowMenu(true);
-};
+  const handleViewFullMenu = async () => {
+    await fetchWeeklyMenu();
+    setShowMenu(true);
+  };
 
-const renderSuccessModal = () => (
-  <Dialog
-    visible={showSuccessModal}
-    onHide={() => setShowSuccessModal(false)}
-    header="Ordine Confermato"
-    modal
-    footer={
-      <div>
-        <Button
-          label="Vai agli Ordini Aperti"
-          onClick={handleGoToOpenOrders}
-          className="p-button-primary"
-        />
-        <Button
-          label="Torna al Menu"
-          onClick={handleBackToMenu}
-          className="p-button-secondary"
-        />
-        <Button
-          label="Vai agli Ordini Aperti"
-          onClick={handleGoToOpenOrders}
-          className="p-button-primary"
-        />
-        <Button
-          label="Torna al Menu"
-          onClick={handleBackToMenu}
-          className="p-button-secondary"
-        />
-      </div>
-    }
-  >
-    <p>Il tuo ordine è stato inviato con successo!</p>
-  </Dialog>
-);
-
-const getMinDate = () => {
-  const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinutes = now.getMinutes();
-
-  if (user.ruolo === "Amministratore") {
-    return new Date();
-  }
-
-  if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
-    now.setDate(now.getDate() + 1);
-  }
-
-  while (now.getDay() === 0 || now.getDay() === 6) {
-    now.setDate(now.getDate() + 1);
-  }
-
-  return now;
-};
-
-const getDisabledDates = () => {
-  const disabledDates = [];
-  const startDate = getMinDate();
-
-  for (let i = 0; i < 60; i++) {
-    const dateToCheck = new Date(startDate);
-    dateToCheck.setDate(startDate.getDate() + i);
-
-    if (dateToCheck.getDay() === 0 || dateToCheck.getDay() === 6) {
-      disabledDates.push(new Date(dateToCheck));
-    }
-  }
-
-  return disabledDates;
-};
-
-return (
-  <div className="container-menu">
-    <h1>Ordina Pasto</h1>
-    {user.ruolo === "Amministratore" && renderUserSelection()}
-    <p className="user-selection-text">
-      {selectedUser ? `Ordine per: ${selectedUser.nome}` : ""}
-    </p>
-    <div className="date-selection">
-      <Calendar
-        value={selectedDay}
-        onChange={(e) => setSelectedDay(e.value)}
-        placeholder="Seleziona la data"
-        locale="it"
-        minDate={getMinDate()}
-        disabledDates={getDisabledDates()}
-      />
-
-      {checkPrenotazione && (
-        <div className="error-message">
-          <h1>Avviso</h1>
-          <p>avete già fatto la prenotazione per questo giorno</p>
-        </div>
-      )}
-
-      {!checkPrenotazione && (
-        <div className="menu-button-container">
+  const renderSuccessModal = () => (
+    <Dialog
+      visible={showSuccessModal}
+      onHide={() => setShowSuccessModal(false)}
+      header="Ordine Confermato"
+      modal
+      footer={
+        <div>
           <Button
-            label="Visualizza il menu della settimana"
-            onClick={handleViewFullMenu}
-            className="menu-button"
+            label="Vai agli Ordini Aperti"
+            onClick={handleGoToOpenOrders}
+            className="p-button-primary"
+          />
+          <Button
+            label="Torna al Menu"
+            onClick={handleBackToMenu}
+            className="p-button-secondary"
+          />
+          <Button
+            label="Vai agli Ordini Aperti"
+            onClick={handleGoToOpenOrders}
+            className="p-button-primary"
+          />
+          <Button
+            label="Torna al Menu"
+            onClick={handleBackToMenu}
+            className="p-button-secondary"
           />
         </div>
-      )}
-    </div>
-
-    {/* Show error message if orders are closed */}
-    {!selectedDay && !isLoading && (
-      <div className="error-message">
-        <h1>Avviso</h1>
-        <p>avete già fatto tutti gli ordini della settimana</p>
-      </div>
-    )}
-
-    {/* Only render the order form if orders are open */}
-    {selectedDay && !checkPrenotazione && (
-      <>
-        <Card className="combinazioni-card">
-          <h4>
-            {" "}
-            <span className="text-bold">Opzione 1</span> - Primo / Secondo o
-            Piatto Unico/ Contorno; <span className="text-bold">Opzione 2</span>{" "}
-            - Primo/ Contorno/ Yogurt o Frutta;{" "}
-            <span className="text-bold">Opzione 3</span> - Secondo o Piatto
-            Unico / Contorno; <span className="text-bold">Opzione 4</span> -
-            Piatto unico;
-          </h4>
-        </Card>
-
-        {renderOrderMenu()}
-        {combinationStatus && (
-          <div className="combination-status">{combinationStatus}</div>
-        )}
-        {error && <div className="error-message">{error}</div>}
-        <Button
-          label="Invia Ordine"
-          onClick={handleSubmit}
-          disabled={!isValidCombination() || isSubmitting}
-          className="submit-button"
-        />
-      </>
-    )}
-
-    <Dialog
-      visible={showMenu}
-      style={{ width: "80vw" }}
-      onHide={() => setShowMenu(false)}
+      }
     >
-      {renderFullMenuList()}
+      <p>Il tuo ordine è stato inviato con successo!</p>
     </Dialog>
+  );
 
-    {renderSuccessModal()}
-  </div>
-);
+  const getMinDate = () => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinutes = now.getMinutes();
+
+    if (user.ruolo === "Amministratore") {
+      return new Date();
+    }
+
+    if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
+      now.setDate(now.getDate() + 1);
+    }
+
+    while (now.getDay() === 0 || now.getDay() === 6) {
+      now.setDate(now.getDate() + 1);
+    }
+
+    return now;
+  };
+
+  const getDisabledDates = () => {
+    const disabledDates = [];
+    const startDate = getMinDate();
+
+    for (let i = 0; i < 60; i++) {
+      const dateToCheck = new Date(startDate);
+      dateToCheck.setDate(startDate.getDate() + i);
+
+      if (dateToCheck.getDay() === 0 || dateToCheck.getDay() === 6) {
+        disabledDates.push(new Date(dateToCheck));
+      }
+    }
+
+    return disabledDates;
+  };
+
+  return (
+    <div className="container-menu">
+      <h1>Ordina Pasto</h1>
+      {user.ruolo === "Amministratore" &&
+        renderUserSelection(
+          <p className="user-selection-text">
+            {selectedUser ? `Ordine per: ${selectedUser.nome}` : ""}
+          </p>
+        )}
+      <div className="date-selection">
+        <Calendar
+          value={selectedDay}
+          onChange={(e) => setSelectedDay(e.value)}
+          placeholder="Seleziona la data"
+          locale="it"
+          minDate={getMinDate()}
+          disabledDates={getDisabledDates()}
+        />
+
+        {checkPrenotazione && (
+          <div className="error-message">
+            <h1>Avviso</h1>
+            <p>avete già fatto la prenotazione per questo giorno</p>
+          </div>
+        )}
+
+        {!checkPrenotazione && (
+          <div className="menu-button-container">
+            <Button
+              label="Visualizza il menu della settimana"
+              onClick={handleViewFullMenu}
+              className="menu-button"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Show error message if orders are closed */}
+      {!selectedDay && !isLoading && (
+        <div className="error-message">
+          <h1>Avviso</h1>
+          <p>avete già fatto tutti gli ordini della settimana</p>
+        </div>
+      )}
+
+      {/* Only render the order form if orders are open */}
+      {selectedDay && !checkPrenotazione && (
+        <>
+          <Card className="combinazioni-card">
+            <h4>
+              {" "}
+              <span className="text-bold">Opzione 1</span> - Primo / Secondo o
+              Piatto Unico/ Contorno;{" "}
+              <span className="text-bold">Opzione 2</span> - Primo/ Contorno/
+              Yogurt o Frutta; <span className="text-bold">Opzione 3</span> -
+              Secondo o Piatto Unico / Contorno;{" "}
+              <span className="text-bold">Opzione 4</span> - Piatto unico;
+            </h4>
+          </Card>
+
+          {renderOrderMenu()}
+          {combinationStatus && (
+            <div className="combination-status">{combinationStatus}</div>
+          )}
+          {error && <div className="error-message">{error}</div>}
+          <Button
+            label="Invia Ordine"
+            onClick={handleSubmit}
+            disabled={!isValidCombination() || isSubmitting}
+            className="submit-button"
+          />
+        </>
+      )}
+
+      <Dialog
+        visible={showMenu}
+        style={{ width: "80vw" }}
+        onHide={() => setShowMenu(false)}
+      >
+        {renderFullMenuList()}
+      </Dialog>
+
+      {renderSuccessModal()}
+    </div>
+  );
+}
 
 export default MenuPage;
