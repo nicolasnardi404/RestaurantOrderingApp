@@ -44,13 +44,14 @@ const processMonthlyOverviewData = (data) => {
 
   data.forEach((item) => {
     const [, day, monthStr, yearStr] = item.reservation_date.match(
-      /(\d{2})\/(\d{2})\/(\d{2})/
+      /(\d{2})-(\d{2})-(\d{2})/
     );
     const date = new Date(
       2000 + parseInt(yearStr),
       parseInt(monthStr) - 1,
       parseInt(day)
     );
+
     year = date.getFullYear();
     month = date.getMonth();
     const dayOfMonth = date.getDate();
@@ -175,8 +176,13 @@ const HistoricComponent = () => {
   }, [filteredData]);
 
   const formatDateForDisplay = (dateString) => {
-    const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-    return new Date(dateString).toLocaleDateString("it-IT", options);
+    const [year, month, day] = dateString.reservation_date.split("-");
+    const date = new Date(year, month - 1, day);
+    const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+    const weekday = dayNames[date.getDay()];
+
+    const formattedDate = `${weekday}. ${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year.slice(-2)}`;
+    return formattedDate;
   };
 
   const handleViewModeChange = (mode) => {
@@ -377,10 +383,8 @@ const HistoricComponent = () => {
 
   const isDateInPast = (dateString) => {
     const now = new Date();
-    const [, datePart] = dateString.split(" ");
-    const [day, month, year] = datePart.split("/");
+    const [day, month, year] = dateString.split("-");
 
-    // Create date using the full year (assuming 20xx for the year)
     const reservationDate = new Date(
       2000 + parseInt(year),
       parseInt(month) - 1,
@@ -559,7 +563,8 @@ const HistoricComponent = () => {
               )}
               <Column
                 field="reservation_date"
-                header="Data Prenotazione"
+                header="Data Prenotazione" // Changed to Italian
+                body={(rowData) => formatDateForDisplay(rowData)}
                 sortable
               />
               <Column field="piatti" header="Tipo di Piatti" sortable />

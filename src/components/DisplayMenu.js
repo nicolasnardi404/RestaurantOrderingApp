@@ -3,16 +3,16 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Card } from "primereact/card";
 import { useNavigate } from "react-router-dom";
-import "../util/addLocale";
 import axios from "axios";
 import formatDateforServer from "../util/formatDateForServer";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { useAuth } from "../context/AuthContext";
+import "../util/addLocale";
 import "../styles/DisplayMenu.css";
-import { InputTextarea } from "primereact/inputtextarea";
-import { Card } from "primereact/card";
 
 function MenuPage() {
   const [selectedDay, setSelectedDay] = useState(null);
@@ -45,6 +45,7 @@ function MenuPage() {
       fetchDishes();
       setCart({});
       setCombinationStatus("");
+      setCombinationStatus("");
     }
   }, [selectedDay]);
 
@@ -62,9 +63,10 @@ function MenuPage() {
         {
           headers: {
             "Content-Type": "application/json",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       const dates = response.data;
@@ -92,18 +94,23 @@ function MenuPage() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
-      // Preencha dishes com todos os pratos retornados pela API
       const allDishes = response.data;
 
       setDishes(allDishes);
       setSempreDisponibileDishes(
-        allDishes.filter((dish) => dish.sempreDisponibile === 1),
+        allDishes.filter((dish) => dish.sempreDisponibile === 1)
+      );
+      setError("");
+      setSempreDisponibileDishes(
+        allDishes.filter((dish) => dish.sempreDisponibile === 1)
       );
       setError("");
     } catch (error) {
+      console.error("Error fetching dishes:", error);
+      setError("Failed to fetch dishes. Please try again.");
       console.error("Error fetching dishes:", error);
       setError("Failed to fetch dishes. Please try again.");
     }
@@ -120,6 +127,8 @@ function MenuPage() {
 
       setWeeklyMenu(response.data);
     } catch (error) {
+      console.error("Error fetching weekly menu:", error);
+      setError("Failed to fetch weekly menu. Please try again.");
       console.error("Error fetching weekly menu:", error);
       setError("Failed to fetch weekly menu. Please try again.");
     }
@@ -175,6 +184,7 @@ function MenuPage() {
 
     if (combinations) {
       setCombinationStatus("");
+      setCombinationStatus("");
     }
   };
 
@@ -193,14 +203,14 @@ function MenuPage() {
   const isValidCombination = () => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(cart).filter(
-      (type) => cart[type] !== null && type !== "Altri",
+      (type) => cart[type] !== null && type !== "Altri"
     );
 
     // Verifica se a combinação é válida sem considerar "Altri"
     const isValid = validCombinations.some(
       (combination) =>
         combination.length === selectedTypes.length &&
-        combination.every((type) => selectedTypes.includes(type)),
+        combination.every((type) => selectedTypes.includes(type))
     );
 
     return isValid;
@@ -211,6 +221,9 @@ function MenuPage() {
     setShowUserDropdown(false);
     // Reset the cart and other related states when changing user
     setCart({});
+    setCombinationStatus("");
+    setError("");
+    setObservazioni("");
     setCombinationStatus("");
     setError("");
     setObservazioni("");
@@ -257,7 +270,7 @@ function MenuPage() {
               showClear
             />
           </div>
-        ),
+        )
       )}
 
       <div className="observazioni">
@@ -277,20 +290,20 @@ function MenuPage() {
 
     const getDishesByDay = (day) => {
       return weeklyMenu.filter(
-        (dish) => dish.dayOfWeek === day && dish.sempreDisponibile === 0,
+        (dish) => dish.dayOfWeek === day && dish.sempreDisponibile === 0
       );
     };
 
     const getSempreDisponibileDishesByType = (mealType) => {
       return weeklyMenu.filter(
-        (dish) => dish.nome_tipo === mealType && dish.sempreDisponibile === 1,
+        (dish) => dish.nome_tipo === mealType && dish.sempreDisponibile === 1
       );
     };
 
     const getSempreDisponibilePiattoUnico = () => {
       return weeklyMenu.filter(
         (dish) =>
-          dish.nome_tipo === "Piatto unico" && dish.sempreDisponibile === 1,
+          dish.nome_tipo === "Piatto unico" && dish.sempreDisponibile === 1
       );
     };
 
@@ -362,6 +375,21 @@ function MenuPage() {
                   .map((dish) => dish.nome_piatto)
                   .join(", ")}
               </td>
+              <td>
+                {getSempreDisponibileDishesByType("Primo")
+                  .map((dish) => dish.nome_piatto)
+                  .join(", ")}
+              </td>
+              <td>
+                {getSempreDisponibileDishesByType("Secondo")
+                  .map((dish) => dish.nome_piatto)
+                  .join(", ")}
+              </td>
+              <td>
+                {getSempreDisponibileDishesByType("Contorno")
+                  .map((dish) => dish.nome_piatto)
+                  .join(", ")}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -399,9 +427,10 @@ function MenuPage() {
         {
           headers: {
             "Content-Type": "application/json",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       if (response.data === true) {
@@ -410,6 +439,8 @@ function MenuPage() {
         setCheckPrenotazione(false);
       }
     } catch (error) {
+      console.error("Error submitting order:", error);
+      setError("Errore durante l'invio dell'ordine. Riprova.");
       console.error("Error submitting order:", error);
       setError("Errore durante l'invio dell'ordine. Riprova.");
     }
@@ -437,17 +468,21 @@ function MenuPage() {
           {
             headers: {
               "Content-Type": "application/json",
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
 
         if (response.status === 200 || response.status === 201) {
           setShowSuccessModal(true);
         } else {
           throw new Error("Failed to submit order");
+          throw new Error("Failed to submit order");
         }
       } catch (error) {
+        console.error("Error submitting order:", error);
+        setError("Errore durante l'invio dell'ordine. Riprova.");
         console.error("Error submitting order:", error);
         setError("Errore durante l'invio dell'ordine. Riprova.");
       } finally {
@@ -455,7 +490,7 @@ function MenuPage() {
       }
     } else {
       setError(
-        "Combinazione non valida. Seleziona una combinazione valida di piatti.",
+        "Combinazione non valida. Seleziona una combinazione valida di piatti."
       );
     }
   };
@@ -463,12 +498,15 @@ function MenuPage() {
   const handleGoToOpenOrders = () => {
     setShowSuccessModal(false);
     navigate("/open-orders");
+    navigate("/open-orders");
   };
 
   const handleBackToMenu = () => {
     setShowSuccessModal(false);
     setSelectedDay(null);
     setCart({});
+    setCombinationStatus("");
+    setError("");
     setCombinationStatus("");
     setError("");
   };
@@ -509,7 +547,7 @@ function MenuPage() {
     const currentMinutes = now.getMinutes();
 
     if (user.ruolo === "Amministratore") {
-      return null;
+      return new Date();
     }
 
     if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
@@ -527,10 +565,6 @@ function MenuPage() {
     const disabledDates = [];
     const startDate = getMinDate();
 
-    if (user.ruolo === "Amministratore") {
-      return [];
-    }
-
     for (let i = 0; i < 60; i++) {
       const dateToCheck = new Date(startDate);
       dateToCheck.setDate(startDate.getDate() + i);
@@ -546,10 +580,12 @@ function MenuPage() {
   return (
     <div className="container-menu">
       <h1>Ordina Pasto</h1>
-      {user.ruolo === "Amministratore" && renderUserSelection()}
-      <p className="user-selection-text">
-        {selectedUser ? `Ordine per: ${selectedUser.nome}` : ""}
-      </p>
+      {user.ruolo === "Amministratore" &&
+        renderUserSelection(
+          <p className="user-selection-text">
+            {selectedUser ? `Ordine per: ${selectedUser.nome}` : ""}
+          </p>
+        )}
       <div className="date-selection">
         <Calendar
           value={selectedDay}
