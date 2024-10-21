@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
-import '../util/addLocale';
-import { InputSwitch } from 'primereact/inputswitch';
-import axios from 'axios';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import formatDateforServer from '../util/formatDateForServer';
-import { ITALIAN_LOCALE_CONFIG } from '../util/ItalianLocaleConfigData';
-import { UseDataLocal } from '../util/UseDataLocal';
-import { useAuth } from '../context/AuthContext';
-import '../styles/HistoricComponent.css';
-import * as XLSX from 'xlsx';
-import { ScrollTop } from 'primereact/scrolltop';
+import React, { useState, useEffect } from "react";
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Button } from "primereact/button";
+import { Card } from "primereact/card";
+import "../util/addLocale";
+import { InputSwitch } from "primereact/inputswitch";
+import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import formatDateforServer from "../util/formatDateForServer";
+import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
+import { UseDataLocal } from "../util/UseDataLocal";
+import { useAuth } from "../context/AuthContext";
+import "../styles/HistoricComponent.css";
+import * as XLSX from "xlsx";
+import { ScrollTop } from "primereact/scrolltop";
 
 // Set locale for Calendar
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
@@ -26,9 +26,15 @@ const processMonthlyOverviewData = (data) => {
   const usernames = new Set();
   let year, month;
 
-  data.forEach(item => {
-    const [, day, monthStr, yearStr] = item.reservation_date.match(/(\d{2})\/(\d{2})\/(\d{2})/);
-    const date = new Date(2000 + parseInt(yearStr), parseInt(monthStr) - 1, parseInt(day));
+  data.forEach((item) => {
+    const [, day, monthStr, yearStr] = item.reservation_date.match(
+      /(\d{2})-(\d{2})-(\d{2})/
+    );
+    const date = new Date(
+      2000 + parseInt(yearStr),
+      parseInt(monthStr) - 1,
+      parseInt(day)
+    );
     year = date.getFullYear();
     month = date.getMonth();
     const dayOfMonth = date.getDate();
@@ -37,7 +43,7 @@ const processMonthlyOverviewData = (data) => {
     if (!monthData[dayOfMonth]) {
       monthData[dayOfMonth] = {};
     }
-    monthData[dayOfMonth] = { ...monthData[dayOfMonth], [item.username]: 'X' };
+    monthData[dayOfMonth] = { ...monthData[dayOfMonth], [item.username]: "X" };
   });
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -47,8 +53,8 @@ const processMonthlyOverviewData = (data) => {
     days: days,
     users: Array.from(usernames),
     data: monthData,
-    month: new Date(year, month).toLocaleString('it-IT', { month: 'long' }),
-    year: year
+    month: new Date(year, month).toLocaleString("it-IT", { month: "long" }),
+    year: year,
   };
 };
 
@@ -57,9 +63,9 @@ const HistoricComponent = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [selectedUsername, setSelectedUsername] = useState('');
+  const [selectedUsername, setSelectedUsername] = useState("");
   const [usernames, setUsernames] = useState([]);
-  const [viewMode, setViewMode] = useState('month');
+  const [viewMode, setViewMode] = useState("month");
   const [totalOrders, setTotalOrders] = useState(0);
   const [showTotalPerDay, setShowTotalPerDay] = useState(false);
   const [totalPerDayData, setTotalPerDayData] = useState([]);
@@ -81,18 +87,18 @@ const HistoricComponent = () => {
     const token = getToken();
 
     if (ruolo === "Amministratore") {
-      if (viewMode === 'month' && selectedMonth) {
+      if (viewMode === "month" && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `${apiUrl}/ordine/readByMese/${monthString}`;
-        console.log(monthString)
-      } else if (viewMode === 'day' && selectedDate) {
+        console.log(monthString);
+      } else if (viewMode === "day" && selectedDate) {
         const dateString = formatDateforServer(selectedDate);
         url = `${apiUrl}/ordine/ordineByDay/${dateString}`;
       } else {
         return; // Do not fetch if no date is selected
       }
     } else {
-      if (viewMode === 'month' && selectedMonth) {
+      if (viewMode === "month" && selectedMonth) {
         const monthString = formatDateforServer(selectedMonth).slice(0, 7);
         url = `${apiUrl}/ordine/readByIdAndMese/${monthString}/${user.userId}`;
       } else {
@@ -102,14 +108,21 @@ const HistoricComponent = () => {
 
     try {
       const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setData(response.data);
-      const uniqueUsernames = [...new Set(response.data.map(item => item.username))];
-      setUsernames(uniqueUsernames.map(username => ({ label: username, value: username })));
+      const uniqueUsernames = [
+        ...new Set(response.data.map((item) => item.username)),
+      ];
+      setUsernames(
+        uniqueUsernames.map((username) => ({
+          label: username,
+          value: username,
+        }))
+      );
       processData(response.data);
     } catch (error) {
-      console.error('Erro ao buscar dados:', error);
+      console.error("Erro ao buscar dados:", error);
     }
   };
 
@@ -125,7 +138,9 @@ const HistoricComponent = () => {
 
   const filterData = () => {
     if (selectedUsername) {
-      setFilteredData(data.filter(item => item.username === selectedUsername));
+      setFilteredData(
+        data.filter((item) => item.username === selectedUsername)
+      );
     } else {
       setFilteredData(data);
     }
@@ -142,19 +157,17 @@ const HistoricComponent = () => {
   }, [filteredData]);
 
   const formatDateForDisplay = (dateString) => {
-    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    return new Date(dateString).toLocaleDateString('it-IT', options);
-  };
+    const [year, month, day] = dateString.reservation_date.split("-");
 
-  const formatDate = (date) => {
-    date = new Date(date);
-    let dayOfWeek = date.getDay();
-    let daysName = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() returns 0 for January
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${daysName[dayOfWeek]}. ${day}/${month}/${year}`;
-  }
+    const date = new Date(year, month - 1, day);
+
+    const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+    const weekday = dayNames[date.getDay()];
+
+    const formattedDate = `${weekday}. ${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year.slice(-2)}`;
+
+    return formattedDate;
+  };
 
   const handleViewModeChange = (mode) => {
     setSelectedUsername(null);
@@ -170,21 +183,28 @@ const HistoricComponent = () => {
 
   // Calculate total orders per day
   const calculateTotalPerDayData = () => {
-    const totals = (selectedUsername ? filteredData : data).reduce((acc, order) => {
-      const date = order.reservation_date.split('T')[0]; // Get only the date
-      if (!acc[date]) {
-        acc[date] = 0;
-      }
-      acc[date]++;
-      return acc;
-    }, {});
+    const totals = (selectedUsername ? filteredData : data).reduce(
+      (acc, order) => {
+        const date = order.reservation_date.split("T")[0]; // Get only the date
+        if (!acc[date]) {
+          acc[date] = 0;
+        }
+        acc[date]++;
+        return acc;
+      },
+      {}
+    );
 
-    const totalPerDayArray = Object.entries(totals).map(([date, totalOrders]) => ({
-      date,
-      totalOrders
-    }));
+    const totalPerDayArray = Object.entries(totals).map(
+      ([date, totalOrders]) => ({
+        date,
+        totalOrders,
+      })
+    );
 
-    setTotalPerDayData(totalPerDayArray.sort((a, b) => a.date.localeCompare(b.date)));
+    setTotalPerDayData(
+      totalPerDayArray.sort((a, b) => a.date.localeCompare(b.date))
+    );
   };
 
   useEffect(() => {
@@ -196,29 +216,33 @@ const HistoricComponent = () => {
   // Modify the generatePDF function to accept a parameter
   const generatePDF = (type) => {
     if (!selectedMonth) {
-      alert('Per favore, seleziona un mese per generare il PDF.');
+      alert("Per favore, seleziona un mese per generare il PDF.");
       return;
     }
 
     const doc = new jsPDF();
-    doc.setFont('helvetica');
+    doc.setFont("helvetica");
     doc.setFontSize(20);
     doc.setTextColor(40, 40, 40);
-    doc.text('Relazione Mensile degli Ordini', 14, 30);
+    doc.text("Relazione Mensile degli Ordini", 14, 30);
 
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Utente: ${selectedUsername || 'Tutti'}`, 14, 45);
-    doc.text(`Mese: ${selectedMonth.toLocaleString('it-IT', { month: 'long', year: 'numeric' })}`, 14, 52);
+    doc.text(`Utente: ${selectedUsername || "Tutti"}`, 14, 45);
+    doc.text(
+      `Mese: ${selectedMonth.toLocaleString("it-IT", { month: "long", year: "numeric" })}`,
+      14,
+      52
+    );
     doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
 
-    if (type === 'daily') {
+    if (type === "daily") {
       doc.autoTable({
         startY: 70,
-        head: [['Data', 'Totale Ordini']],
-        body: totalPerDayData.map(item => [
+        head: [["Data", "Totale Ordini"]],
+        body: totalPerDayData.map((item) => [
           formatDateForDisplay(item.date),
-          item.totalOrders
+          item.totalOrders,
         ]),
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [66, 139, 202], textColor: 255 },
@@ -227,10 +251,10 @@ const HistoricComponent = () => {
     } else {
       doc.autoTable({
         startY: 70,
-        head: [['Data', 'Tipo di Piatti']],
-        body: filteredData.map(order => [
+        head: [["Data", "Tipo di Piatti"]],
+        body: filteredData.map((order) => [
           formatDateForDisplay(order.reservation_date),
-          order.piatti
+          order.piatti,
         ]),
         styles: { fontSize: 10, cellPadding: 5 },
         headStyles: { fillColor: [66, 139, 202], textColor: 255 },
@@ -243,10 +267,17 @@ const HistoricComponent = () => {
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setTextColor(150);
-      doc.text(`Pagina ${i} di ${pageCount}`, doc.internal.pageSize.width / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+      doc.text(
+        `Pagina ${i} di ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 10,
+        { align: "center" }
+      );
     }
 
-    doc.save(`${selectedUsername || 'tutti'}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`);
+    doc.save(
+      `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`
+    );
   };
 
   const processData = (data) => {
@@ -254,8 +285,8 @@ const HistoricComponent = () => {
     const usernames = new Set();
     let year, month;
 
-    data.forEach(item => {
-      const date = new Date(item.reservation_date.split(' ')[1]);
+    data.forEach((item) => {
+      const date = new Date(item.reservation_date.split(" ")[1]);
       year = date.getFullYear();
       month = date.getMonth();
       const day = date.getDate();
@@ -264,7 +295,7 @@ const HistoricComponent = () => {
       if (!monthData[day]) {
         monthData[day] = {};
       }
-      monthData[day][item.username] = 'X';
+      monthData[day][item.username] = "X";
     });
 
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -274,8 +305,8 @@ const HistoricComponent = () => {
       days: days,
       users: Array.from(usernames),
       data: monthData,
-      month: new Date(year, month).toLocaleString('default', { month: 'long' }),
-      year: year
+      month: new Date(year, month).toLocaleString("default", { month: "long" }),
+      year: year,
     };
 
     setProcessedData(processedData);
@@ -300,46 +331,59 @@ const HistoricComponent = () => {
     const ws = XLSX.utils.aoa_to_sheet([]);
 
     // Add header row
-    XLSX.utils.sheet_add_aoa(ws, [['Utente', ...monthlyOverviewData.days, 'Totale']], { origin: 'A1' });
+    XLSX.utils.sheet_add_aoa(
+      ws,
+      [["Utente", ...monthlyOverviewData.days, "Totale"]],
+      { origin: "A1" }
+    );
 
     // Add data rows
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
-      monthlyOverviewData.days.forEach(day => {
-        if (monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]) {
-          rowData.push('X');
+      monthlyOverviewData.days.forEach((day) => {
+        if (
+          monthlyOverviewData.data[day] &&
+          monthlyOverviewData.data[day][user]
+        ) {
+          rowData.push("X");
           userTotal++;
         } else {
-          rowData.push('');
+          rowData.push("");
         }
       });
       rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
     });
 
-    const monthlyTotalRow = ['Totale del mese'];
+    const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
-    monthlyOverviewData.days.forEach(day => {
-      const dayTotal = monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0;
+    monthlyOverviewData.days.forEach((day) => {
+      const dayTotal = monthlyOverviewData.data[day]
+        ? Object.keys(monthlyOverviewData.data[day]).length
+        : 0;
       grandTotal += dayTotal;
       monthlyTotalRow.push(dayTotal);
     });
     monthlyTotalRow.push(grandTotal); // Add grand total
-    XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], { origin: `A${monthlyOverviewData.users.length + 2}` });
+    XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], {
+      origin: `A${monthlyOverviewData.users.length + 2}`,
+    });
 
     // Add the worksheet to the workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Monthly Overview');
+    XLSX.utils.book_append_sheet(wb, ws, "Monthly Overview");
 
     // Generate Excel file
-    XLSX.writeFile(wb, `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`);
+    XLSX.writeFile(
+      wb,
+      `panoramica_mensile_${monthlyOverviewData.month}_${monthlyOverviewData.year}.xlsx`
+    );
   };
 
-
   const scrollToBottom = () => {
-    const bottomElement = document.getElementById('rapporto-amministrazione');
+    const bottomElement = document.getElementById("rapporto-amministrazione");
     if (bottomElement) {
-      bottomElement.scrollIntoView({ behavior: 'smooth' });
+      bottomElement.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -361,32 +405,52 @@ const HistoricComponent = () => {
                   <div className="p-buttonset">
                     <Button
                       label="Mese"
-                      onClick={() => handleViewModeChange('month')}
-                      className={viewMode === 'month' ? 'p-button-primary' : 'p-button-secondary'}
+                      onClick={() => handleViewModeChange("month")}
+                      className={
+                        viewMode === "month"
+                          ? "p-button-primary"
+                          : "p-button-secondary"
+                      }
                     />
                     <Button
                       label="Giorno"
-                      onClick={() => handleViewModeChange('day')}
-                      className={viewMode === 'day' ? 'p-button-primary' : 'p-button-secondary'}
+                      onClick={() => handleViewModeChange("day")}
+                      className={
+                        viewMode === "day"
+                          ? "p-button-primary"
+                          : "p-button-secondary"
+                      }
                     />
                   </div>
                 </div>
                 <div className="p-field">
-                  <label htmlFor="datePicker">{viewMode === 'month' ? 'Seleziona Mese' : 'Seleziona Giorno'}</label>
+                  <label htmlFor="datePicker">
+                    {viewMode === "month"
+                      ? "Seleziona Mese"
+                      : "Seleziona Giorno"}
+                  </label>
                   <Calendar
                     id="datePicker"
-                    value={viewMode === 'month' ? selectedMonth : selectedDate}
-                    onChange={(e) => viewMode === 'month' ? setSelectedMonth(e.value) : setSelectedDate(e.value)}
-                    view={viewMode === 'month' ? "month" : "date"}
+                    value={viewMode === "month" ? selectedMonth : selectedDate}
+                    onChange={(e) =>
+                      viewMode === "month"
+                        ? setSelectedMonth(e.value)
+                        : setSelectedDate(e.value)
+                    }
+                    view={viewMode === "month" ? "month" : "date"}
                     locale="it"
-                    dateFormat={viewMode === 'month' ? "M. mm/yy" : "D. dd/mm/y"}
+                    dateFormat={
+                      viewMode === "month" ? "M. mm/yy" : "D. dd/mm/y"
+                    }
                   />
                 </div>
               </div>
               <div className="input-switch-section">
                 {(selectedDate || selectedMonth) && (
                   <div className="p-field">
-                    <label htmlFor="totalPerDaySwitch">Mostra totale per giorno</label>
+                    <label htmlFor="totalPerDaySwitch">
+                      Mostra totale per giorno
+                    </label>
                     <InputSwitch
                       id="totalPerDaySwitch"
                       checked={showTotalPerDay}
@@ -475,7 +539,7 @@ const HistoricComponent = () => {
               <Column
                 field="reservation_date"
                 header="Data Prenotazione" // Changed to Italian
-                body={(rowData) => rowData.reservation_date}
+                body={(rowData) => formatDateForDisplay(rowData)}
                 sortable
               />
               <Column
@@ -486,45 +550,64 @@ const HistoricComponent = () => {
             </DataTable>
           )}
         </Card>
-      </div >
+      </div>
 
       {monthlyOverviewData && (
         <Card className="data-card">
-          <h3>Panoramica Mensile - {monthlyOverviewData.month} {monthlyOverviewData.year}</h3>
+          <h3>
+            Panoramica Mensile - {monthlyOverviewData.month}{" "}
+            {monthlyOverviewData.year}
+          </h3>
           <table className="monthly-table">
             <thead>
               <tr>
                 <th>Utente</th>
-                {monthlyOverviewData.days.map(day => <th key={day}>{day}</th>)}
+                {monthlyOverviewData.days.map((day) => (
+                  <th key={day}>{day}</th>
+                ))}
                 <th>Totale</th>
               </tr>
             </thead>
             <tbody>
-              {monthlyOverviewData.users.map(user => (
+              {monthlyOverviewData.users.map((user) => (
                 <tr key={user}>
                   <td>{user}</td>
-                  {monthlyOverviewData.days.map(day => (
+                  {monthlyOverviewData.days.map((day) => (
                     <td key={day}>
-                      {monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user] ? 'X' : ''}
+                      {monthlyOverviewData.data[day] &&
+                      monthlyOverviewData.data[day][user]
+                        ? "X"
+                        : ""}
                     </td>
                   ))}
                   <td>
-                    {monthlyOverviewData.days.filter(day =>
-                      monthlyOverviewData.data[day] && monthlyOverviewData.data[day][user]
-                    ).length}
+                    {
+                      monthlyOverviewData.days.filter(
+                        (day) =>
+                          monthlyOverviewData.data[day] &&
+                          monthlyOverviewData.data[day][user]
+                      ).length
+                    }
                   </td>
                 </tr>
               ))}
               <tr>
                 <td>Totale per giorno</td>
-                {monthlyOverviewData.days.map(day => (
+                {monthlyOverviewData.days.map((day) => (
                   <td key={day}>
-                    {monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0}
+                    {monthlyOverviewData.data[day]
+                      ? Object.keys(monthlyOverviewData.data[day]).length
+                      : 0}
                   </td>
                 ))}
                 <td>
-                  {monthlyOverviewData.days.reduce((total, day) =>
-                    total + (monthlyOverviewData.data[day] ? Object.keys(monthlyOverviewData.data[day]).length : 0), 0
+                  {monthlyOverviewData.days.reduce(
+                    (total, day) =>
+                      total +
+                      (monthlyOverviewData.data[day]
+                        ? Object.keys(monthlyOverviewData.data[day]).length
+                        : 0),
+                    0
                   )}
                 </td>
               </tr>
@@ -532,7 +615,14 @@ const HistoricComponent = () => {
           </table>
           <div className="total-orders-section">
             <h3>&nbsp;Totale Ordini:&nbsp;</h3>
-            <h3 className="total-orders">{showTotalPerDay ? totalPerDayData.reduce((sum, item) => sum + item.totalOrders, 0) : totalOrders}</h3>
+            <h3 className="total-orders">
+              {showTotalPerDay
+                ? totalPerDayData.reduce(
+                    (sum, item) => sum + item.totalOrders,
+                    0
+                  )
+                : totalOrders}
+            </h3>
           </div>
         </Card>
       )}
@@ -544,28 +634,38 @@ const HistoricComponent = () => {
             <Button
               label="Genera PDF con Totali Giornalieri"
               icon="pi pi-file-pdf"
-              onClick={() => generatePDF('daily')}
+              onClick={() => generatePDF("daily")}
               disabled={!selectedMonth || !showTotalPerDay}
               className="p-button-lg btn"
             />
             <Button
               label="Genera PDF con Dettagli Ordini"
               icon="pi pi-file-pdf"
-              onClick={() => generatePDF('detailed')}
+              onClick={() => generatePDF("detailed")}
               disabled={!selectedMonth || !selectedUsername}
               className="p-button-lg btn"
             />
 
-            <Button label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`} icon="pi pi-download" onClick={generateExcel} className="p-mt-3" />
+            <Button
+              label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`}
+              icon="pi pi-download"
+              onClick={generateExcel}
+              className="p-mt-3"
+            />
           </div>
-          <p>Per attivare il pulsante di generazione PDF con Dettagli Ordini, seleziona un mese ed un utente.</p>
-          <p>Per attivare il pulsante di generazione PDF con Totali Giornalieri, seleziona un mese e il pulsante "Mostra totale per giorno".</p>
+          <p>
+            Per attivare il pulsante di generazione PDF con Dettagli Ordini,
+            seleziona un mese ed un utente.
+          </p>
+          <p>
+            Per attivare il pulsante di generazione PDF con Totali Giornalieri,
+            seleziona un mese e il pulsante "Mostra totale per giorno".
+          </p>
         </Card>
-      )
-      }
+      )}
       <ScrollTop />
-    </div >
+    </div>
   );
-}
+};
 
 export default HistoricComponent;
