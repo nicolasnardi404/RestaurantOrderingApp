@@ -47,7 +47,7 @@
 }
 
 .p-dialog .p-dialog-content {
-  padding: 20px;
+  padding: 2rem;
 }
 
 .p-field {
@@ -152,18 +152,94 @@
   margin: 10px;
 }
 
-@media (max-width: 768px) {
-  .manage-piatti {
-    padding: 10px;
-  }
+.edit-piatto-table .p-datatable-tbody > tr > td {
+  padding: 1rem;
+  border: none;
+}
 
-  .p-datatable .p-datatable-thead > tr > th,
-  .p-datatable .p-datatable-tbody > tr > td {
-    padding: 0.5rem;
-  }
+.edit-piatto-table .p-datatable-tbody > tr > td .p-inputtext,
+.edit-piatto-table .p-datatable-tbody > tr > td .p-dropdown,
+.edit-piatto-table .p-datatable-tbody > tr > td .p-calendar {
+  width: 100%;
+}
 
-  .p-button-rounded {
-    width: 2rem !important;
-    height: 2rem !important;
-  }
+.edit-piatto-table .p-datatable-thead {
+  display: none;
+}
+
+.p-dialog .p-dialog-footer {
+  text-align: center;
+}
+
+.dropdown-tipo-piatto {
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.edit-piatto-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.edit-piatto-form .p-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sempre-disponibile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 auto;
+}
+
+.edit-piatto-form .p-col {
+  flex: 1;
+  text-align: center;
+}
+
+.edit-piatto-form .p-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-piatto-form .p-field label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.edit-piatto-form .p-inputtext,
+.edit-piatto-form .p-dropdown,
+.edit-piatto-form .p-calendar {
+  width: 100%;
+}
+
+.edit-piatto-form .p-field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.edit-piatto-form .p-field-checkbox .p-checkbox-label {
+  font-weight: normal;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 2rem;
+}
+
+.p-checkbox-label {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
