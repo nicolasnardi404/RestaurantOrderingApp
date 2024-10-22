@@ -619,7 +619,7 @@ function MenuPage() {
         {selectedDay && !menuDelGiorno && (
           <div className="error-message">
             <h1>Avviso</h1>
-            <p>Nessun menu è stato ancora aggiunto per quel giorno</p>
+            <p>Nessun menu è stato aggiunto per questo giorno</p>
           </div>
         )}
 
