@@ -42,7 +42,7 @@ export default function App() {
           <Route element={<ProtectedRoute allowedRoles={["Amministratore"]} />}>
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/users" element={<UserManagement />} />
-            <Route path="/register" element={<RegisterPage />} />
+            {/* <Route path="/register" element={<RegisterPage />} /> */}
             <Route path="/managepiatti" element={<CRUDPiatti />} />
             <Route path="/add-multiple-piatti" element={<MultiplePiatti />} />
           </Route>

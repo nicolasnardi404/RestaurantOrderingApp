@@ -15,15 +15,19 @@ const GestioneUtenti = () => {
   const [error, setError] = useState(null);
   const { getToken } = useAuth();
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [userToUpdate, setUserToUpdate] = useState({
+
+  const [registerVisible, setRegisterVisible] = useState(false);
+  const [newUser, setNewUser] = useState({
     nome: "",
     email: "",
     password: "",
-    idRuolo: "",
-    attivo: false,
+    idRuolo: 2,
+    attivo: true,
   });
-  const [deleteUserId, setDeleteUserId] = useState(null);
+
   const [dialogVisible, setDialogVisible] = useState(false);
+  const [userToUpdate, setUserToUpdate] = useState({});
+  const [deleteUserId, setDeleteUserId] = useState(null);
   const [confirmVisible, setConfirmVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -45,6 +49,27 @@ const GestioneUtenti = () => {
     }
   };
 
+  const handleRegister = async () => {
+    try {
+      const token = getToken();
+      await axios.post(`${apiUrl}/register`, newUser, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchUtenti();
+      setRegisterVisible(false);
+      setNewUser({
+        nome: "",
+        email: "",
+        password: "",
+        idRuolo: 2,
+        attivo: true,
+      });
+    } catch (error) {
+      setError("Registrazione fallita. Riprova.");
+      console.error("Errore durante a registrazione:", error);
+    }
+  };
+
   const openUpdateDialog = (utente) => {
     setUserToUpdate(utente);
     setDialogVisible(true);
@@ -56,16 +81,8 @@ const GestioneUtenti = () => {
       const token = getToken();
       await axios.put(
         `${apiUrl}/user/update/${userToUpdate.id}`,
-        {
-          nome,
-          email,
-          password,
-          idRuolo,
-          attivo,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { nome, email, password, idRuolo, attivo },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchUtenti();
       setDialogVisible(false);
@@ -79,10 +96,6 @@ const GestioneUtenti = () => {
   const openConfirmDialog = (idUtente) => {
     setDeleteUserId(idUtente);
     setConfirmVisible(true);
-  };
-
-  const handleRedirect = (path) => {
-    navigate(path);
   };
 
   const deleteUtente = async () => {
@@ -99,6 +112,56 @@ const GestioneUtenti = () => {
       }
     }
   };
+
+  const renderRegisterDialog = () => (
+    <Dialog
+      header="Registrazione Utente"
+      visible={registerVisible}
+      style={{ width: "50%" }}
+      footer={
+        <div>
+          <Button
+            label="Cancelar"
+            icon="pi pi-times"
+            onClick={() => setRegisterVisible(false)}
+          />
+          <Button
+            label="Registrati"
+            icon="pi pi-check"
+            onClick={handleRegister}
+          />
+        </div>
+      }
+      onHide={() => setRegisterVisible(false)}
+    >
+      <div className="user-management-dialog">
+        <div className="p-col-12">
+          <label>Nome:</label>
+          <InputText
+            value={newUser.nome}
+            onChange={(e) => setNewUser({ ...newUser, nome: e.target.value })}
+          />
+        </div>
+        <div className="p-col-12">
+          <label>Email:</label>
+          <InputText
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+          />
+        </div>
+        <div className="p-col-12">
+          <label>Password:</label>
+          <InputText
+            type="password"
+            value={newUser.password}
+            onChange={(e) =>
+              setNewUser({ ...newUser, password: e.target.value })
+            }
+          />
+        </div>
+      </div>
+    </Dialog>
+  );
 
   const renderUpdateDialog = () => (
     <Dialog
@@ -128,10 +191,10 @@ const GestioneUtenti = () => {
           />
         </div>
         <div className="p-col-12">
-          <label>Senha:</label>
+          <label>Password:</label>
           <InputText
             type="password"
-            value={null}
+            value={userToUpdate.password}
             onChange={(e) =>
               setUserToUpdate({ ...userToUpdate, password: e.target.value })
             }
@@ -194,12 +257,11 @@ const GestioneUtenti = () => {
     <div className="container-user">
       <div className="div-header">
         <h1 className="title">Gestione Utenti</h1>
-        <button
-          onClick={() => handleRedirect("/register")}
-          className="pass-button"
-        >
-          Registrazione
-        </button>
+        <Button
+          label="Registrazione"
+          icon="pi pi-user-plus"
+          onClick={() => setRegisterVisible(true)}
+        />
       </div>
       <table className="user-table">
         <thead>
@@ -237,6 +299,7 @@ const GestioneUtenti = () => {
         </tbody>
       </table>
 
+      {renderRegisterDialog()}
       {renderUpdateDialog()}
       {renderConfirmDialog()}
     </div>
