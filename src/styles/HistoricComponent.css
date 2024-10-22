@@ -89,7 +89,7 @@
 }
 
 .future-date {
-  color: #2ecc71;
+  color: green;
   font-weight: bold;
 }
 
@@ -172,7 +172,7 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #2ecc71;
+  background-color: green;
   margin: 0 auto;
 }
 
