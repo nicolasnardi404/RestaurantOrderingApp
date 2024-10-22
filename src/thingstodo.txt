@@ -9,7 +9,7 @@ ORDINE APERTA
 HISTORICO DE ORDERS
     [ ] - SEARCH botton
     [ ] - DATA NO PDF TA ERRADA
-    [ ] - ATUALIZAR LIETURA DAS NOVAS DATAS JSON
+    [ ] - ATUALIZAR LEITURA DAS NOVAS DATAS JSON
     [ ] - LINHAS NO ARQUIVO DE excel
 
 TUTTIL GLI ORDINE
@@ -26,7 +26,8 @@ PRENOTA PIATTO
 ---- REVISAR STYLE DE TODAS PAGINAS ANTES DE APRESENTAR
 
 
-
+-- date when totale
+-- totale when user selected in the panoramica is for user
 
 
 

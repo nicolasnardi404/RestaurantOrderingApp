@@ -94,6 +94,15 @@ const HistoricComponent = () => {
   const [monthlyOverviewData, setMonthlyOverviewData] = useState(null);
   const apiUrl = process.env.REACT_APP_API_URL;
 
+  // Add new state variables for temporary filter values
+  const [tempSelectedDate, setTempSelectedDate] = useState(null);
+  const [tempSelectedMonth, setTempSelectedMonth] = useState(new Date());
+  const [tempSelectedUsername, setTempSelectedUsername] = useState("");
+  const [tempViewMode, setTempViewMode] = useState("month");
+
+  // Add new state variable for temporary total/detail view
+  const [tempShowTotalPerDay, setTempShowTotalPerDay] = useState(false);
+
   useEffect(() => {
     if (ruolo === "Amministratore") {
       setAdmin(true);
@@ -184,15 +193,9 @@ const HistoricComponent = () => {
   };
 
   const handleViewModeChange = (mode) => {
-    setSelectedUsername(null);
-    setShowTotalPerDay(null);
-    setFilteredData(null);
-    setData(null);
-    setUsernames(null);
-    setMonthlyOverviewData(false);
-    setViewMode(mode);
-    setSelectedDate(null); // Reset selected date
-    setSelectedMonth(null); // Reset selected month
+    setTempViewMode(mode);
+    setTempSelectedDate(null);
+    setTempSelectedMonth(null);
   };
 
   // Calculate total orders per day
@@ -380,6 +383,7 @@ const HistoricComponent = () => {
   };
 
   const isDateInPast = (dateString) => {
+    console.log(dateString);
     const now = new Date();
     const [day, month, year] = dateString.split("-");
 
@@ -408,110 +412,162 @@ const HistoricComponent = () => {
     return isDateInPast(rowData.reservation_date) ? "" : "future-date";
   };
 
+  // New function to handle search button click
+  const handleSearch = () => {
+    setSelectedDate(tempSelectedDate);
+    setSelectedMonth(tempSelectedMonth);
+    setSelectedUsername(tempSelectedUsername);
+    setViewMode(tempViewMode);
+    setShowTotalPerDay(tempShowTotalPerDay);
+    // This will trigger the useEffect that calls fetchData
+  };
+
+  const viewModeOptions = [
+    { label: "Mese", value: "month" },
+    { label: "Giorno", value: "day" },
+  ];
+
+  const detailLevelOptions = [
+    { label: "Dettaglio", value: false },
+    { label: "Totale", value: true },
+  ];
+
   return (
     <div className="historic-container">
       <div className="card-row">
         <Card className="filter-card">
-          {isAdmin && (
-            <>
-              <h2>Storico Ordini</h2>
-            </>
-          )}
+          <h2>Storico Ordini</h2>
           {isAdmin ? (
-            <div className="p-field">
-              <div className="p-buttonset">
-                <label>Visualizzazione</label>
-                <div className="mesi-giorni">
-                  <Button
-                    label="Mese"
-                    onClick={() => handleViewModeChange("month")}
-                    className={
-                      viewMode === "month"
-                        ? "p-button-primary"
-                        : "p-button-secondary"
-                    }
-                  />
-                  <Button
-                    label="Giorno"
-                    onClick={() => handleViewModeChange("day")}
-                    className={
-                      viewMode === "day"
-                        ? "p-button-primary"
-                        : "p-button-secondary"
-                    }
-                  />
-                </div>
-              </div>
-              <div className="data-picker">
-                <label className="label-data-picker" htmlFor="datePicker">
-                  {viewMode === "month" ? "Seleziona Mese" : "Seleziona Giorno"}
-                </label>
-                <Calendar
-                  id="datePicker"
-                  value={viewMode === "month" ? selectedMonth : selectedDate}
-                  onChange={(e) =>
-                    viewMode === "month"
-                      ? setSelectedMonth(e.value)
-                      : setSelectedDate(e.value)
-                  }
-                  view={viewMode === "month" ? "month" : "date"}
-                  locale="it"
-                  dateFormat={viewMode === "month" ? "M. mm/yy" : "D. dd/mm/y"}
+            <div className="search-section">
+              <div className="p-col-12 p-md-3"></div>
+              <div>
+                <label htmlFor="viewModeDropdown">Visualizzazione</label>
+                <Dropdown
+                  id="viewModeDropdown"
+                  value={tempViewMode}
+                  options={viewModeOptions}
+                  onChange={(e) => {
+                    setTempViewMode(e.value);
+                    setTempSelectedDate(null);
+                    setTempSelectedMonth(null);
+                  }}
+                  placeholder="Seleziona visualizzazione"
+                  className="dropdown-user"
                 />
               </div>
-
-              {(selectedDate || selectedMonth) && (
-                <div className="total-per-day">
-                  <Button
-                    label={
-                      showTotalPerDay
-                        ? "Cambia per dettaglio"
-                        : "Cambia per totale"
+              <div className="p-col-12 p-md-3">
+                <div className="p-field">
+                  <label htmlFor="datePicker">
+                    {tempViewMode === "month"
+                      ? "Seleziona Mese"
+                      : "Seleziona Giorno"}
+                  </label>
+                  <Calendar
+                    id="datePicker"
+                    value={
+                      tempViewMode === "month"
+                        ? tempSelectedMonth
+                        : tempSelectedDate
                     }
-                    onClick={() => setShowTotalPerDay(!showTotalPerDay)}
-                    className="p-button-primary"
+                    onChange={(e) =>
+                      tempViewMode === "month"
+                        ? setTempSelectedMonth(e.value)
+                        : setTempSelectedDate(e.value)
+                    }
+                    view={tempViewMode === "month" ? "month" : "date"}
+                    locale="it"
+                    dateFormat={
+                      tempViewMode === "month" ? "M. mm/yy" : "D. dd/mm/y"
+                    }
                   />
                 </div>
-              )}
-              {usernames && isAdmin && (
-                <div className="dropdown-user-group">
+              </div>
+              <div className="p-col-12 p-md-3">
+                <div className="p-field">
                   <label htmlFor="userDropdown">Seleziona Utente</label>
                   <Dropdown
                     id="userDropdown"
-                    value={selectedUsername}
+                    value={tempSelectedUsername}
                     options={usernames}
-                    onChange={(e) => setSelectedUsername(e.value)}
+                    onChange={(e) => setTempSelectedUsername(e.value)}
                     placeholder="Tutti gli utenti"
                     showClear
                     className="dropdown-user"
                   />
                 </div>
-              )}
+              </div>
+              <div className="p-col-12 p-md-3">
+                <div className="p-field">
+                  <label htmlFor="detailLevelDropdown">
+                    Livello di Dettaglio
+                  </label>
+                  <Dropdown
+                    id="detailLevelDropdown"
+                    value={tempShowTotalPerDay}
+                    options={detailLevelOptions}
+                    onChange={(e) => setTempShowTotalPerDay(e.value)}
+                    placeholder="Seleziona livello di dettaglio"
+                    className="dropdown-user"
+                  />
+                </div>
+              </div>
+              <div className="search-button-container">
+                <Button
+                  label="Cerca"
+                  icon="pi pi-search"
+                  onClick={handleSearch}
+                  className="search-button"
+                />
+              </div>
             </div>
           ) : (
-            // User view - only calendar
-            <div className="user-view-section">
-              <h2>Storico Ordini</h2>
-              <div className="p-field">
-                <label htmlFor="datePicker">Seleziona Mese</label>
-                <Calendar
-                  id="datePicker"
-                  value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.value)}
-                  view="month"
-                  locale="it"
-                  dateFormat="mm/yy"
+            <div className="search-section-user">
+              <div className="p-col-12 p-md-6">
+                <div className="p-field">
+                  <label htmlFor="datePicker">Seleziona Mese</label>
+                  <Calendar
+                    id="datePicker"
+                    value={tempSelectedMonth}
+                    onChange={(e) => setTempSelectedMonth(e.value)}
+                    view="month"
+                    locale="it"
+                    dateFormat="M. mm/yy"
+                  />
+                </div>
+              </div>
+              <div className="p-col-12 p-md-6">
+                <div className="p-field ">
+                  <label htmlFor="detailLevelDropdown">
+                    Livello di Dettaglio
+                  </label>
+                  <Dropdown
+                    id="detailLevelDropdown"
+                    value={tempShowTotalPerDay}
+                    options={detailLevelOptions}
+                    onChange={(e) => setTempShowTotalPerDay(e.value)}
+                    placeholder="Seleziona livello di dettaglio"
+                    className="dropdown-user"
+                  />
+                </div>
+              </div>
+              <div className="search-button-container">
+                <Button
+                  label="Cerca"
+                  icon="pi pi-search"
+                  onClick={handleSearch}
+                  className="search-button"
                 />
               </div>
             </div>
           )}
+
           {isAdmin && monthlyOverviewData && (
             <div className="total-pdf-card" id="rapporto-amministrazione">
               <div className="pdf-button-section">
                 <Button
                   label={
-                    selectedUsername
-                      ? `Genera PDF totali del mese di ${selectedUsername}`
+                    tempSelectedUsername
+                      ? `Genera PDF totali del mese di ${tempSelectedUsername}`
                       : "Genera PDF totali del mese per tutti "
                   }
                   icon="pi pi-file-pdf"

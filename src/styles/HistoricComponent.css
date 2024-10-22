@@ -13,7 +13,7 @@
 
 .p-field {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
 }
 
@@ -89,7 +89,7 @@
 }
 
 .future-date {
-  color: green;
+  color: #2ecc71;
   font-weight: bold;
 }
 
@@ -153,4 +153,32 @@ h2 {
 
 .monthly-table th {
   background-color: #f2f2f2;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.search-section-user {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+}
+
+.search-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #2ecc71;
+  margin: 0 auto;
+}
+
+.search-button-container {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
