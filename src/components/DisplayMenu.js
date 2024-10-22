@@ -410,8 +410,13 @@ function MenuPage() {
         return;
       }
 
+      let selectedId =
+        user.ruolo === "Amministratore"
+          ? (selectedId = selectedUser["id"])
+          : (selectedId = user.userId);
+
       const orderData = {
-        id: user.userId,
+        id: selectedId,
         data: `${dataPrenotazione}`,
       };
       const response = await axios.post(
@@ -556,7 +561,7 @@ function MenuPage() {
     const currentMinutes = now.getMinutes();
 
     if (user.ruolo === "Amministratore") {
-      return new Date();
+      return null;
     }
 
     if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
@@ -573,6 +578,10 @@ function MenuPage() {
   const getDisabledDates = () => {
     const disabledDates = [];
     const startDate = getMinDate();
+
+    if (user.ruolo === "Amministratore") {
+      return null;
+    }
 
     for (let i = 0; i < 60; i++) {
       const dateToCheck = new Date(startDate);
@@ -619,7 +628,7 @@ function MenuPage() {
         {selectedDay && !menuDelGiorno && (
           <div className="error-message">
             <h1>Avviso</h1>
-            <p>Nessun menu è stato aggiunto per questo giorno</p>
+            <p>Il menù per questo giorno non è ancora disponibile</p>
           </div>
         )}
 

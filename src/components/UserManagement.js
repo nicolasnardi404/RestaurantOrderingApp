@@ -194,7 +194,7 @@ const GestioneUtenti = () => {
           <label>Password:</label>
           <InputText
             type="password"
-            value={userToUpdate.password}
+            value={null}
             onChange={(e) =>
               setUserToUpdate({ ...userToUpdate, password: e.target.value })
             }

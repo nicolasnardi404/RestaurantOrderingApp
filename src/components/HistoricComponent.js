@@ -556,16 +556,13 @@ const HistoricComponent = () => {
               emptyMessage="Nessun ordine trovato"
               rowClassName={rowClassName}
             >
-              {isAdmin && (
-                <Column field="username" header="Nome Utente" sortable />
-              )}
+              {isAdmin && <Column field="username" header="Nome Utente" />}
               <Column
                 field="reservation_date"
                 header="Data Prenotazione" // Changed to Italian
                 body={(rowData) => formatDateForDisplay(rowData)}
-                sortable
               />
-              <Column field="piatti" header="Tipo di Piatti" sortable />
+              <Column field="piatti" header="Tipo di Piatti" />
             </DataTable>
           )}
         </Card>
