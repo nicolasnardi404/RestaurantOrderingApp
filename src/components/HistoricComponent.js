@@ -383,12 +383,11 @@ const HistoricComponent = () => {
   };
 
   const isDateInPast = (dateString) => {
-    console.log(dateString);
     const now = new Date();
-    const [day, month, year] = dateString.split("-");
+    const [year, month, day] = dateString.split("-");
 
     const reservationDate = new Date(
-      2000 + parseInt(year),
+      parseInt(year),
       parseInt(month) - 1,
       parseInt(day)
     );
@@ -398,14 +397,20 @@ const HistoricComponent = () => {
       return false; // Treat invalid dates as future dates
     }
 
+    // If the reservation date is in the future, it's not in the past
+    if (reservationDate > now) {
+      return false;
+    }
+
+    // If it's today, check if it's before 10:30
     if (reservationDate.toDateString() === now.toDateString()) {
-      // For the current day, check if it's before or after 10:30
       const currentTime = now.getHours() * 60 + now.getMinutes();
       const cutoffTime = 10 * 60 + 30; // 10:30
       return currentTime >= cutoffTime;
     }
 
-    return reservationDate < now;
+    // If it's before today, it's in the past
+    return true;
   };
 
   const rowClassName = (rowData) => {
@@ -535,29 +540,6 @@ const HistoricComponent = () => {
                   />
                 </div>
               </div>
-              <div className="p-col-12 p-md-6">
-                <div className="p-field ">
-                  <label htmlFor="detailLevelDropdown">
-                    Livello di Dettaglio
-                  </label>
-                  <Dropdown
-                    id="detailLevelDropdown"
-                    value={tempShowTotalPerDay}
-                    options={detailLevelOptions}
-                    onChange={(e) => setTempShowTotalPerDay(e.value)}
-                    placeholder="Seleziona livello di dettaglio"
-                    className="dropdown-user"
-                  />
-                </div>
-              </div>
-              <div className="search-button-container">
-                <Button
-                  label="Cerca"
-                  icon="pi pi-search"
-                  onClick={handleSearch}
-                  className="search-button"
-                />
-              </div>
             </div>
           )}
 
@@ -612,16 +594,13 @@ const HistoricComponent = () => {
               emptyMessage="Nessun ordine trovato"
               rowClassName={rowClassName}
             >
-              {isAdmin && (
-                <Column field="username" header="Nome Utente" sortable />
-              )}
+              {isAdmin && <Column field="username" header="Nome Utente" />}
               <Column
                 field="reservation_date"
                 header="Data Prenotazione" // Changed to Italian
                 body={(rowData) => formatDateForDisplay(rowData)}
-                sortable
               />
-              <Column field="piatti" header="Tipo di Piatti" sortable />
+              <Column field="piatti" header="Tipo di Piatti" />
             </DataTable>
           )}
         </Card>
