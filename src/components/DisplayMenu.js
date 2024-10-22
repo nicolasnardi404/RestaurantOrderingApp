@@ -73,8 +73,12 @@ function MenuPage() {
   const fetchAvailableDates = async () => {
     try {
       const token = getToken();
+      let selectedId;
+      selectedUser
+        ? (selectedId = selectedUser.id)
+        : (selectedId = user.userId);
       const response = await axios.get(
-        `${apiUrl}/prenotazione/readByIdAndData/${user.userId}`,
+        `${apiUrl}/prenotazione/readByIdAndData/${selectedId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -410,10 +414,10 @@ function MenuPage() {
         return;
       }
 
-      let selectedId =
-        user.ruolo === "Amministratore"
-          ? (selectedId = selectedUser["id"])
-          : (selectedId = user.userId);
+      let selectedId;
+      selectedUser
+        ? (selectedId = selectedUser.id)
+        : (selectedId = user.userId);
 
       const orderData = {
         id: selectedId,
@@ -474,8 +478,13 @@ function MenuPage() {
       setIsSubmitting(true);
       const idPiatto = Object.values(cart).map((dish) => dish.id);
 
+      let selectedId;
+      selectedUser
+        ? (selectedId = selectedUser.id)
+        : (selectedId = user.userId);
+
       const orderData = {
-        idUser: selectedUser ? selectedUser.id : user.userId,
+        idUser: selectedId,
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
         observazioni: observazioni,

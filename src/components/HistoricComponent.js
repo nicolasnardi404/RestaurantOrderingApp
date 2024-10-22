@@ -535,29 +535,6 @@ const HistoricComponent = () => {
                   />
                 </div>
               </div>
-              <div className="p-col-12 p-md-6">
-                <div className="p-field ">
-                  <label htmlFor="detailLevelDropdown">
-                    Livello di Dettaglio
-                  </label>
-                  <Dropdown
-                    id="detailLevelDropdown"
-                    value={tempShowTotalPerDay}
-                    options={detailLevelOptions}
-                    onChange={(e) => setTempShowTotalPerDay(e.value)}
-                    placeholder="Seleziona livello di dettaglio"
-                    className="dropdown-user"
-                  />
-                </div>
-              </div>
-              <div className="search-button-container">
-                <Button
-                  label="Cerca"
-                  icon="pi pi-search"
-                  onClick={handleSearch}
-                  className="search-button"
-                />
-              </div>
             </div>
           )}
 
