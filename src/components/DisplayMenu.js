@@ -32,8 +32,6 @@ function MenuPage() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [menuDelGiorno, setMenuDelGiorno] = useState(false);
-  const [orarioLimite, setOrarioLimite] = useState(null);
   const navigate = useNavigate();
   const { user, getToken } = useAuth();
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -42,10 +40,8 @@ function MenuPage() {
 
   useEffect(() => {
     fetchAvailableDates();
-    timeLimit();
+    checkPrenotazionePerGiorno();
     if (selectedDay) {
-      checkPrenotazionePerGiorno();
-      checkMenuDelGiorno();
       fetchDishes();
       setCart({});
       setCombinationStatus("");
@@ -58,27 +54,11 @@ function MenuPage() {
     }
   }, [user.ruolo]);
 
-  const timeLimit = async () => {
-    const token = getToken();
-    const response = await axios.get(`${apiUrl}/prenotazione/getOraLimite`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    setOrarioLimite(response.data.chiusura);
-  };
-
   const fetchAvailableDates = async () => {
     try {
       const token = getToken();
-      let selectedId;
-      selectedUser
-        ? (selectedId = selectedUser.id)
-        : (selectedId = user.userId);
       const response = await axios.get(
-        `${apiUrl}/prenotazione/readByIdAndData/${selectedId}`,
+        `${apiUrl}/prenotazione/readByIdAndData/${user.userId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -145,6 +125,8 @@ function MenuPage() {
     } catch (error) {
       console.error("Error fetching weekly menu:", error);
       setError("Failed to fetch weekly menu. Please try again.");
+      console.error("Error fetching weekly menu:", error);
+      setError("Failed to fetch weekly menu. Please try again.");
     }
   };
 
@@ -198,6 +180,7 @@ function MenuPage() {
 
     if (combinations) {
       setCombinationStatus("");
+      setCombinationStatus("");
     }
   };
 
@@ -234,6 +217,9 @@ function MenuPage() {
     setShowUserDropdown(false);
     // Reset the cart and other related states when changing user
     setCart({});
+    setCombinationStatus("");
+    setError("");
+    setObservazioni("");
     setCombinationStatus("");
     setError("");
     setObservazioni("");
@@ -406,21 +392,9 @@ function MenuPage() {
   const checkPrenotazionePerGiorno = async () => {
     try {
       const token = getToken();
-      const dataPrenotazione = selectedDay
-        ? formatDateforServer(selectedDay)
-        : null;
-
-      if (dataPrenotazione === null) {
-        return;
-      }
-
-      let selectedId;
-      selectedUser
-        ? (selectedId = selectedUser.id)
-        : (selectedId = user.userId);
-
+      const dataPrenotazione = formatDateforServer(selectedDay);
       const orderData = {
-        id: selectedId,
+        id: user.userId,
         data: `${dataPrenotazione}`,
       };
       const response = await axios.post(
@@ -428,6 +402,7 @@ function MenuPage() {
         orderData,
         {
           headers: {
+            "Content-Type": "application/json",
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
@@ -442,30 +417,6 @@ function MenuPage() {
     } catch (error) {
       console.error("Error submitting order:", error);
       setError("Errore durante l'invio dell'ordine. Riprova.");
-    }
-  };
-
-  const checkMenuDelGiorno = async () => {
-    const dataPrenotazione = formatDateforServer(selectedDay);
-
-    try {
-      const token = getToken();
-      const response = await axios.get(
-        `${apiUrl}/piatto/checkMenuGiorno/${dataPrenotazione}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data) {
-        setMenuDelGiorno(true);
-      } else {
-        setMenuDelGiorno(false);
-      }
-    } catch (error) {
       console.error("Error submitting order:", error);
       setError("Errore durante l'invio dell'ordine. Riprova.");
     }
@@ -478,13 +429,8 @@ function MenuPage() {
       setIsSubmitting(true);
       const idPiatto = Object.values(cart).map((dish) => dish.id);
 
-      let selectedId;
-      selectedUser
-        ? (selectedId = selectedUser.id)
-        : (selectedId = user.userId);
-
       const orderData = {
-        idUser: selectedId,
+        idUser: selectedUser ? selectedUser.id : user.userId,
         dataPrenotazione: `${dataPrenotazione}`,
         idPiatto: idPiatto,
         observazioni: observazioni,
@@ -498,6 +444,7 @@ function MenuPage() {
           {
             headers: {
               "Content-Type": "application/json",
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -507,8 +454,11 @@ function MenuPage() {
           setShowSuccessModal(true);
         } else {
           throw new Error("Failed to submit order");
+          throw new Error("Failed to submit order");
         }
       } catch (error) {
+        console.error("Error submitting order:", error);
+        setError("Errore durante l'invio dell'ordine. Riprova.");
         console.error("Error submitting order:", error);
         setError("Errore durante l'invio dell'ordine. Riprova.");
       } finally {
@@ -524,12 +474,15 @@ function MenuPage() {
   const handleGoToOpenOrders = () => {
     setShowSuccessModal(false);
     navigate("/open-orders");
+    navigate("/open-orders");
   };
 
   const handleBackToMenu = () => {
     setShowSuccessModal(false);
     setSelectedDay(null);
     setCart({});
+    setCombinationStatus("");
+    setError("");
     setCombinationStatus("");
     setError("");
   };
@@ -570,7 +523,7 @@ function MenuPage() {
     const currentMinutes = now.getMinutes();
 
     if (user.ruolo === "Amministratore") {
-      return null;
+      return new Date();
     }
 
     if (currentHour > 10 || (currentHour === 10 && currentMinutes > 30)) {
@@ -588,10 +541,6 @@ function MenuPage() {
     const disabledDates = [];
     const startDate = getMinDate();
 
-    if (user.ruolo === "Amministratore") {
-      return null;
-    }
-
     for (let i = 0; i < 60; i++) {
       const dateToCheck = new Date(startDate);
       dateToCheck.setDate(startDate.getDate() + i);
@@ -607,10 +556,6 @@ function MenuPage() {
   return (
     <div className="container-menu">
       <h1>Ordina Pasto</h1>
-      <p>
-        È possibile prenotare o modificare il menù di oggi fino alle{" "}
-        <strong>{orarioLimite}</strong>
-      </p>
       {user.ruolo === "Amministratore" &&
         renderUserSelection(
           <p className="user-selection-text">
@@ -627,21 +572,14 @@ function MenuPage() {
           disabledDates={getDisabledDates()}
         />
 
-        {checkPrenotazione && menuDelGiorno && (
+        {checkPrenotazione && (
           <div className="error-message">
             <h1>Avviso</h1>
-            <p>Hai già fatto la prenotazione per questo giorno</p>
+            <p>avete già fatto la prenotazione per questo giorno</p>
           </div>
         )}
 
-        {selectedDay && !menuDelGiorno && (
-          <div className="error-message">
-            <h1>Avviso</h1>
-            <p>Il menù per questo giorno non è ancora disponibile</p>
-          </div>
-        )}
-
-        {!checkPrenotazione && menuDelGiorno && (
+        {!checkPrenotazione && (
           <div className="menu-button-container">
             <Button
               label="Visualizza il menu della settimana"
@@ -656,12 +594,12 @@ function MenuPage() {
       {!selectedDay && !isLoading && (
         <div className="error-message">
           <h1>Avviso</h1>
-          <p>Hai già fatto tutti gli ordini della settimana</p>
+          <p>avete già fatto tutti gli ordini della settimana</p>
         </div>
       )}
 
       {/* Only render the order form if orders are open */}
-      {selectedDay && !checkPrenotazione && menuDelGiorno && (
+      {selectedDay && !checkPrenotazione && (
         <>
           <Card className="combinazioni-card">
             <h4>
