@@ -16,6 +16,7 @@ import "../styles/ViewOpenOrders.css";
 import "primeicons/primeicons.css";
 import formatDateforServer from "../util/formatDateForServer";
 import { formatCalendarData } from "../util/FormatCalendarData";
+import { formatDateForDisplay } from "../util/FormatDateForDisplay";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -420,6 +421,10 @@ const ViewOpenOrders = () => {
     }
   };
 
+  const rowClassName = (rowData) => {
+    return isDateInPast(rowData.datePiatti) ? "" : "future-date";
+  };
+
   const renderAdminTable = () => (
     <div>
       <div className="p-inputgroup mb-3">
@@ -436,10 +441,17 @@ const ViewOpenOrders = () => {
         value={filteredOrders}
         loading={loading}
         responsiveLayout="scroll"
+        rowClassName={rowClassName}
       >
         <Column field="idPrenotazione" header="ID" />
         <Column field="username" header="Username" />
-        <Column field="datePiatti" header="Data Prenotazione" />
+        <Column
+          field="datePiatti"
+          header="Data Prenotazione"
+          body={(rowData) =>
+            formatDateForDisplay({ reservation_date: rowData.datePiatti })
+          }
+        />
         <Column field="piatti" header="Piatti" />
         <Column field="tipo_piatti" header="Combinazione" />
         <Column
@@ -453,7 +465,12 @@ const ViewOpenOrders = () => {
   );
 
   const renderUserTable = () => (
-    <DataTable value={orders} loading={loading} responsiveLayout="scroll">
+    <DataTable
+      value={orders}
+      loading={loading}
+      responsiveLayout="scroll"
+      rowClassName={rowClassName}
+    >
       <Column field="idPrenotazione" header="ID" />
       <Column field="datePiatti" header="Data Prenotazione" />
       <Column field="piatti" header="Piatti" />
@@ -475,7 +492,7 @@ const ViewOpenOrders = () => {
       "Contorno",
       "Piatto unico",
       "Dessert",
-      "Altri",
+      "Pane/Grissini",
     ];
 
     const tableData = mealTypes.map((mealType) => {
@@ -527,6 +544,37 @@ const ViewOpenOrders = () => {
         </div>
       </div>
     );
+  };
+
+  const isDateInPast = (dateString) => {
+    const now = new Date();
+    const [year, month, day] = dateString.split("-");
+
+    const reservationDate = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+
+    if (isNaN(reservationDate.getTime())) {
+      console.error("Invalid date:", dateString);
+      return false; // Treat invalid dates as future dates
+    }
+
+    // If the reservation date is in the future, it's not in the past
+    if (reservationDate > now) {
+      return false;
+    }
+
+    // If it's today, check if it's before 10:30
+    if (reservationDate.toDateString() === now.toDateString()) {
+      const currentTime = now.getHours() * 60 + now.getMinutes();
+      const cutoffTime = 10 * 60 + 30; // 10:30
+      return currentTime >= cutoffTime;
+    }
+
+    // If it's before today, it's in the past
+    return true;
   };
 
   return (

@@ -173,3 +173,7 @@ h1 {
     height: 2rem !important;
   }
 }
+
+.future-date {
+  background-color: #e6ffe6 !important;
+}
