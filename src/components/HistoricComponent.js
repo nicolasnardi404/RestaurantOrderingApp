@@ -182,9 +182,39 @@ const HistoricComponent = () => {
     }
   }, [filteredData]);
 
-  const formatDateForDisplay = (dateString) => {
-    const [year, month, day] = dateString.reservation_date.split("-");
+  const formatDateForDisplay = (dateInput) => {
+    let dateString;
+
+    if (typeof dateInput === "string") {
+      // If dateInput is already a string, use it directly
+      dateString = dateInput;
+    } else if (dateInput && dateInput.reservation_date) {
+      // If dateInput is an object with reservation_date property
+      dateString = dateInput.reservation_date;
+    } else {
+      console.error("Invalid date input:", dateInput);
+      return "Invalid Date";
+    }
+
+    // Remove any non-digit characters to handle formats like "2024-10-21"
+    dateString = dateString.replace(/\D/g, "");
+
+    if (dateString.length !== 8) {
+      console.error("Invalid date format:", dateString);
+      return "Invalid Date";
+    }
+
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
+
     const date = new Date(year, month - 1, day);
+
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date:", dateString);
+      return "Invalid Date";
+    }
+
     const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const weekday = dayNames[date.getDay()];
 
@@ -347,11 +377,7 @@ const HistoricComponent = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
-    // Define border styles
-    const thinBorder = { style: "thin", color: { rgb: "000000" } };
-    const thickBorder = { style: "medium", color: { rgb: "000000" } };
-
-    // Add header row with styles
+    // Add header row
     const headerRow = [
       "Utente",
       ...monthlyOverviewData.days.map((d) => d.day),
@@ -359,22 +385,7 @@ const HistoricComponent = () => {
     ];
     XLSX.utils.sheet_add_aoa(ws, [headerRow], { origin: "A1" });
 
-    // Apply styles to header row
-    for (let i = 0; i < headerRow.length; i++) {
-      const cellRef = XLSX.utils.encode_cell({ r: 0, c: i });
-      ws[cellRef].s = {
-        font: { bold: true },
-        fill: { fgColor: { rgb: "CCCCCC" } },
-        border: {
-          top: thickBorder,
-          bottom: thinBorder,
-          left: i === 0 ? thickBorder : thinBorder,
-          right: i === headerRow.length - 1 ? thickBorder : thinBorder,
-        },
-      };
-    }
-
-    // Add data rows with styles
+    // Add data rows
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
@@ -391,22 +402,9 @@ const HistoricComponent = () => {
       });
       rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
-
-      // Apply styles to data cells
-      for (let i = 0; i < rowData.length; i++) {
-        const cellRef = XLSX.utils.encode_cell({ r: index + 1, c: i });
-        ws[cellRef].s = {
-          border: {
-            top: thinBorder,
-            bottom: thinBorder,
-            left: i === 0 ? thickBorder : thinBorder,
-            right: i === rowData.length - 1 ? thickBorder : thinBorder,
-          },
-        };
-      }
     });
 
-    // Add monthly total row with styles
+    // Add monthly total row
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
     monthlyOverviewData.days.forEach(({ day }) => {
@@ -421,24 +419,6 @@ const HistoricComponent = () => {
       origin: `A${monthlyOverviewData.users.length + 2}`,
     });
 
-    // Apply styles to monthly total row
-    for (let i = 0; i < monthlyTotalRow.length; i++) {
-      const cellRef = XLSX.utils.encode_cell({
-        r: monthlyOverviewData.users.length + 1,
-        c: i,
-      });
-      ws[cellRef].s = {
-        font: { bold: true },
-        fill: { fgColor: { rgb: "EEEEEE" } },
-        border: {
-          top: thinBorder,
-          bottom: thickBorder,
-          left: i === 0 ? thickBorder : thinBorder,
-          right: i === monthlyTotalRow.length - 1 ? thickBorder : thinBorder,
-        },
-      };
-    }
-
     // Set column widths
     const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
     for (let i = 1; i <= monthlyOverviewData.days.length; i++) {
@@ -446,6 +426,17 @@ const HistoricComponent = () => {
     }
     colWidths.push({ wch: 10 }); // Width for the "Totale" column
     ws["!cols"] = colWidths;
+
+    // Center align all cells
+    const range = XLSX.utils.decode_range(ws["!ref"]);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!ws[cellRef]) continue;
+        if (!ws[cellRef].s) ws[cellRef].s = {};
+        ws[cellRef].s.alignment = { horizontal: "center", vertical: "center" };
+      }
+    }
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Monthly Overview");
@@ -655,7 +646,7 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => rowData.date}
+                body={(rowData) => formatDateForDisplay(rowData.date)}
                 sortable
               />
               <Column
