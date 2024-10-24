@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
       setUser({
         userId: decodedToken.data.userId,
         nome: decodedToken.data.nome,
+        email: decodedToken.data.email,
         ruolo: decodedToken.data.ruolo,
       });
     } else {
@@ -45,6 +46,7 @@ export const AuthProvider = ({ children }) => {
       setUser({
         userId: decodedToken.data.userId,
         nome: decodedToken.data.nome,
+        email: decodedToken.data.email,
         ruolo: decodedToken.data.ruolo,
       });
 

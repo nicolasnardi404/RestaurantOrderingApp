@@ -28,14 +28,12 @@ export default function UserMenu() {
   const getMenuItems = () => {
     const commonItems = [
       { label: "Ordini Aperti", icon: "list", path: "/open-orders" },
-      { label: "Prenota Piatto", icon: "shopping-cart", path: "/menu" },
+      { label: "Prenota Pasto", icon: "shopping-cart", path: "/menu" },
       { label: "Controllo Consegna", icon: "book", path: "/day-order" },
       { label: "Storico", icon: "calendar", path: "/historic" },
     ];
 
-    const amministratoreItems = [
-      { label: "Admin", icon: "cog", path: "/admin" },
-    ];
+    const amministratoreItems = [];
 
     return user && user.ruolo === "Amministratore"
       ? [...commonItems, ...amministratoreItems]
@@ -61,6 +59,11 @@ export default function UserMenu() {
           >
             <i className="pi pi-user"></i> Profilo
           </button>
+          <hr></hr>
+          <button className="dropdown-item" onClick={() => navigate("/admin")}>
+            <i className="pi pi-cog"></i> Admin
+          </button>
+          <hr></hr>
           <button className="dropdown-item" onClick={handleLogout}>
             <i className="pi pi-power-off"></i> Logout
           </button>

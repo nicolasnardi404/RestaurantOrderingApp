@@ -183,7 +183,9 @@ const HistoricComponent = () => {
   }, [filteredData]);
 
   const formatDateForDisplay = (dateString) => {
-    const [year, month, day] = dateString.reservation_date.split("-");
+    const [year, month, day] = dateString.reservation_date
+      ? dateString.reservation_date.split("-")
+      : dateString.date.split("-");
     const date = new Date(year, month - 1, day);
     const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const weekday = dayNames[date.getDay()];
@@ -231,57 +233,57 @@ const HistoricComponent = () => {
   }, [showTotalPerDay, data, filteredData, selectedUsername]);
 
   // Modify the generatePDF function to accept a parameter
-  const generatePDF = (type) => {
-    if (!selectedMonth) {
-      alert("Per favore, seleziona un mese per generare il PDF.");
-      return;
-    }
+  // const generatePDF = (type) => {
+  //   if (!selectedMonth) {
+  //     alert("Per favore, seleziona un mese per generare il PDF.");
+  //     return;
+  //   }
 
-    const doc = new jsPDF();
-    doc.setFont("helvetica");
-    doc.setFontSize(20);
-    doc.setTextColor(40, 40, 40);
-    doc.text("Relazione Mensile degli Ordini", 14, 30);
+  //   const doc = new jsPDF();
+  //   doc.setFont("helvetica");
+  //   doc.setFontSize(20);
+  //   doc.setTextColor(40, 40, 40);
+  //   doc.text("Relazione Mensile degli Ordini", 14, 30);
 
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Utente: ${selectedUsername || "Tutti"}`, 14, 45);
-    doc.text(
-      `Mese: ${selectedMonth.toLocaleString("it-IT", { month: "long", year: "numeric" })}`,
-      14,
-      52
-    );
-    doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
+  //   doc.setFontSize(12);
+  //   doc.setTextColor(100, 100, 100);
+  //   doc.text(`Utente: ${selectedUsername || "Tutti"}`, 14, 45);
+  //   doc.text(
+  //     `Mese: ${selectedMonth.toLocaleString("it-IT", { month: "long", year: "numeric" })}`,
+  //     14,
+  //     52
+  //   );
+  //   doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
 
-    doc.autoTable({
-      startY: 70,
-      head: [["Data", "Totale Ordini"]],
-      body: totalPerDayData.map((item) => [
-        formatDateForDisplay(item.date),
-        item.totalOrders,
-      ]),
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-    });
+  //   doc.autoTable({
+  //     startY: 70,
+  //     head: [["Data", "Totale Ordini"]],
+  //     body: totalPerDayData.map((item) => [
+  //       formatDateForDisplay(item),
+  //       item.totalOrders,
+  //     ]),
+  //     styles: { fontSize: 10, cellPadding: 5 },
+  //     headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+  //     alternateRowStyles: { fillColor: [245, 245, 245] },
+  //   });
 
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.setTextColor(150);
-      doc.text(
-        `Pagina ${i} di ${pageCount}`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: "center" }
-      );
-    }
+  //   const pageCount = doc.internal.getNumberOfPages();
+  //   for (let i = 1; i <= pageCount; i++) {
+  //     doc.setPage(i);
+  //     doc.setFontSize(10);
+  //     doc.setTextColor(150);
+  //     doc.text(
+  //       `Pagina ${i} di ${pageCount}`,
+  //       doc.internal.pageSize.width / 2,
+  //       doc.internal.pageSize.height - 10,
+  //       { align: "center" }
+  //     );
+  //   }
 
-    doc.save(
-      `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`
-    );
-  };
+  //   doc.save(
+  //     `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`
+  //   );
+  // };
 
   const processData = (data) => {
     const monthData = {};
@@ -455,6 +457,9 @@ const HistoricComponent = () => {
                     setTempViewMode(e.value);
                     setTempSelectedDate(null);
                     setTempSelectedMonth(null);
+                    setData(null);
+                    setFilteredData(null);
+                    setMonthlyOverviewData(null);
                   }}
                   placeholder="Seleziona visualizzazione"
                   className="dropdown-user"
@@ -546,7 +551,7 @@ const HistoricComponent = () => {
           {isAdmin && monthlyOverviewData && (
             <div className="total-pdf-card" id="rapporto-amministrazione">
               <div className="pdf-button-section">
-                <Button
+                {/* <Button
                   label={
                     tempSelectedUsername
                       ? `Genera PDF totali del mese di ${tempSelectedUsername}`
@@ -554,7 +559,7 @@ const HistoricComponent = () => {
                   }
                   icon="pi pi-file-pdf"
                   onClick={() => generatePDF("daily")}
-                />
+                /> */}
 
                 <Button
                   label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`}
@@ -578,13 +583,11 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => rowData.date}
-                sortable
+                body={(rowData) => formatDateForDisplay(rowData)}
               />
               <Column
                 field="totalOrders"
                 header="Totale Ordini" // Changed to Italian
-                sortable
               />
             </DataTable>
           ) : (

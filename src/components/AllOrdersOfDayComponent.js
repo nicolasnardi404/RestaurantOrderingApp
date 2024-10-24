@@ -80,97 +80,97 @@ const AllOrderOfDayComponent = () => {
     setSelectedDate(e.value);
   };
 
-  const generatePDF = () => {
-    const doc = new jsPDF();
+  // const generatePDF = () => {
+  //   const doc = new jsPDF();
 
-    // Add title
-    doc.setFontSize(20);
-    doc.setTextColor(40, 40, 40);
-    doc.text("Rapporto giornaliero sugli ordini", 14, 20);
+  //   // Add title
+  //   doc.setFontSize(20);
+  //   doc.setTextColor(40, 40, 40);
+  //   doc.text("Rapporto giornaliero sugli ordini", 14, 20);
 
-    // Add report info
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Date: ${DisplayData(selectedDate)}`, 14, 30);
-    doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
+  //   // Add report info
+  //   doc.setFontSize(12);
+  //   doc.setTextColor(100, 100, 100);
+  //   doc.text(`Date: ${DisplayData(selectedDate)}`, 14, 30);
+  //   doc.text(`Total Orders: ${dailyOrders.length}`, 14, 37);
 
-    // Add detailed orders table
-    const detailedOrdersBody = dailyOrders.map((order) => [
-      order.username,
-      order.piatti,
-      order.observazioni,
-    ]);
+  //   // Add detailed orders table
+  //   const detailedOrdersBody = dailyOrders.map((order) => [
+  //     order.username,
+  //     order.piatti,
+  //     order.observazioni,
+  //   ]);
 
-    doc.autoTable({
-      startY: 45,
-      head: [["User", "Dishes Ordered", "Observazioni"]],
-      body: detailedOrdersBody,
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
-      alternateRowStyles: { fillColor: [220, 220, 220] },
-    });
+  //   doc.autoTable({
+  //     startY: 45,
+  //     head: [["User", "Dishes Ordered", "Observazioni"]],
+  //     body: detailedOrdersBody,
+  //     styles: { fontSize: 10, cellPadding: 5 },
+  //     headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
+  //     alternateRowStyles: { fillColor: [220, 220, 220] },
+  //   });
 
-    // Update startY for summary table
-    const summaryTableStartY = doc.autoTable.previous.finalY + 10; // Adding space after detailed orders
+  //   // Update startY for summary table
+  //   const summaryTableStartY = doc.autoTable.previous.finalY + 10; // Adding space after detailed orders
 
-    // Add summary table
-    const summaryTableBody = [];
+  //   // Add summary table
+  //   const summaryTableBody = [];
 
-    dailySummary.forEach((entry) => {
-      entry.piatti.forEach((piatto, piattoIndex) => {
-        if (piattoIndex === 0) {
-          // Adding the "tipo_piatto" and "quantita_totale" row
-          summaryTableBody.push([
-            entry.tipo_piatto,
-            entry.tipo_quantita,
-            "",
-            "",
-          ]);
-          // Adding the dish and quantity for the first piatto
-          summaryTableBody.push(["", "", piatto.nome, piatto.quantita]);
-        } else {
-          // Adding subsequent piatti rows without the tipo_piatto and quantita_totale
-          summaryTableBody.push(["", "", piatto.nome, piatto.quantita]);
-        }
-      });
-    });
+  //   dailySummary.forEach((entry) => {
+  //     entry.piatti.forEach((piatto, piattoIndex) => {
+  //       if (piattoIndex === 0) {
+  //         // Adding the "tipo_piatto" and "quantita_totale" row
+  //         summaryTableBody.push([
+  //           entry.tipo_piatto,
+  //           entry.tipo_quantita,
+  //           "",
+  //           "",
+  //         ]);
+  //         // Adding the dish and quantity for the first piatto
+  //         summaryTableBody.push(["", "", piatto.nome, piatto.quantita]);
+  //       } else {
+  //         // Adding subsequent piatti rows without the tipo_piatto and quantita_totale
+  //         summaryTableBody.push(["", "", piatto.nome, piatto.quantita]);
+  //       }
+  //     });
+  //   });
 
-    // Draw the summary table with conditional row styles
-    doc.autoTable({
-      startY: summaryTableStartY,
-      head: [
-        ["Tipo di Piatto", "Quantità Totale", "Nome del Piatto", "Quantità"],
-      ],
-      body: summaryTableBody,
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
-      rowStyles: (row, data) => {
-        // Check if it's a "tipo_piatto" row (not empty in first column)
-        if (row.data[0] !== "") {
-          return { fillColor: [220, 220, 220] }; // Changed to (220, 220, 220)
-        }
-        return { fillColor: [255, 255, 255] }; // White for the piatto rows
-      },
-    });
+  //   // Draw the summary table with conditional row styles
+  //   doc.autoTable({
+  //     startY: summaryTableStartY,
+  //     head: [
+  //       ["Tipo di Piatto", "Quantità Totale", "Nome del Piatto", "Quantità"],
+  //     ],
+  //     body: summaryTableBody,
+  //     styles: { fontSize: 10, cellPadding: 5 },
+  //     headStyles: { fillColor: [52, 152, 219], textColor: 255 }, // Use #3498db
+  //     rowStyles: (row, data) => {
+  //       // Check if it's a "tipo_piatto" row (not empty in first column)
+  //       if (row.data[0] !== "") {
+  //         return { fillColor: [220, 220, 220] }; // Changed to (220, 220, 220)
+  //       }
+  //       return { fillColor: [255, 255, 255] }; // White for the piatto rows
+  //     },
+  //   });
 
-    // Add footer
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.setTextColor(150);
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: "center" }
-      );
-    }
+  //   // Add footer
+  //   const pageCount = doc.internal.getNumberOfPages();
+  //   for (let i = 1; i <= pageCount; i++) {
+  //     doc.setPage(i);
+  //     doc.setFontSize(10);
+  //     doc.setTextColor(150);
+  //     doc.text(
+  //       `Page ${i} of ${pageCount}`,
+  //       doc.internal.pageSize.width / 2,
+  //       doc.internal.pageSize.height - 10,
+  //       { align: "center" }
+  //     );
+  //   }
 
-    // Save the PDF with the date in the filename
-    const fileName = `DailyOrderReport_${formatCalendarData(selectedDate)}.pdf`;
-    doc.save(fileName);
-  };
+  //   // Save the PDF with the date in the filename
+  //   const fileName = `DailyOrderReport_${formatCalendarData(selectedDate)}.pdf`;
+  //   doc.save(fileName);
+  // };
 
   const DisplayData = (date) => {
     let dayOfWeek = date.getDay();
@@ -248,16 +248,6 @@ const AllOrderOfDayComponent = () => {
             </table>
           </div>
         </Card>
-      )}
-
-      {role === "Amministratore" && (
-        <div className="pdf-button-section">
-          <Button
-            label="Genera PDF"
-            icon="pi pi-file-pdf"
-            onClick={generatePDF}
-          />
-        </div>
       )}
     </div>
   );

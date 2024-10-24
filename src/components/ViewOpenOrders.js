@@ -492,7 +492,7 @@ const ViewOpenOrders = () => {
       "Contorno",
       "Piatto unico",
       "Dessert",
-      "Pane/Grissini",
+      "Altri",
     ];
 
     const tableData = mealTypes.map((mealType) => {

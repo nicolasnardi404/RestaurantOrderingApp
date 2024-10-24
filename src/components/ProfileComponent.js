@@ -23,12 +23,12 @@ export default function ProfilePage() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          },
+          }
         );
 
         if (response.data && Array.isArray(response.data)) {
           const alerts = response.data.filter(
-            (alert) => alert.idUser === user.userId,
+            (alert) => alert.idUser === user.userId
           );
           const days = alerts.map((alert) => alert.giorno);
           setSelectedDays(days);
@@ -46,7 +46,7 @@ export default function ProfilePage() {
 
   const handleChange = (day) => {
     setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
   };
 
@@ -126,6 +126,9 @@ export default function ProfilePage() {
           <strong>Nome:</strong> {user.nome}
         </p>
         <p className="profile-detail">
+          <strong>Email:</strong> {user.email}
+        </p>
+        <p className="profile-detail">
           <strong>Ruolo:</strong> {user.ruolo}
         </p>
       </div>
@@ -133,22 +136,20 @@ export default function ProfilePage() {
       {hasWarnings && (
         <div className="update-section">
           <p className="profile-detail">
-            <strong>Giorni di Prenotazione:</strong>{" "}
+            <strong>Giorni di Presenza in Ufficio:</strong>{" "}
             {selectedDays.join(", ") || "Nessuno"}
           </p>
           <button onClick={handleDelete} className="delete-button">
-            Elimina Giorni di Prenotazione
+            Elimina Giorni di Presenza in Ufficio
           </button>
-          <p className="update-message">
-            Hai già fatto giorni di prenotazione. Se desideri aggiornare,
-            elimina prima i precedenti.
-          </p>
         </div>
       )}
 
       {!hasWarnings && (
         <form onSubmit={handleSubmit} className="warning-form">
-          <h2 className="form-title">Selezionare Giorni di Prenotazione</h2>
+          <h2 className="form-title">
+            Selezionare Giorni di Presenza in Ufficio
+          </h2>
           {daysOfWeek.map((day) => (
             <div key={day} className="day-checkbox">
               <label className="profile-detail">
