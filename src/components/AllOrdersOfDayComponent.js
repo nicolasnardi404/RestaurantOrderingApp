@@ -54,25 +54,23 @@ const AllOrderOfDayComponent = () => {
 
   const fetchDailySummary = async (date) => {
     setLoading(true);
-    if (role === "Amministratore") {
-      try {
-        const dateString = formatCalendarData(date);
-        const token = getToken();
-        const response = await axios.get(
-          `${apiUrl}/ordine/totalPiattoByDay/${dateString}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Add the token to the request headers
-            },
-          }
-        );
-        setDailySummary(response.data);
-      } catch (error) {
-        console.error("Error fetching daily summary:", error);
-        setDailySummary([]);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const dateString = formatCalendarData(date);
+      const token = getToken();
+      const response = await axios.get(
+        `${apiUrl}/ordine/totalPiattoByDay/${dateString}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add the token to the request headers
+          },
+        }
+      );
+      setDailySummary(response.data);
+    } catch (error) {
+      console.error("Error fetching daily summary:", error);
+      setDailySummary([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -204,51 +202,47 @@ const AllOrderOfDayComponent = () => {
         >
           <Column field="username" header="Utente" sortable />
           <Column field="piatti" header="Piatti Ordinati" sortable />
-          {user.ruolo === "Amministratore" && (
-            <Column field="observazioni" header="Osservazioni" sortable />
-          )}
+          <Column field="observazioni" header="Osservazioni" sortable />
         </DataTable>
       </Card>
 
-      {role === "Amministratore" && (
-        <Card
-          title={`Riepilogo per ${DisplayData(selectedDate)}`}
-          className="summary-card"
-        >
-          <div>
-            <table className="summary-table">
-              <thead>
-                <tr>
-                  <th>Tipo di Piatto</th>
-                  <th>Quantità Totale</th>
-                  <th>Nome del Piatto</th>
-                  <th>Quantità</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dailySummary.map((entry, index) =>
-                  entry.piatti.map((piatto, piattoIndex) => (
-                    <tr key={`${index}-${piattoIndex}`}>
-                      {piattoIndex === 0 && (
-                        <>
-                          <td rowSpan={entry.piatti.length}>
-                            {entry.tipo_piatto}
-                          </td>
-                          <td rowSpan={entry.piatti.length}>
-                            {entry.tipo_quantita}
-                          </td>
-                        </>
-                      )}
-                      <td>{piatto.nome}</td>
-                      <td>{piatto.quantita}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      )}
+      <Card
+        title={`Riepilogo per ${DisplayData(selectedDate)}`}
+        className="summary-card"
+      >
+        <div>
+          <table className="summary-table">
+            <thead>
+              <tr>
+                <th>Tipo di Piatto</th>
+                <th>Quantità Totale</th>
+                <th>Nome del Piatto</th>
+                <th>Quantità</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dailySummary.map((entry, index) =>
+                entry.piatti.map((piatto, piattoIndex) => (
+                  <tr key={`${index}-${piattoIndex}`}>
+                    {piattoIndex === 0 && (
+                      <>
+                        <td rowSpan={entry.piatti.length}>
+                          {entry.tipo_piatto}
+                        </td>
+                        <td rowSpan={entry.piatti.length}>
+                          {entry.tipo_quantita}
+                        </td>
+                      </>
+                    )}
+                    <td>{piatto.nome}</td>
+                    <td>{piatto.quantita}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </div>
   );
 };

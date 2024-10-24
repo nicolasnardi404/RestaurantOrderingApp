@@ -546,12 +546,12 @@ function MenuPage() {
       footer={
         <div>
           <Button
-            label="Vai agli Ordini Aperti"
+            label="Ordini Aperti"
             onClick={handleGoToOpenOrders}
             className="p-button-primary"
           />
           <Button
-            label="Torna al Menu"
+            label="Prenota Pasto"
             onClick={handleBackToMenu}
             className="p-button-secondary"
           />
@@ -615,6 +615,11 @@ function MenuPage() {
             {selectedUser ? `Ordine per: ${selectedUser.nome}` : ""}
           </p>
         )}
+
+      {user.ruolo === "Amministratore" && selectedUser ? (
+        <p>Utente: {selectedUser.nome}</p>
+      ) : null}
+
       <div className="date-selection">
         <Calendar
           value={selectedDay}

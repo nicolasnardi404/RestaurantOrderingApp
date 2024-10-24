@@ -521,6 +521,7 @@ const ViewOpenOrders = () => {
           <label className="font-bold">
             Data Prenotazione: {formatDate(editingOrder.reservationDate)}
           </label>
+          <label className="font-bold">Utente:</label>
         </div>
         <DataTable value={tableData} className="p-datatable-sm">
           <Column field="mealType" header="Tipo Pasto" />

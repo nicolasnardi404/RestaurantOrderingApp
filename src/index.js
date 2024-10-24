@@ -16,7 +16,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
 import MultiplePiatti from "./pages/MultiplePiatti";
 import ProfilePage from "./pages/ProfilePage";
-import AdminPage from "./pages/Admin";
 import UserManagement from "./pages/User";
 
 // Componente principal App
@@ -40,7 +39,6 @@ export default function App() {
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={["Amministratore"]} />}>
-            <Route path="/admin" element={<AdminPage />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/managepiatti" element={<CRUDPiatti />} />

@@ -59,11 +59,24 @@ export default function UserMenu() {
           >
             <i className="pi pi-user"></i> Profilo
           </button>
-          <hr></hr>
-          <button className="dropdown-item" onClick={() => navigate("/admin")}>
-            <i className="pi pi-cog"></i> Admin
-          </button>
-          <hr></hr>
+          {user.ruolo === "Amministratore" && (
+            <>
+              <hr></hr>
+              <button
+                className="dropdown-item"
+                onClick={() => navigate("/managepiatti")}
+              >
+                <i className="pi pi-bars"></i> Gestione Menu
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => navigate("/users")}
+              >
+                <i className="pi pi-user-edit"></i> Gestione Utente
+              </button>
+              <hr></hr>
+            </>
+          )}
           <button className="dropdown-item" onClick={handleLogout}>
             <i className="pi pi-power-off"></i> Logout
           </button>
