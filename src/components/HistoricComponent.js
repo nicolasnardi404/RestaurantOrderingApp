@@ -187,12 +187,6 @@ const HistoricComponent = () => {
       ? dateString.reservation_date.split("-")
       : dateString.date.split("-");
     const date = new Date(year, month - 1, day);
-
-    if (isNaN(date.getTime())) {
-      console.error("Invalid date:", dateString);
-      return "Invalid Date";
-    }
-
     const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const weekday = dayNames[date.getDay()];
 
@@ -629,7 +623,7 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => formatDateForDisplay(rowData.date)}
+                body={(rowData) => formatDateForDisplay(rowData)}
               />
               <Column
                 field="totalOrders"

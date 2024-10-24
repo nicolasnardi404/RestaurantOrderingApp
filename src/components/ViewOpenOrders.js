@@ -267,9 +267,11 @@ const ViewOpenOrders = () => {
               (id) => dishesById[id]?.tipo_piatto === "Dessert"
             )
           ] || null,
-        Altri:
+        "Pane/Grissini":
           dishesById[
-            selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Altri")
+            selectedDishes.find(
+              (id) => dishesById[id]?.tipo_piatto === "Pane/Grissini"
+            )
           ] || null,
         Observazioni:
           dishesById[
@@ -315,7 +317,7 @@ const ViewOpenOrders = () => {
   const isValidCombination = (selectedDishes) => {
     console.log("selected dishes" + JSON.stringify(selectedDishes));
     const selectedTypes = Object.keys(selectedDishes).filter(
-      (type) => selectedDishes[type] !== null && type !== "Altri"
+      (type) => selectedDishes[type] !== null && type !== "Pane/Grissini"
     );
 
     const isValid = validCombinations.some(
@@ -336,7 +338,7 @@ const ViewOpenOrders = () => {
     if (Secondo) selectedItems.add("Secondo");
     if (Contorno) selectedItems.add("Contorno");
     if (PiattoUnico) selectedItems.add("Piatto unico");
-    if (Altri) selectedItems.add("Altri");
+    if (Altri) selectedItems.add("Pane/Grissini");
     if (Dessert) selectedItems.add("Dessert");
 
     const combinations = validCombinations.some((combination) => {
@@ -499,7 +501,7 @@ const ViewOpenOrders = () => {
       "Contorno",
       "Piatto unico",
       "Dessert",
-      "Altri",
+      "Pane/Grissini",
       "Observazioni",
     ];
 
