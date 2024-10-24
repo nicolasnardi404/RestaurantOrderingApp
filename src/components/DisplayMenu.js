@@ -543,6 +543,7 @@ function MenuPage() {
       onHide={() => setShowSuccessModal(false)}
       header="Ordine Confermato"
       modal
+      closable={false} // This will remove the close (X) button
       footer={
         <div>
           <Button
