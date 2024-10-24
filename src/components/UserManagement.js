@@ -212,9 +212,9 @@ const GestioneUtenti = () => {
         <div className="p-col-12">
           <label>Attivo:</label>
           <InputSwitch
-            checked={userToUpdate.attivo}
+            checked={userToUpdate.attivo === 1}
             onChange={(e) =>
-              setUserToUpdate({ ...userToUpdate, attivo: e.value })
+              setUserToUpdate({ ...userToUpdate, attivo: e.value ? 1 : 0 })
             }
           />
         </div>
@@ -266,18 +266,18 @@ const GestioneUtenti = () => {
       <table className="user-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>Nome</th>
             <th>Email</th>
+            <th>Attivo</th>
             <th>Azioni</th>
           </tr>
         </thead>
         <tbody>
           {utenti.map((utente) => (
             <tr className="user-item" key={utente.id}>
-              <td>{utente.id}</td>
               <td>{utente.nome}</td>
               <td>{utente.email}</td>
+              <td>{utente.attivo ? "Attivo" : "Inattivo"}</td>
               <td>
                 <div className="action-buttons">
                   <Button

@@ -200,6 +200,7 @@ const AllOrderOfDayComponent = () => {
           emptyMessage="Nessun ordine per questo giorno."
           className="p-datatable-responsive"
         >
+          <Column body={(rowData, { rowIndex }) => rowIndex + 1} header="N°" />
           <Column field="username" header="Utente" />
           <Column field="piatti" header="Piatti Ordinati" />
           <Column field="observazioni" header="Osservazioni" />

@@ -265,7 +265,6 @@ function ManagePiatti() {
         globalFilter={globalFilter}
         header={header}
       >
-        <Column field="id_piatto" header="ID" />
         <Column field="nome_piatto" header="Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="dayOfWeek" header="Giorno Della Settimana" />

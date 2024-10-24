@@ -189,7 +189,7 @@ function MenuPage() {
     if (Secondo) selectedItems.add("Secondo");
     if (Contorno) selectedItems.add("Contorno");
     if (PiattoUnico) selectedItems.add("Piatto unico");
-    if (Altri) selectedItems.add("Altri");
+    if (Altri) selectedItems.add("Pane/Grissini");
     if (Dessert) selectedItems.add("Dessert");
 
     const combinations = validCombinations.some((combination) => {
@@ -216,7 +216,9 @@ function MenuPage() {
   const isValidCombination = () => {
     // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(cart).filter(
-      (type) => cart[type] !== null && type !== "Altri"
+      (type) =>
+        cart[type] !== null &&
+        (type !== "Pane/Grissini" || type !== "Observazioni")
     );
 
     // Verifica se a combinação é válida sem considerar "Altri"
@@ -235,7 +237,7 @@ function MenuPage() {
     setCart({});
     setCombinationStatus("");
     setError("");
-    setObservazioni("");
+    setSelectedDay(new Date());
   };
 
   const toggleUserDropdown = () => {
@@ -265,22 +267,27 @@ function MenuPage() {
 
   const renderOrderMenu = () => (
     <div className="order-menu">
-      {["Primo", "Secondo", "Contorno", "Piatto unico", "Altri", "Dessert"].map(
-        (mealType) => (
-          <div key={mealType} className="menu-category">
-            <h3>{mealType === "Altri" ? "Pane/Grissini" : mealType}</h3>
-            <Dropdown
-              value={cart[mealType]}
-              options={getFilteredDishes(mealType)}
-              onChange={(e) => handleDropdownChange(mealType, e.value)}
-              optionLabel="nome"
-              placeholder={`=== SELEZIONA ===`}
-              className="w-full md:w-14rem"
-              showClear
-            />
-          </div>
-        )
-      )}
+      {[
+        "Primo",
+        "Secondo",
+        "Contorno",
+        "Piatto unico",
+        "Pane/Grissini",
+        "Dessert",
+      ].map((mealType) => (
+        <div key={mealType} className="menu-category">
+          <h3>{mealType}</h3>
+          <Dropdown
+            value={cart[mealType]}
+            options={getFilteredDishes(mealType)}
+            onChange={(e) => handleDropdownChange(mealType, e.value)}
+            optionLabel="nome"
+            placeholder={`=== SELEZIONA ===`}
+            className="w-full md:w-14rem"
+            showClear
+          />
+        </div>
+      ))}
 
       <div className="observazioni">
         <h3>Osservazioni</h3>
