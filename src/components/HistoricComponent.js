@@ -182,9 +182,39 @@ const HistoricComponent = () => {
     }
   }, [filteredData]);
 
-  const formatDateForDisplay = (dateString) => {
-    const [year, month, day] = dateString.reservation_date.split("-");
+  const formatDateForDisplay = (dateInput) => {
+    let dateString;
+
+    if (typeof dateInput === "string") {
+      // If dateInput is already a string, use it directly
+      dateString = dateInput;
+    } else if (dateInput && dateInput.reservation_date) {
+      // If dateInput is an object with reservation_date property
+      dateString = dateInput.reservation_date;
+    } else {
+      console.error("Invalid date input:", dateInput);
+      return "Invalid Date";
+    }
+
+    // Remove any non-digit characters to handle formats like "2024-10-21"
+    dateString = dateString.replace(/\D/g, "");
+
+    if (dateString.length !== 8) {
+      console.error("Invalid date format:", dateString);
+      return "Invalid Date";
+    }
+
+    const year = dateString.slice(0, 4);
+    const month = dateString.slice(4, 6);
+    const day = dateString.slice(6, 8);
+
     const date = new Date(year, month - 1, day);
+
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date:", dateString);
+      return "Invalid Date";
+    }
+
     const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const weekday = dayNames[date.getDay()];
 
@@ -337,9 +367,17 @@ const HistoricComponent = () => {
 
       // New monthly overview data processing
       const overviewData = processMonthlyOverviewData(data);
+
+      // Filter the users in the monthly overview data if a username is selected
+      if (selectedUsername) {
+        overviewData.users = overviewData.users.filter(
+          (user) => user === selectedUsername
+        );
+      }
+
       setMonthlyOverviewData(overviewData);
     }
-  }, [data]);
+  }, [data, selectedUsername]);
 
   const generateExcel = () => {
     if (!monthlyOverviewData) return;
@@ -347,11 +385,6 @@ const HistoricComponent = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
-    // Define border styles
-    const thinBorder = { style: "thin", color: { rgb: "000000" } };
-    const thickBorder = { style: "medium", color: { rgb: "000000" } };
-
-    // Add header row with styles
     const headerRow = [
       "Utente",
       ...monthlyOverviewData.days.map((d) => d.day),
@@ -406,7 +439,7 @@ const HistoricComponent = () => {
       }
     });
 
-    // Add monthly total row with styles
+
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
     monthlyOverviewData.days.forEach(({ day }) => {
@@ -420,6 +453,7 @@ const HistoricComponent = () => {
     XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], {
       origin: `A${monthlyOverviewData.users.length + 2}`,
     });
+
 
     // Apply styles to monthly total row
     for (let i = 0; i < monthlyTotalRow.length; i++) {
@@ -438,6 +472,7 @@ const HistoricComponent = () => {
         },
       };
     }
+
 
     // Set column widths
     const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
@@ -655,7 +690,7 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => rowData.date}
+                body={(rowData) => formatDateForDisplay(rowData.date)}
                 sortable
               />
               <Column
@@ -688,6 +723,7 @@ const HistoricComponent = () => {
           <h3>
             Panoramica Mensile - {monthlyOverviewData.month}{" "}
             {monthlyOverviewData.year}
+            {selectedUsername && ` - ${selectedUsername}`}
           </h3>
           <table className="monthly-table">
             <thead>
@@ -740,7 +776,11 @@ const HistoricComponent = () => {
                 {monthlyOverviewData.days.map(({ day }) => (
                   <td key={day}>
                     {monthlyOverviewData.data[day]
-                      ? Object.keys(monthlyOverviewData.data[day]).length
+                      ? selectedUsername
+                        ? monthlyOverviewData.data[day][selectedUsername]
+                          ? 1
+                          : 0
+                        : Object.keys(monthlyOverviewData.data[day]).length
                       : 0}
                   </td>
                 ))}
@@ -749,7 +789,11 @@ const HistoricComponent = () => {
                     (total, { day }) =>
                       total +
                       (monthlyOverviewData.data[day]
-                        ? Object.keys(monthlyOverviewData.data[day]).length
+                        ? selectedUsername
+                          ? monthlyOverviewData.data[day][selectedUsername]
+                            ? 1
+                            : 0
+                          : Object.keys(monthlyOverviewData.data[day]).length
                         : 0),
                     0
                   )}
