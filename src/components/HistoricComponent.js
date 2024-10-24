@@ -183,7 +183,9 @@ const HistoricComponent = () => {
   }, [filteredData]);
 
   const formatDateForDisplay = (dateString) => {
-    const [year, month, day] = dateString.reservation_date.split("-");
+    const [year, month, day] = dateString.reservation_date
+      ? dateString.reservation_date.split("-")
+      : dateString.date.split("-");
     const date = new Date(year, month - 1, day);
     const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const weekday = dayNames[date.getDay()];
@@ -655,13 +657,11 @@ const HistoricComponent = () => {
               <Column
                 field="date"
                 header="Data" // Changed to Italian
-                body={(rowData) => rowData.date}
-                sortable
+                body={(rowData) => formatDateForDisplay(rowData.date)}
               />
               <Column
                 field="totalOrders"
                 header="Totale Ordini" // Changed to Italian
-                sortable
               />
             </DataTable>
           ) : (

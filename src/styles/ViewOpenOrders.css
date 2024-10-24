@@ -17,6 +17,14 @@
   margin-bottom: 20px;
 }
 
+.error-combination {
+  color: var(--accent-color);
+  background-color: #ffebee;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
 /* DataTable styles */
 .p-datatable {
   margin-top: 20px;

@@ -449,7 +449,6 @@ const ViewOpenOrders = () => {
         responsiveLayout="scroll"
         rowClassName={rowClassName}
       >
-        <Column field="idPrenotazione" header="ID" />
         <Column field="username" header="Username" />
         <Column
           field="datePiatti"
@@ -541,10 +540,12 @@ const ViewOpenOrders = () => {
     return (
       <div>
         <div className="p-field mb-4">
+          {user.ruolo === "Amministratore" && (
+            <label className="font-bold">Utente: {usernameFilter}</label>
+          )}
           <label className="font-bold">
             Data Prenotazione: {formatDate(editingOrder.reservationDate)}
           </label>
-          <label className="font-bold">Utente:</label>
         </div>
         <DataTable value={tableData} className="p-datatable-sm">
           <Column field="mealType" header="Tipo Pasto" />
@@ -558,6 +559,9 @@ const ViewOpenOrders = () => {
           <div className="combination-status mt-3">{combinationStatus}</div>
         )}
         {error && <div className="error-message mt-3">{error}</div>}
+        {!isValidCombination(editingOrder.selectedDishes) && (
+          <p className="error-combination">Combinazione Invalida</p>
+        )}
         <div className="flex justify-content-end mt-4">
           <Button
             label="Aggiorna ordine"
