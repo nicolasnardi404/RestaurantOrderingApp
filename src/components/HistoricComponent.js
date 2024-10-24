@@ -230,58 +230,73 @@ const HistoricComponent = () => {
     }
   }, [showTotalPerDay, data, filteredData, selectedUsername]);
 
-  // Modify the generatePDF function to accept a parameter
-  const generatePDF = (type) => {
-    if (!selectedMonth) {
-      alert("Per favore, seleziona un mese per generare il PDF.");
-      return;
-    }
+  // // Modify the generatePDF function to accept a parameter
+  // const generatePDF = (type) => {
+  //   if (!selectedMonth) {
+  //     alert("Per favore, seleziona un mese per generare il PDF.");
+  //     return;
+  //   }
 
-    const doc = new jsPDF();
-    doc.setFont("helvetica");
-    doc.setFontSize(20);
-    doc.setTextColor(40, 40, 40);
-    doc.text("Relazione Mensile degli Ordini", 14, 30);
+  // Creazione di un nuovo documento PDF
+  // const doc = new jsPDF();
+  // Impostazione del font e della dimensione del testo per il titolo
+  // doc.setFont("helvetica");
+  // doc.setFontSize(20);
+  // Impostazione del colore del testo per il titolo
+  // doc.setTextColor(40, 40, 40);
+  // Inserimento del titolo nel documento
+  // doc.text("Relazione Mensile degli Ordini", 14, 30);
 
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Utente: ${selectedUsername || "Tutti"}`, 14, 45);
-    doc.text(
-      `Mese: ${selectedMonth.toLocaleString("it-IT", { month: "long", year: "numeric" })}`,
-      14,
-      52
-    );
-    doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
+  // Impostazione del font e della dimensione del testo per le informazioni
+  // doc.setFontSize(12);
+  // Impostazione del colore del testo per le informazioni
+  // doc.setTextColor(100, 100, 100);
+  // Inserimento delle informazioni dell'utente nel documento
+  // doc.text(`Utente: ${selectedUsername || "Tutti"}`, 14, 45);
+  // Inserimento delle informazioni del mese nel documento
+  // doc.text(
+  //   `Mese: ${selectedMonth.toLocaleString("it-IT", { month: "long", year: "numeric" })}`,
+  //   14,
+  //   52
+  // );
+  // Inserimento del totale degli ordini nel documento
+  // doc.text(`Totale Ordini: ${totalOrders}`, 14, 59);
 
-    doc.autoTable({
-      startY: 70,
-      head: [["Data", "Totale Ordini"]],
-      body: totalPerDayData.map((item) => [
-        formatDateForDisplay(item.date),
-        item.totalOrders,
-      ]),
-      styles: { fontSize: 10, cellPadding: 5 },
-      headStyles: { fillColor: [66, 139, 202], textColor: 255 },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
-    });
+  // Creazione di una tabella automatica per i dati giornalieri
+  // doc.autoTable({
+  //   startY: 70,
+  //   // Definizione delle intestazioni della tabella
+  //   head: [["Data", "Totale Ordini"]],
+  //   // Preparazione dei dati per la tabella
+  //   body: totalPerDayData.map((item) => [
+  //     // Formattazione della data per la visualizzazione
+  //     formatDateForDisplay(item.date),
+  //     item.totalOrders,
+  //   ]),
+  //   // Stili per la tabella
+  //   styles: { fontSize: 10, cellPadding: 5 },
+  //   // Stili per le intestazioni della tabella
+  //   headStyles: { fillColor: [66, 139, 202], textColor: 255 },
+  //   // Stili per le righe alternate della tabella
+  //   alternateRowStyles: { fillColor: [245, 245, 245] },
+  // });
+  // const pageCount = doc.internal.getNumberOfPages();
+  // for (let i = 1; i <= pageCount; i++) {
+  //   doc.setPage(i);
+  //   doc.setFontSize(10);
+  //   doc.setTextColor(150);
+  //   doc.text(
+  //     `Pagina ${i} di ${pageCount}`,
+  //     doc.internal.pageSize.width / 2,
+  //     doc.internal.pageSize.height - 10,
+  //     { align: "center" }
+  //   );
+  // }
 
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.setTextColor(150);
-      doc.text(
-        `Pagina ${i} di ${pageCount}`,
-        doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 10,
-        { align: "center" }
-      );
-    }
-
-    doc.save(
-      `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`
-    );
-  };
+  //  doc.save(
+  //     `${selectedUsername || "tutti"}_${selectedMonth.getFullYear()}_${selectedMonth.getMonth() + 1}_ordini.pdf`
+  //   );
+  // };
 
   const processData = (data) => {
     const monthData = {};
@@ -504,7 +519,7 @@ const HistoricComponent = () => {
               <div className="p-col-12 p-md-3">
                 <div className="p-field">
                   <label htmlFor="detailLevelDropdown">
-                    Livello di Dettaglio !
+                    Livello di Dettaglio
                   </label>
                   <Dropdown
                     id="detailLevelDropdown"
@@ -545,7 +560,7 @@ const HistoricComponent = () => {
 
           {isAdmin && monthlyOverviewData && (
             <div className="total-pdf-card" id="rapporto-amministrazione">
-              <div className="pdf-button-section">
+              {/* <div className="pdf-button-section">
                 <Button
                   label={
                     tempSelectedUsername
@@ -562,7 +577,7 @@ const HistoricComponent = () => {
                   onClick={generateExcel}
                   className="p-mt-3"
                 />
-              </div>
+              </div> */}
             </div>
           )}
         </Card>
