@@ -367,9 +367,17 @@ const HistoricComponent = () => {
 
       // New monthly overview data processing
       const overviewData = processMonthlyOverviewData(data);
+
+      // Filter the users in the monthly overview data if a username is selected
+      if (selectedUsername) {
+        overviewData.users = overviewData.users.filter(
+          (user) => user === selectedUsername
+        );
+      }
+
       setMonthlyOverviewData(overviewData);
     }
-  }, [data]);
+  }, [data, selectedUsername]);
 
   const generateExcel = () => {
     if (!monthlyOverviewData) return;
@@ -679,6 +687,7 @@ const HistoricComponent = () => {
           <h3>
             Panoramica Mensile - {monthlyOverviewData.month}{" "}
             {monthlyOverviewData.year}
+            {selectedUsername && ` - ${selectedUsername}`}
           </h3>
           <table className="monthly-table">
             <thead>
@@ -731,7 +740,11 @@ const HistoricComponent = () => {
                 {monthlyOverviewData.days.map(({ day }) => (
                   <td key={day}>
                     {monthlyOverviewData.data[day]
-                      ? Object.keys(monthlyOverviewData.data[day]).length
+                      ? selectedUsername
+                        ? monthlyOverviewData.data[day][selectedUsername]
+                          ? 1
+                          : 0
+                        : Object.keys(monthlyOverviewData.data[day]).length
                       : 0}
                   </td>
                 ))}
@@ -740,7 +753,11 @@ const HistoricComponent = () => {
                     (total, { day }) =>
                       total +
                       (monthlyOverviewData.data[day]
-                        ? Object.keys(monthlyOverviewData.data[day]).length
+                        ? selectedUsername
+                          ? monthlyOverviewData.data[day][selectedUsername]
+                            ? 1
+                            : 0
+                          : Object.keys(monthlyOverviewData.data[day]).length
                         : 0),
                     0
                   )}
