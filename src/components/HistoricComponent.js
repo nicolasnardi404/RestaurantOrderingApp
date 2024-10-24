@@ -347,14 +347,34 @@ const HistoricComponent = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
-    // Add header row
-    XLSX.utils.sheet_add_aoa(
-      ws,
-      [["Utente", ...monthlyOverviewData.days.map((d) => d.day), "Totale"]],
-      { origin: "A1" }
-    );
+    // Define border styles
+    const thinBorder = { style: "thin", color: { rgb: "000000" } };
+    const thickBorder = { style: "medium", color: { rgb: "000000" } };
 
-    // Add data rows
+    // Add header row with styles
+    const headerRow = [
+      "Utente",
+      ...monthlyOverviewData.days.map((d) => d.day),
+      "Totale",
+    ];
+    XLSX.utils.sheet_add_aoa(ws, [headerRow], { origin: "A1" });
+
+    // Apply styles to header row
+    for (let i = 0; i < headerRow.length; i++) {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: i });
+      ws[cellRef].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "CCCCCC" } },
+        border: {
+          top: thickBorder,
+          bottom: thinBorder,
+          left: i === 0 ? thickBorder : thinBorder,
+          right: i === headerRow.length - 1 ? thickBorder : thinBorder,
+        },
+      };
+    }
+
+    // Add data rows with styles
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
@@ -363,7 +383,7 @@ const HistoricComponent = () => {
           monthlyOverviewData.data[day] &&
           monthlyOverviewData.data[day][user]
         ) {
-          rowData.push("X");
+          rowData.push(1);
           userTotal++;
         } else {
           rowData.push("");
@@ -371,8 +391,22 @@ const HistoricComponent = () => {
       });
       rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
+
+      // Apply styles to data cells
+      for (let i = 0; i < rowData.length; i++) {
+        const cellRef = XLSX.utils.encode_cell({ r: index + 1, c: i });
+        ws[cellRef].s = {
+          border: {
+            top: thinBorder,
+            bottom: thinBorder,
+            left: i === 0 ? thickBorder : thinBorder,
+            right: i === rowData.length - 1 ? thickBorder : thinBorder,
+          },
+        };
+      }
     });
 
+    // Add monthly total row with styles
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
     monthlyOverviewData.days.forEach(({ day }) => {
@@ -386,6 +420,32 @@ const HistoricComponent = () => {
     XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], {
       origin: `A${monthlyOverviewData.users.length + 2}`,
     });
+
+    // Apply styles to monthly total row
+    for (let i = 0; i < monthlyTotalRow.length; i++) {
+      const cellRef = XLSX.utils.encode_cell({
+        r: monthlyOverviewData.users.length + 1,
+        c: i,
+      });
+      ws[cellRef].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "EEEEEE" } },
+        border: {
+          top: thinBorder,
+          bottom: thickBorder,
+          left: i === 0 ? thickBorder : thinBorder,
+          right: i === monthlyTotalRow.length - 1 ? thickBorder : thinBorder,
+        },
+      };
+    }
+
+    // Set column widths
+    const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
+    for (let i = 1; i <= monthlyOverviewData.days.length; i++) {
+      colWidths.push({ wch: 5 }); // Width for day columns
+    }
+    colWidths.push({ wch: 10 }); // Width for the "Totale" column
+    ws["!cols"] = colWidths;
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Monthly Overview");
@@ -560,7 +620,8 @@ const HistoricComponent = () => {
 
           {isAdmin && monthlyOverviewData && (
             <div className="total-pdf-card" id="rapporto-amministrazione">
-              {/* <div className="pdf-button-section">
+              <div className="pdf-button-section">
+                {/* PDF generation button remains commented out
                 <Button
                   label={
                     tempSelectedUsername
@@ -570,6 +631,7 @@ const HistoricComponent = () => {
                   icon="pi pi-file-pdf"
                   onClick={() => generatePDF("daily")}
                 />
+                */}
 
                 <Button
                   label={`Panoramica Mensile di ${monthlyOverviewData.month} ${monthlyOverviewData.year}`}
@@ -577,7 +639,7 @@ const HistoricComponent = () => {
                   onClick={generateExcel}
                   className="p-mt-3"
                 />
-              </div> */}
+              </div>
             </div>
           )}
         </Card>
@@ -658,7 +720,7 @@ const HistoricComponent = () => {
                     >
                       {monthlyOverviewData.data[day] &&
                       monthlyOverviewData.data[day][user]
-                        ? "X"
+                        ? "1"
                         : ""}
                     </td>
                   ))}
