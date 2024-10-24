@@ -271,6 +271,12 @@ const ViewOpenOrders = () => {
           dishesById[
             selectedDishes.find((id) => dishesById[id]?.tipo_piatto === "Altri")
           ] || null,
+        Observazioni:
+          dishesById[
+            selectedDishes.find(
+              (id) => dishesById[id]?.tipo_piatto === "Observazioni"
+            )
+          ] || null,
       },
       reservationDate: order.datePiatti,
       availableDishes: dishesForOrder,
@@ -454,6 +460,7 @@ const ViewOpenOrders = () => {
         />
         <Column field="piatti" header="Piatti" />
         <Column field="tipo_piatti" header="Combinazione" />
+        <Column field="Observazioni" header="Osservazioni" />
         <Column
           className="action-column"
           body={actionTemplate}
@@ -475,6 +482,7 @@ const ViewOpenOrders = () => {
       <Column field="datePiatti" header="Data Prenotazione" />
       <Column field="piatti" header="Piatti" />
       <Column field="tipo_piatti" header="Combinazione" />
+      <Column field="Observazioni" header="Osservazioni" />
       <Column
         body={actionTemplate}
         header="Azioni"
@@ -493,26 +501,41 @@ const ViewOpenOrders = () => {
       "Piatto unico",
       "Dessert",
       "Altri",
+      "Observazioni",
     ];
 
     const tableData = mealTypes.map((mealType) => {
-      return {
-        mealType,
-        dropdown: (
-          <Dropdown
-            value={editingOrder.selectedDishes[mealType]}
-            options={editingOrder.availableDishes.filter(
-              (dish) => dish.tipo_piatto === mealType
-            )}
-            {...console.log("MealType:" + [mealType])}
-            onChange={(e) => handleDropdownChange(mealType, e.value)}
-            optionLabel="nome"
-            placeholder="= SELEZIONA ="
-            showClear
-            className="w-full"
-          />
-        ),
-      };
+      if (mealType === "Observazioni") {
+        return {
+          mealType,
+          dropdown: (
+            <input
+              type="text"
+              value={console.log(editingOrder.selectedDishes) || ""}
+              onChange={(e) => handleDropdownChange(mealType, e.target.value)}
+              placeholder="Scrive le tue Osservazione"
+              className="w-full"
+            />
+          ),
+        };
+      } else {
+        return {
+          mealType,
+          dropdown: (
+            <Dropdown
+              value={editingOrder.selectedDishes[mealType]}
+              options={editingOrder.availableDishes.filter(
+                (dish) => dish.tipo_piatto === mealType
+              )}
+              onChange={(e) => handleDropdownChange(mealType, e.value)}
+              optionLabel="nome"
+              placeholder="= SELEZIONA ="
+              showClear
+              className="w-full"
+            />
+          ),
+        };
+      }
     });
 
     return (
