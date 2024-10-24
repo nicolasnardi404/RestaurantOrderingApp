@@ -398,16 +398,11 @@ const HistoricComponent = () => {
       ws[cellRef].s = {
         font: { bold: true },
         fill: { fgColor: { rgb: "CCCCCC" } },
-        border: {
-          top: thickBorder,
-          bottom: thinBorder,
-          left: i === 0 ? thickBorder : thinBorder,
-          right: i === headerRow.length - 1 ? thickBorder : thinBorder,
-        },
+        // Removed border styles
       };
     }
 
-    // Add data rows with styles
+    // Add data rows
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
@@ -424,21 +419,7 @@ const HistoricComponent = () => {
       });
       rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
-
-      // Apply styles to data cells
-      for (let i = 0; i < rowData.length; i++) {
-        const cellRef = XLSX.utils.encode_cell({ r: index + 1, c: i });
-        ws[cellRef].s = {
-          border: {
-            top: thinBorder,
-            bottom: thinBorder,
-            left: i === 0 ? thickBorder : thinBorder,
-            right: i === rowData.length - 1 ? thickBorder : thinBorder,
-          },
-        };
-      }
     });
-
 
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
@@ -453,26 +434,6 @@ const HistoricComponent = () => {
     XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], {
       origin: `A${monthlyOverviewData.users.length + 2}`,
     });
-
-
-    // Apply styles to monthly total row
-    for (let i = 0; i < monthlyTotalRow.length; i++) {
-      const cellRef = XLSX.utils.encode_cell({
-        r: monthlyOverviewData.users.length + 1,
-        c: i,
-      });
-      ws[cellRef].s = {
-        font: { bold: true },
-        fill: { fgColor: { rgb: "EEEEEE" } },
-        border: {
-          top: thinBorder,
-          bottom: thickBorder,
-          left: i === 0 ? thickBorder : thinBorder,
-          right: i === monthlyTotalRow.length - 1 ? thickBorder : thinBorder,
-        },
-      };
-    }
-
 
     // Set column widths
     const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
