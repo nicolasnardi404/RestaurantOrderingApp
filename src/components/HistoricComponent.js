@@ -504,7 +504,7 @@ const HistoricComponent = () => {
               <div className="p-col-12 p-md-3">
                 <div className="p-field">
                   <label htmlFor="detailLevelDropdown">
-                    Livello di Dettaglio
+                    Livello di Dettaglio !
                   </label>
                   <Dropdown
                     id="detailLevelDropdown"
