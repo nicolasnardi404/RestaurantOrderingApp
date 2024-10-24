@@ -385,7 +385,6 @@ const HistoricComponent = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
-    // Add header row
     const headerRow = [
       "Utente",
       ...monthlyOverviewData.days.map((d) => d.day),
@@ -393,7 +392,22 @@ const HistoricComponent = () => {
     ];
     XLSX.utils.sheet_add_aoa(ws, [headerRow], { origin: "A1" });
 
-    // Add data rows
+    // Apply styles to header row
+    for (let i = 0; i < headerRow.length; i++) {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c: i });
+      ws[cellRef].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "CCCCCC" } },
+        border: {
+          top: thickBorder,
+          bottom: thinBorder,
+          left: i === 0 ? thickBorder : thinBorder,
+          right: i === headerRow.length - 1 ? thickBorder : thinBorder,
+        },
+      };
+    }
+
+    // Add data rows with styles
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
@@ -410,9 +424,22 @@ const HistoricComponent = () => {
       });
       rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
+
+      // Apply styles to data cells
+      for (let i = 0; i < rowData.length; i++) {
+        const cellRef = XLSX.utils.encode_cell({ r: index + 1, c: i });
+        ws[cellRef].s = {
+          border: {
+            top: thinBorder,
+            bottom: thinBorder,
+            left: i === 0 ? thickBorder : thinBorder,
+            right: i === rowData.length - 1 ? thickBorder : thinBorder,
+          },
+        };
+      }
     });
 
-    // Add monthly total row
+
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
     monthlyOverviewData.days.forEach(({ day }) => {
@@ -427,6 +454,26 @@ const HistoricComponent = () => {
       origin: `A${monthlyOverviewData.users.length + 2}`,
     });
 
+
+    // Apply styles to monthly total row
+    for (let i = 0; i < monthlyTotalRow.length; i++) {
+      const cellRef = XLSX.utils.encode_cell({
+        r: monthlyOverviewData.users.length + 1,
+        c: i,
+      });
+      ws[cellRef].s = {
+        font: { bold: true },
+        fill: { fgColor: { rgb: "EEEEEE" } },
+        border: {
+          top: thinBorder,
+          bottom: thickBorder,
+          left: i === 0 ? thickBorder : thinBorder,
+          right: i === monthlyTotalRow.length - 1 ? thickBorder : thinBorder,
+        },
+      };
+    }
+
+
     // Set column widths
     const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
     for (let i = 1; i <= monthlyOverviewData.days.length; i++) {
@@ -434,17 +481,6 @@ const HistoricComponent = () => {
     }
     colWidths.push({ wch: 10 }); // Width for the "Totale" column
     ws["!cols"] = colWidths;
-
-    // Center align all cells
-    const range = XLSX.utils.decode_range(ws["!ref"]);
-    for (let R = range.s.r; R <= range.e.r; ++R) {
-      for (let C = range.s.c; C <= range.e.c; ++C) {
-        const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
-        if (!ws[cellRef]) continue;
-        if (!ws[cellRef].s) ws[cellRef].s = {};
-        ws[cellRef].s.alignment = { horizontal: "center", vertical: "center" };
-      }
-    }
 
     // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Monthly Overview");
