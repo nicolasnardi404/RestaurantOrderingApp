@@ -187,6 +187,12 @@ const HistoricComponent = () => {
       ? dateString.reservation_date.split("-")
       : dateString.date.split("-");
     const date = new Date(year, month - 1, day);
+
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date:", dateString);
+      return "Invalid Date";
+    }
+
     const dayNames = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
     const weekday = dayNames[date.getDay()];
 
@@ -339,9 +345,17 @@ const HistoricComponent = () => {
 
       // New monthly overview data processing
       const overviewData = processMonthlyOverviewData(data);
+
+      // Filter the users in the monthly overview data if a username is selected
+      if (selectedUsername) {
+        overviewData.users = overviewData.users.filter(
+          (user) => user === selectedUsername
+        );
+      }
+
       setMonthlyOverviewData(overviewData);
     }
-  }, [data]);
+  }, [data, selectedUsername]);
 
   const generateExcel = () => {
     if (!monthlyOverviewData) return;
@@ -349,11 +363,6 @@ const HistoricComponent = () => {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
-    // Define border styles
-    const thinBorder = { style: "thin", color: { rgb: "000000" } };
-    const thickBorder = { style: "medium", color: { rgb: "000000" } };
-
-    // Add header row with styles
     const headerRow = [
       "Utente",
       ...monthlyOverviewData.days.map((d) => d.day),
@@ -367,16 +376,11 @@ const HistoricComponent = () => {
       ws[cellRef].s = {
         font: { bold: true },
         fill: { fgColor: { rgb: "CCCCCC" } },
-        border: {
-          top: thickBorder,
-          bottom: thinBorder,
-          left: i === 0 ? thickBorder : thinBorder,
-          right: i === headerRow.length - 1 ? thickBorder : thinBorder,
-        },
+        // Removed border styles
       };
     }
 
-    // Add data rows with styles
+    // Add data rows
     monthlyOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
@@ -393,22 +397,8 @@ const HistoricComponent = () => {
       });
       rowData.push(userTotal); // Add user total
       XLSX.utils.sheet_add_aoa(ws, [rowData], { origin: `A${index + 2}` });
-
-      // Apply styles to data cells
-      for (let i = 0; i < rowData.length; i++) {
-        const cellRef = XLSX.utils.encode_cell({ r: index + 1, c: i });
-        ws[cellRef].s = {
-          border: {
-            top: thinBorder,
-            bottom: thinBorder,
-            left: i === 0 ? thickBorder : thinBorder,
-            right: i === rowData.length - 1 ? thickBorder : thinBorder,
-          },
-        };
-      }
     });
 
-    // Add monthly total row with styles
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
     monthlyOverviewData.days.forEach(({ day }) => {
@@ -422,24 +412,6 @@ const HistoricComponent = () => {
     XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], {
       origin: `A${monthlyOverviewData.users.length + 2}`,
     });
-
-    // Apply styles to monthly total row
-    for (let i = 0; i < monthlyTotalRow.length; i++) {
-      const cellRef = XLSX.utils.encode_cell({
-        r: monthlyOverviewData.users.length + 1,
-        c: i,
-      });
-      ws[cellRef].s = {
-        font: { bold: true },
-        fill: { fgColor: { rgb: "EEEEEE" } },
-        border: {
-          top: thinBorder,
-          bottom: thickBorder,
-          left: i === 0 ? thickBorder : thinBorder,
-          right: i === monthlyTotalRow.length - 1 ? thickBorder : thinBorder,
-        },
-      };
-    }
 
     // Set column widths
     const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
@@ -688,6 +660,7 @@ const HistoricComponent = () => {
           <h3>
             Panoramica Mensile - {monthlyOverviewData.month}{" "}
             {monthlyOverviewData.year}
+            {selectedUsername && ` - ${selectedUsername}`}
           </h3>
           <table className="monthly-table">
             <thead>
@@ -740,7 +713,11 @@ const HistoricComponent = () => {
                 {monthlyOverviewData.days.map(({ day }) => (
                   <td key={day}>
                     {monthlyOverviewData.data[day]
-                      ? Object.keys(monthlyOverviewData.data[day]).length
+                      ? selectedUsername
+                        ? monthlyOverviewData.data[day][selectedUsername]
+                          ? 1
+                          : 0
+                        : Object.keys(monthlyOverviewData.data[day]).length
                       : 0}
                   </td>
                 ))}
@@ -749,7 +726,11 @@ const HistoricComponent = () => {
                     (total, { day }) =>
                       total +
                       (monthlyOverviewData.data[day]
-                        ? Object.keys(monthlyOverviewData.data[day]).length
+                        ? selectedUsername
+                          ? monthlyOverviewData.data[day][selectedUsername]
+                            ? 1
+                            : 0
+                          : Object.keys(monthlyOverviewData.data[day]).length
                         : 0),
                     0
                   )}
