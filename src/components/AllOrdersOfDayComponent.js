@@ -203,7 +203,11 @@ const AllOrderOfDayComponent = () => {
           <Column body={(rowData, { rowIndex }) => rowIndex + 1} header="N°" />
           <Column field="username" header="Utente" />
           <Column field="piatti" header="Piatti Ordinati" />
-          <Column field="observazioni" header="Osservazioni" />
+          <Column
+            field="observazioni"
+            header="Osservazioni"
+            body={(rowData) => <strong>{rowData.observazioni}</strong>}
+          />
         </DataTable>
       </Card>
 

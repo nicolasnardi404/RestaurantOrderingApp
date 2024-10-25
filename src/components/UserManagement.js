@@ -6,8 +6,8 @@ import { useNavigate } from "react-router-dom";
 import "primeicons/primeicons.css";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { InputSwitch } from "primereact/inputswitch";
 import "../styles/UserManagement.css";
+import { Checkbox } from "primereact/checkbox";
 
 const GestioneUtenti = () => {
   const [utenti, setUtenti] = useState([]);
@@ -209,14 +209,16 @@ const GestioneUtenti = () => {
             }
           />
         </div>
-        <div className="p-col-12">
-          <label>Attivo:</label>
-          <InputSwitch
-            checked={userToUpdate.attivo === 1}
-            onChange={(e) =>
-              setUserToUpdate({ ...userToUpdate, attivo: e.value ? 1 : 0 })
-            }
-          />
+        <div className="p-col-12 my-custom-class">
+          <label>
+            Attivo:
+            <Checkbox
+              checked={userToUpdate.attivo === 1}
+              onChange={(e) =>
+                setUserToUpdate({ ...userToUpdate, attivo: e.checked ? 1 : 0 })
+              }
+            />
+          </label>
         </div>
       </div>
     </Dialog>

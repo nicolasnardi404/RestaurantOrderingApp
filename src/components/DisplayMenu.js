@@ -214,11 +214,11 @@ function MenuPage() {
   ];
 
   const isValidCombination = () => {
-    // Filtra os tipos de pratos selecionados, exceto "Altri"
     const selectedTypes = Object.keys(cart).filter(
       (type) =>
         cart[type] !== null &&
-        (type !== "Pane/Grissini" || type !== "Observazioni")
+        type !== "Pane/Grissini" &&
+        type !== "Observazioni"
     );
 
     // Verifica se a combinação é válida sem considerar "Altri"

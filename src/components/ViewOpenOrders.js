@@ -302,6 +302,13 @@ const ViewOpenOrders = () => {
     });
   };
 
+  const handleObservazioniChange = (value) => {
+    setEditingOrder((prevOrder) => ({
+      ...prevOrder,
+      Observazioni: value || "",
+    }));
+  };
+
   const validCombinations = [
     ["Primo", "Secondo", "Contorno"],
     ["Primo", "Piatto unico", "Contorno"],
@@ -501,7 +508,6 @@ const ViewOpenOrders = () => {
       responsiveLayout="scroll"
       rowClassName={rowClassName}
     >
-      <Column field="idPrenotazione" header="ID" />
       <Column field="datePiatti" header="Data Prenotazione" />
       <Column field="piatti" header="Piatti" />
       <Column field="tipo_piatti" header="Combinazione" />
@@ -534,8 +540,8 @@ const ViewOpenOrders = () => {
           dropdown: (
             <input
               type="text"
-              value={editingOrder.selectedDishes.Observazioni}
-              onChange={(e) => handleDropdownChange(mealType, e.target.value)}
+              value={editingOrder.Observazioni || ""}
+              onChange={(e) => handleObservazioniChange(e.target.value)} // Chama a nova função aqui
               placeholder="Scrive le tue Osservazione"
               className="w-full"
             />
