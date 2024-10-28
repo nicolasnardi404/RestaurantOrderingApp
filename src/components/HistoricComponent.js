@@ -353,12 +353,15 @@ const HistoricComponent = () => {
   const generateExcel = () => {
     if (!monthlyOverviewData) return;
 
+    // Create a complete data set that includes all users
+    const completeOverviewData = processMonthlyOverviewData(data);
+
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
 
     const headerRow = [
       "Utente",
-      ...monthlyOverviewData.days.map((d) => d.day),
+      ...completeOverviewData.days.map((d) => d.day),
       "Totale",
     ];
     XLSX.utils.sheet_add_aoa(ws, [headerRow], { origin: "A1" });
@@ -369,18 +372,17 @@ const HistoricComponent = () => {
       ws[cellRef].s = {
         font: { bold: true },
         fill: { fgColor: { rgb: "CCCCCC" } },
-        // Removed border styles
       };
     }
 
-    // Add data rows
-    monthlyOverviewData.users.forEach((user, index) => {
+    // Add data rows for ALL users
+    completeOverviewData.users.forEach((user, index) => {
       const rowData = [user];
       let userTotal = 0;
-      monthlyOverviewData.days.forEach(({ day }) => {
+      completeOverviewData.days.forEach(({ day }) => {
         if (
-          monthlyOverviewData.data[day] &&
-          monthlyOverviewData.data[day][user]
+          completeOverviewData.data[day] &&
+          completeOverviewData.data[day][user]
         ) {
           rowData.push(1);
           userTotal++;
@@ -394,21 +396,21 @@ const HistoricComponent = () => {
 
     const monthlyTotalRow = ["Totale del mese"];
     let grandTotal = 0;
-    monthlyOverviewData.days.forEach(({ day }) => {
-      const dayTotal = monthlyOverviewData.data[day]
-        ? Object.keys(monthlyOverviewData.data[day]).length
+    completeOverviewData.days.forEach(({ day }) => {
+      const dayTotal = completeOverviewData.data[day]
+        ? Object.keys(completeOverviewData.data[day]).length
         : 0;
       grandTotal += dayTotal;
       monthlyTotalRow.push(dayTotal);
     });
     monthlyTotalRow.push(grandTotal); // Add grand total
     XLSX.utils.sheet_add_aoa(ws, [monthlyTotalRow], {
-      origin: `A${monthlyOverviewData.users.length + 2}`,
+      origin: `A${completeOverviewData.users.length + 2}`,
     });
 
     // Set column widths
     const colWidths = [{ wch: 20 }]; // Width for the "Utente" column
-    for (let i = 1; i <= monthlyOverviewData.days.length; i++) {
+    for (let i = 1; i <= completeOverviewData.days.length; i++) {
       colWidths.push({ wch: 5 }); // Width for day columns
     }
     colWidths.push({ wch: 10 }); // Width for the "Totale" column
