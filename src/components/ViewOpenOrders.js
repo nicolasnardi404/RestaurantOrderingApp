@@ -99,8 +99,6 @@ const ViewOpenOrders = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Fetched orders:", response.data);
-
       if (Array.isArray(response.data)) {
         setOrders(response.data);
         setUsers(getNames(response.data));
@@ -322,7 +320,6 @@ const ViewOpenOrders = () => {
   ];
 
   const isValidCombination = (selectedDishes) => {
-    console.log("selected dishes" + JSON.stringify(selectedDishes));
     const selectedTypes = Object.keys(selectedDishes).filter(
       (type) =>
         selectedDishes[type] !== null &&
@@ -428,7 +425,7 @@ const ViewOpenOrders = () => {
           dataPrenotazione: formatDateforServer(editingOrder.reservationDate),
           idPiatto: selectedDishIds,
           idOrdine: idOrdineArray,
-          Observazioni: editingOrder.selectedDishes.Observazioni, // Adicione Observazioni aqui
+          Observazioni: editingOrder.Observazioni, // Adicione Observazioni aqui
         };
 
         const token = getToken();

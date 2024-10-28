@@ -1,5 +1,3 @@
-open ORDERS
-    [ ] - ADD OBSERVATION TO TABLE
-    [ ] - ADD OBSERVATION TO MODIFICA
+
 
 

@@ -28,6 +28,7 @@ import ProfileComponent from "./components/ProfileComponent";
 import HistoricComponent from "./components/HistoricComponent";
 import DragAndDrop from "./components/DragAndDrop";
 
+
 function App() {
   return (
     <AuthProvider>
@@ -73,7 +74,9 @@ function App() {
                 path="/add-multiple-piatti"
                 element={<AddMultiplePiatti />}
               />
+
               <Route path="/drag-and-drop" element={<DragAndDrop />} />
+
             </Route>
           </Route>
 
