@@ -17,6 +17,7 @@
     "primereact": "^10.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-dropzone": "^14.2.10",
     "react-router-dom": "^6.25.1",
     "react-scripts": "5.0.1",
     "restaurant-ordering-app-client": "file:",

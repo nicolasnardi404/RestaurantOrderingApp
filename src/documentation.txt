@@ -1,0 +1,17 @@
+
+### Public Routes
+- `/login` - Login page
+- `/` - Redirects to login
+
+### Protected Routes (Amministratore & Dipendente)
+- `/menu` - Display menu and place orders
+- `/open-orders` - View current open orders
+- `/day-order` - View daily order summary
+- `/historic` - View order history
+- `/profile` - User profile management
+
+### Admin-Only Routes
+- `/users` - User management
+- `/register` - New user registration
+- `/managepiatti` - Menu item management
+- `/add-multiple-piatti` - Bulk menu item addition
