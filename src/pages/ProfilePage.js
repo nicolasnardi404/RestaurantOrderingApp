@@ -1,3 +1,4 @@
+/*
 import React from "react";
 import "../styles/ProfilePage.css";
 import ProfilePage from "../components/ProfileComponent";
@@ -11,3 +12,4 @@ export default function Menu() {
     </div>
   );
 }
+*/

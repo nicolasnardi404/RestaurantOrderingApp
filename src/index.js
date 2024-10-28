@@ -1,48 +1,78 @@
 import React from "react";
 import { AuthProvider } from "./context/AuthContext";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ReactDOM from "react-dom/client"; // Import atualizado
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Outlet,
+} from "react-router-dom";
+import { createRoot } from "react-dom/client";
+import UserMenu from "./components/UserMenu";
 
-// Importação das páginas
-import LogIn from "./pages/LogIn";
-import Menu from "./pages/Menu";
-import Historic from "./pages/Historic";
-import RegisterPage from "./pages/Register";
+// Import pages
+import Login from "./components/Login";
+
+import Register from "./components/Register";
 import OpenOrders from "./pages/OpenOrders";
 import MyApp from "./_app";
-import CRUDPiatti from "./pages/CRUDPiatti";
-import AllOrderOfDay from "./pages/AllOrderOfDay";
+import UserManagement from "./components/UserManagement";
+import ManagePiatti from "./components/ManagePiatti";
+import DisplayMenu from "./components/DisplayMenu";
+import AddMultiplePiatti from "./components/AddMultiplePiatti";
+import AllOrdersOfDayComponent from "./components/AllOrdersOfDayComponent";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
 import MultiplePiatti from "./pages/MultiplePiatti";
-import ProfilePage from "./pages/ProfilePage";
-import UserManagement from "./pages/User";
+import ViewOpenOrders from "./components/ViewOpenOrders";
+import ProfileComponent from "./components/ProfileComponent";
+import HistoricComponent from "./components/HistoricComponent";
 
-// Componente principal App
-export default function App() {
+function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<LogIn />} />
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
 
           <Route
             element={
               <ProtectedRoute allowedRoles={["Amministratore", "Dipendente"]} />
             }
           >
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/open-orders" element={<OpenOrders />} />
-            <Route path="/day-order" element={<AllOrderOfDay />} />
-            <Route path="/historic" element={<Historic />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route
+              element={
+                <>
+                  <UserMenu />
+                  <Outlet />
+                </>
+              }
+            >
+              <Route path="/menu" element={<DisplayMenu />} />
+              <Route path="/open-orders" element={<ViewOpenOrders />} />
+              <Route path="/day-order" element={<AllOrdersOfDayComponent />} />
+              <Route path="/historic" element={<HistoricComponent />} />
+              <Route path="/profile" element={<ProfileComponent />} />
+            </Route>
           </Route>
 
           <Route element={<ProtectedRoute allowedRoles={["Amministratore"]} />}>
-            <Route path="/users" element={<UserManagement />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/managepiatti" element={<CRUDPiatti />} />
-            <Route path="/add-multiple-piatti" element={<MultiplePiatti />} />
+            <Route
+              element={
+                <>
+                  <UserMenu />
+                  <Outlet />
+                </>
+              }
+            >
+              <Route path="/users" element={<UserManagement />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/managepiatti" element={<ManagePiatti />} />
+              <Route
+                path="/add-multiple-piatti"
+                element={<AddMultiplePiatti />}
+              />
+            </Route>
           </Route>
 
           <Route path="*" element={<NotFound />} />
@@ -52,5 +82,13 @@ export default function App() {
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+// Create root
+const container = document.getElementById("root");
+const root = createRoot(container);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+export default App;

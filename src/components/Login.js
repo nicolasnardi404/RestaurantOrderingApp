@@ -4,6 +4,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import Logo from "../assets/logoNetSurf.png";
 import "../styles/LoginStyle.css";
+import "../App.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");

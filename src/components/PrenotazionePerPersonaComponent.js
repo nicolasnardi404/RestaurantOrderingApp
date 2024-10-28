@@ -1,3 +1,4 @@
+/*
 export default function PrenotazionePerPersonaComponent({ idUser }) {
   const [data, setData] = useState([]);
   const navigate = navigate();
@@ -52,3 +53,4 @@ export default function PrenotazionePerPersonaComponent({ idUser }) {
     </div>
   );
 }
+*/

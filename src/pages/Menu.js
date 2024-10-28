@@ -1,3 +1,4 @@
+/*
 import React from "react";
 import "../App.css";
 import DisplayMenu from "../components/DisplayMenu";
@@ -11,3 +12,4 @@ export default function Menu() {
     </div>
   );
 }
+*/
