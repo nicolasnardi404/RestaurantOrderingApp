@@ -267,6 +267,13 @@ function ManagePiatti() {
         onClick={() => navigate("/add-multiple-piatti")} // Navigate to the new page
         className="p-button-primary add-piatto-button"
       />
+      <Button
+        label="Drag and Drop"
+        icon="pi pi-arrows-alt"
+        onClick={() => navigate("/drag-and-drop")} // Navigate to the new page
+        className="p-button-primary add-piatto-button"
+      />
+
       <DataTable
         value={filteredPiatti}
         globalFilter={globalFilter}

@@ -26,6 +26,8 @@ import MultiplePiatti from "./pages/MultiplePiatti";
 import ViewOpenOrders from "./components/ViewOpenOrders";
 import ProfileComponent from "./components/ProfileComponent";
 import HistoricComponent from "./components/HistoricComponent";
+import DragAndDrop from "./components/DragAndDrop";
+
 
 function App() {
   return (
@@ -72,6 +74,9 @@ function App() {
                 path="/add-multiple-piatti"
                 element={<AddMultiplePiatti />}
               />
+
+              <Route path="/drag-and-drop" element={<DragAndDrop />} />
+
             </Route>
           </Route>
 
