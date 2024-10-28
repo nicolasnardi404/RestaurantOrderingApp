@@ -1,3 +1,4 @@
+/*
 import React from "react";
 import "../App.css";
 import UserMenu from "../components/UserMenu";
@@ -11,3 +12,4 @@ export default function CRUDPiatti() {
     </div>
   );
 }
+*/

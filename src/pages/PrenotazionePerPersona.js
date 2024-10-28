@@ -1,3 +1,4 @@
+/*
 import { Dropdown } from "primereact/dropdown";
 import PrenotazionePerPersonaComponent from "../components/PrenotazionePerPersonaComponent";
 import UserMenu from "../components/UserMenu";
@@ -41,3 +42,4 @@ export default function PrenotazionePerPersona() {
     </div>
   );
 }
+*/

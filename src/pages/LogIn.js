@@ -1,12 +1,14 @@
+/*
 import React from "react";
 import "../App.css";
-import SimpleLogin from "../components/SimpleLogin";
+import Login from "../components/Login";
 import UserMenu from "../components/UserMenu";
 
 export default function LogIn() {
   return (
     <div className="App">
-      <SimpleLogin />
+      <Login />
     </div>
   );
 }
+*/
