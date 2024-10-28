@@ -63,6 +63,10 @@
   margin: 0 auto;
 }
 
+.my-custom-class label {
+  gap: 10px; /* Ajuste o valor conforme necessário */
+}
+
 @media (max-width: 768px) {
   .container-user {
     padding: 10px;

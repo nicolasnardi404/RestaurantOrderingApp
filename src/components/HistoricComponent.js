@@ -6,7 +6,6 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import "../util/addLocale";
-import { InputSwitch } from "primereact/inputswitch";
 import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";

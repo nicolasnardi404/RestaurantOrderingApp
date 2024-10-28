@@ -6,10 +6,8 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
-import { ConfirmDialog } from "primereact/confirmdialog";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
-import { InputSwitch } from "primereact/inputswitch";
 import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
@@ -30,6 +28,7 @@ function ManagePiatti() {
   const [globalFilter, setGlobalFilter] = useState(null);
   const [disponibileFilter, setDisponibileFilter] = useState(0); // Start with showing unavailable (0)
   const [selectedDay, setSelectedDay] = useState(null); // State for selected day
+  const [displayDialog, setDisplayDialog] = useState(false);
   const toast = useRef(null); // Initialize toast reference
   const { getToken } = useAuth();
   const token = getToken();
@@ -165,8 +164,9 @@ function ManagePiatti() {
     }
   };
 
-  const rejectDelete = () => {
+  const cancelDialog = () => {
     setConfirmDeleteVisible(false); // Close the dialog
+    setDisplayDialog(false);
   };
 
   const showToast = (severity, summary, detail) => {
@@ -209,10 +209,10 @@ function ManagePiatti() {
         </span>
         <div className="disponibile-filter">
           <label htmlFor="disponibileFilter">Sempre Disponibile: </label>
-          <InputSwitch
+          <Checkbox
             id="disponibileFilter"
             checked={disponibileFilter === 1}
-            onChange={(e) => setDisponibileFilter(e.value ? 1 : 0)}
+            onChange={(e) => setDisponibileFilter(e.checked ? 1 : 0)}
           />
         </div>
         <div className="day-filter">
@@ -238,14 +238,21 @@ function ManagePiatti() {
     <div className="manage-piatti">
       {/* Add the Toast component */}
       <Toast ref={toast} />
-      <ConfirmDialog
+      <Dialog
         visible={confirmDeleteVisible}
-        message="Sei sicuro di voler eliminare questo piatto?"
-        header="Conferma Eliminazione"
-        accept={confirmDelete}
-        reject={rejectDelete}
-        onHide={() => setConfirmDeleteVisible(false)}
-      />
+        style={{ width: "450px" }}
+        header="Conferma eliminazione"
+        modal
+        footer={
+          <div>
+            <Button label="No" icon="pi pi-times" onClick={cancelDialog} />
+            <Button label="Sì" icon="pi pi-check" onClick={confirmDelete} />
+          </div>
+        }
+        onHide={cancelDialog}
+      >
+        <p>Sei sicuro di voler eliminare questo piatto?</p>
+      </Dialog>
 
       <h1>Organizzare il Menu della Settimana</h1>
       <Button
@@ -265,7 +272,6 @@ function ManagePiatti() {
         globalFilter={globalFilter}
         header={header}
       >
-        <Column field="id_piatto" header="ID" />
         <Column field="nome_piatto" header="Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="dayOfWeek" header="Giorno Della Settimana" />

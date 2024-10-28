@@ -302,6 +302,13 @@ const ViewOpenOrders = () => {
     });
   };
 
+  const handleObservazioniChange = (value) => {
+    setEditingOrder((prevOrder) => ({
+      ...prevOrder,
+      Observazioni: value || "",
+    }));
+  };
+
   const validCombinations = [
     ["Primo", "Secondo", "Contorno"],
     ["Primo", "Piatto unico", "Contorno"],
@@ -317,7 +324,10 @@ const ViewOpenOrders = () => {
   const isValidCombination = (selectedDishes) => {
     console.log("selected dishes" + JSON.stringify(selectedDishes));
     const selectedTypes = Object.keys(selectedDishes).filter(
-      (type) => selectedDishes[type] !== null && type !== "Pane/Grissini"
+      (type) =>
+        selectedDishes[type] !== null &&
+        type !== "Pane/Grissini" &&
+        type !== "Observazioni"
     );
 
     const isValid = validCombinations.some(
@@ -330,8 +340,15 @@ const ViewOpenOrders = () => {
   };
 
   const checkCombination = (currentCart) => {
-    const { Primo, Secondo, Contorno, PiattoUnico, Altri, Dessert } =
-      currentCart;
+    const {
+      Primo,
+      Secondo,
+      Contorno,
+      PiattoUnico,
+      Altri,
+      Dessert,
+      Observazioni,
+    } = currentCart;
 
     const selectedItems = new Set();
     if (Primo) selectedItems.add("Primo");
@@ -340,6 +357,7 @@ const ViewOpenOrders = () => {
     if (PiattoUnico) selectedItems.add("Piatto unico");
     if (Altri) selectedItems.add("Pane/Grissini");
     if (Dessert) selectedItems.add("Dessert");
+    if (Observazioni) selectedItems.add("Observazioni");
 
     const combinations = validCombinations.some((combination) => {
       return combination.every((item) => selectedItems.has(item));
@@ -393,7 +411,12 @@ const ViewOpenOrders = () => {
     if (isValidCombination(editingOrder.selectedDishes)) {
       try {
         const selectedDishIds = Object.values(editingOrder.selectedDishes)
-          .filter((dish) => dish !== null && dish !== undefined)
+          .filter(
+            (dish) =>
+              dish !== null &&
+              dish !== undefined &&
+              dish !== editingOrder.selectedDishes.Observazioni
+          ) // Exclude Observazioni
           .map((dish) => dish.id);
 
         const idOrdineArray = editingOrder.idOrdine
@@ -405,6 +428,7 @@ const ViewOpenOrders = () => {
           dataPrenotazione: formatDateforServer(editingOrder.reservationDate),
           idPiatto: selectedDishIds,
           idOrdine: idOrdineArray,
+          Observazioni: editingOrder.selectedDishes.Observazioni, // Adicione Observazioni aqui
         };
 
         const token = getToken();
@@ -417,14 +441,19 @@ const ViewOpenOrders = () => {
 
         setShowEditDialog(false);
         await fetchOrders();
-        alert("Ordine aggiornato con successo.");
+        toast.current.show({
+          severity: "success",
+          summary: "Success",
+          detail: "Ordine modificada com sucesso.",
+          life: 3000,
+        });
       } catch (error) {
         console.error("Error updating order:", error);
         setError("Impossibile aggiornare l'ordine. Riprova.");
       }
     } else {
       setError(
-        "La combinazione selezionata non è valida. Assicurati di scegliere una combinazione corretta di piatti."
+        "La combinazione selezionata non è valida. Assicurati di scegliere uma combinação correta de piatti."
       );
     }
   };
@@ -479,7 +508,6 @@ const ViewOpenOrders = () => {
       responsiveLayout="scroll"
       rowClassName={rowClassName}
     >
-      <Column field="idPrenotazione" header="ID" />
       <Column field="datePiatti" header="Data Prenotazione" />
       <Column field="piatti" header="Piatti" />
       <Column field="tipo_piatti" header="Combinazione" />
@@ -512,8 +540,8 @@ const ViewOpenOrders = () => {
           dropdown: (
             <input
               type="text"
-              value={console.log(editingOrder.selectedDishes) || ""}
-              onChange={(e) => handleDropdownChange(mealType, e.target.value)}
+              value={editingOrder.Observazioni || ""}
+              onChange={(e) => handleObservazioniChange(e.target.value)} // Chama a nova função aqui
               placeholder="Scrive le tue Osservazione"
               className="w-full"
             />
