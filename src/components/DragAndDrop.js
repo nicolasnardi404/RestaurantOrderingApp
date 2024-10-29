@@ -2,11 +2,13 @@ import React, { useState, useCallback } from "react";
 import { read, utils } from "xlsx";
 import { useDropzone } from "react-dropzone";
 import { Card } from "primereact/card";
+import { Button } from "primereact/button";
 import PiattiTable from "./PiattiTable";
 import axios from "axios";
 
 export default function DragAndDrop() {
   const [piattiData, setPiattiData] = useState([]);
+  const [fileDropped, setFileDropped] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
   const tipoPiattoOptions = [
     { label: "Primo", value: "Primo" },
@@ -117,29 +119,28 @@ export default function DragAndDrop() {
     });
 
     setPiattiData(processedData);
+    setFileDropped(true);
     console.log(processedData);
-    sendDataToServer(processedData);
   };
 
-  const sendDataToServer = async (data) => {
+  const sendDataToServer = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/piatto/createDishes`, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await axios.post(
+        `${apiUrl}/piatto/createDishes`,
+        piattiData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       console.log("Data successfully sent:", response.data);
+      alert("Data saved successfully!");
     } catch (error) {
       console.error("Error sending data:", error);
+      alert("Error saving data. Please try again.");
     }
-  };
-
-  const getStartOfWeek = () => {
-    const now = new Date();
-    const day = now.getDay();
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(now.setDate(diff));
   };
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -167,26 +168,35 @@ export default function DragAndDrop() {
 
   return (
     <div className="card p-4">
-      <div {...getRootProps()}>
-        <Card
-          className={`text-center cursor-pointer ${isDragActive ? "bg-blue-50" : ""}`}
-          style={{
-            border: "2px dashed #ccc",
-            padding: "2rem",
-            marginBottom: "2rem",
-          }}
-        >
-          <input {...getInputProps()} />
-          <p className="m-0">
-            {isDragActive
-              ? "Drop the Excel file here..."
-              : "Drag and drop an Excel file here, or click to select"}
-          </p>
-        </Card>
-      </div>
+      {!fileDropped && (
+        <div {...getRootProps()}>
+          <Card
+            className={`text-center cursor-pointer ${isDragActive ? "bg-blue-50" : ""}`}
+            style={{
+              border: "2px dashed #ccc",
+              padding: "2rem",
+              marginBottom: "2rem",
+            }}
+          >
+            <input {...getInputProps()} />
+            <p className="m-0">
+              {isDragActive
+                ? "Drop the Excel file here..."
+                : "Drag and drop an Excel file here, or click to select"}
+            </p>
+          </Card>
+        </div>
+      )}
 
       {piattiData.length > 0 && (
-        <PiattiTable data={piattiData} setData={setPiattiData} />
+        <>
+          <PiattiTable data={piattiData} setData={setPiattiData} />
+          <Button
+            label="Save Data"
+            onClick={sendDataToServer}
+            className="p-button-success mt-3"
+          />
+        </>
       )}
     </div>
   );
