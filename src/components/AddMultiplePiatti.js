@@ -68,11 +68,12 @@ const AddMultiplePiatti = () => {
       const piattiToSave = piatti.map((piatto) => ({
         nome: piatto.nome_piatto,
         tipo_piatto: piatto.idTipoPiatto,
+        data: formatCalendarData(commonDate),
       }));
 
       const formattedDate = formatCalendarData(commonDate); // Format to YYYY-MM-DD
       console.log(piatti);
-      await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
+      await api.post(`/piatto/createDishes`, piattiToSave);
 
       showToast("success", "Successo", "Piatti aggiunti con successo");
       setPiatti([{ nome_piatto: "", idTipoPiatto: 1, nome_tipo: "Primo" }]); // Reset the form
