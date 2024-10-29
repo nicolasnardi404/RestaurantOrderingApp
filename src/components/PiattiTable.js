@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
+import { Calendar } from "primereact/calendar";
 import { formatDateForDisplay } from "../util/FormatDateForDisplay";
 
 export default function PiattiTable({ data, setData }) {
@@ -120,11 +121,56 @@ export default function PiattiTable({ data, setData }) {
     );
   };
 
+  // **Calendar Editor Component**
+  const CalendarEditor = ({ rowData, field }) => {
+    const [value, setValue] = useState(new Date(rowData[field]));
+
+    const handleChange = (e) => {
+      const newDate = e.value;
+      setValue(newDate);
+      const formattedDate = newDate.toISOString().split("T")[0]; // Format date as 'YYYY-MM-DD'
+      onEditorValueChange(rowData, field, formattedDate);
+    };
+
+    const handleClick = (e) => {
+      e.stopPropagation(); // Prevents the click from bubbling up to the DataTable
+    };
+
+    return (
+      <Calendar
+        value={value}
+        onChange={handleChange}
+        dateFormat="yy-mm-dd"
+        showIcon
+        appendTo="self" // Ensures the popup is positioned correctly within the cell
+        onClick={handleClick} // Add this line to stop event propagation
+        onFocus={(e) => e.target.select()} // Optional: Select the input on focus
+      />
+    );
+  };
+
+  const dt = useRef(null); // Reference to the DataTable
+
+  const handleCellClick = (e) => {
+    dt.current.initCellEditMode(e.originalEvent, e.index, e.field);
+  };
+
+  const [editingRow, setEditingRow] = useState(null);
+
+  const handleEditClick = (rowData) => {
+    setEditingRow(rowData.id);
+  };
+
+  const handleSaveClick = () => {
+    setEditingRow(null);
+  };
+
   return (
     <div className="card">
       <DataTable
+        ref={dt}
         value={data}
-        dataKey="id" // Ensure each row has a unique 'id'
+        dataKey="id"
         responsiveLayout="scroll"
         editMode="cell"
         showGridlines
@@ -132,16 +178,20 @@ export default function PiattiTable({ data, setData }) {
         <Column
           field="nome_piatto"
           header="Nome Piatto"
-          style={{ width: "33%" }}
-          editor={(props) => (
-            <TextEditor rowData={props.rowData} field={props.field} />
-          )}
+          style={{ width: "25%" }}
+          editor={(props) =>
+            editingRow === props.rowData.id ? (
+              <TextEditor rowData={props.rowData} field={props.field} />
+            ) : null
+          }
         />
         <Column
           field="tipo_piatto"
           header="Tipo Piatto"
-          style={{ width: "33%" }}
-          editor={dropdownEditor}
+          style={{ width: "25%" }}
+          editor={(props) =>
+            editingRow === props.rowData.id ? dropdownEditor(props) : null
+          }
           body={(rowData) => {
             const tipo = tipoPiattoOptions.find(
               (option) => option.value === rowData.tipo_piatto
@@ -152,8 +202,28 @@ export default function PiattiTable({ data, setData }) {
         <Column
           field="data"
           header="Data"
-          style={{ width: "34%" }}
+          style={{ width: "25%" }}
           body={dateBodyTemplate}
+          editor={(props) =>
+            editingRow === props.rowData.id ? (
+              <CalendarEditor rowData={props.rowData} field={props.field} />
+            ) : null
+          }
+        />
+        <Column
+          header="Actions"
+          style={{ width: "25%" }}
+          body={(rowData) => (
+            <button
+              onClick={() =>
+                editingRow === rowData.id
+                  ? handleSaveClick()
+                  : handleEditClick(rowData)
+              }
+            >
+              {editingRow === rowData.id ? "Save" : "Edit"}
+            </button>
+          )}
         />
       </DataTable>
     </div>
