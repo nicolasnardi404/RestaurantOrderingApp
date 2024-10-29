@@ -4,18 +4,20 @@ import { useDropzone } from "react-dropzone";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import PiattiTable from "./PiattiTable";
+import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 
 export default function DragAndDrop() {
   const [piattiData, setPiattiData] = useState([]);
   const [fileDropped, setFileDropped] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
-  const tipoPiattoOptions = [
-    { label: "Primo", value: "Primo" },
-    { label: "Secondo", value: "Secondo" },
-    { label: "Contorno", value: "Contorno" },
-    { label: "Piatto unico", value: "Piatto unico" },
-  ];
+  const { getToken } = useAuth();
+
+  const tipoPiattoMapping = {
+    Primo: 1,
+    Secondo: 2,
+    Contorno: 3,
+  };
 
   const processExcelData = (data) => {
     const worksheet = data.Sheets[data.SheetNames[0]];
@@ -53,16 +55,16 @@ export default function DragAndDrop() {
           if (row1[j]) {
             processedData.push({
               id: idCounter++,
-              nome_piatto: row1[j].trim(),
-              tipo_piatto: "Primo",
+              nome: row1[j].trim(),
+              tipo_piatto: tipoPiattoMapping["Primo"],
               data: formattedDate,
             });
           }
           if (row2[j]) {
             processedData.push({
               id: idCounter++,
-              nome_piatto: row2[j].trim(),
-              tipo_piatto: "Primo",
+              nome: row2[j].trim(),
+              tipo_piatto: tipoPiattoMapping["Primo"],
               data: formattedDate,
             });
           }
@@ -73,16 +75,16 @@ export default function DragAndDrop() {
           if (row1[j]) {
             processedData.push({
               id: idCounter++,
-              nome_piatto: row1[j].trim(),
-              tipo_piatto: "Secondo",
+              nome: row1[j].trim(),
+              tipo_piatto: tipoPiattoMapping["Secondo"],
               data: formattedDate,
             });
           }
           if (row2[j]) {
             processedData.push({
               id: idCounter++,
-              nome_piatto: row2[j].trim(),
-              tipo_piatto: "Secondo",
+              nome: row2[j].trim(),
+              tipo_piatto: tipoPiattoMapping["Secondo"],
               data: formattedDate,
             });
           }
@@ -93,16 +95,16 @@ export default function DragAndDrop() {
           if (row1[j]) {
             processedData.push({
               id: idCounter++,
-              nome_piatto: row1[j].trim(),
-              tipo_piatto: "Contorno",
+              nome: row1[j].trim(),
+              tipo_piatto: tipoPiattoMapping["Contorno"],
               data: formattedDate,
             });
           }
           if (row2[j]) {
             processedData.push({
               id: idCounter++,
-              nome_piatto: row2[j].trim(),
-              tipo_piatto: "Contorno",
+              nome: row2[j].trim(),
+              tipo_piatto: tipoPiattoMapping["Contorno"],
               data: formattedDate,
             });
           }
@@ -115,7 +117,7 @@ export default function DragAndDrop() {
       if (a.data !== b.data) {
         return a.data.localeCompare(b.data);
       }
-      return a.tipo_piatto.localeCompare(b.tipo_piatto);
+      return a.tipo_piatto - b.tipo_piatto;
     });
 
     setPiattiData(processedData);
@@ -124,13 +126,15 @@ export default function DragAndDrop() {
   };
 
   const sendDataToServer = async () => {
+    const token = getToken();
     try {
+      console.log(piattiData);
       const response = await axios.post(
         `${apiUrl}/piatto/createDishes`,
         piattiData,
         {
           headers: {
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Add the token to the headers
           },
         }
       );

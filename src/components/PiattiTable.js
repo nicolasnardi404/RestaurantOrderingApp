@@ -166,11 +166,7 @@ export default function PiattiTable({ data, setData }) {
     console.log("Saving updated row:", updatedRow);
 
     // Validate updatedRow if necessary
-    if (
-      !updatedRow.nome_piatto ||
-      !updatedRow.tipo_piatto ||
-      !updatedRow.data
-    ) {
+    if (!updatedRow.nome || !updatedRow.tipo_piatto || !updatedRow.data) {
       alert("Tutti i campi sono obbligatori.");
       return;
     }
@@ -228,7 +224,7 @@ export default function PiattiTable({ data, setData }) {
         onRowEditComplete={onRowEditComplete}
       >
         <Column
-          field="nome_piatto"
+          field="nome"
           header="Nome Piatto"
           style={{ width: "25%" }}
           editor={(options) => textEditor(options)}
