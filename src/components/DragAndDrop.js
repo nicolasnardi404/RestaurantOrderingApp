@@ -20,6 +20,7 @@ export default function DragAndDrop() {
     const rawData = utils.sheet_to_json(worksheet, { header: 1 });
 
     const processedData = [];
+    let idCounter = 0;
 
     // Calculate the current week's Monday
     const now = new Date();
@@ -49,6 +50,7 @@ export default function DragAndDrop() {
         for (let j = 1; j <= 2; j++) {
           if (row1[j]) {
             processedData.push({
+              id: idCounter++,
               nome_piatto: row1[j].trim(),
               tipo_piatto: "Primo",
               data: formattedDate,
@@ -56,6 +58,7 @@ export default function DragAndDrop() {
           }
           if (row2[j]) {
             processedData.push({
+              id: idCounter++,
               nome_piatto: row2[j].trim(),
               tipo_piatto: "Primo",
               data: formattedDate,
@@ -67,6 +70,7 @@ export default function DragAndDrop() {
         for (let j = 3; j <= 4; j++) {
           if (row1[j]) {
             processedData.push({
+              id: idCounter++,
               nome_piatto: row1[j].trim(),
               tipo_piatto: "Secondo",
               data: formattedDate,
@@ -74,6 +78,7 @@ export default function DragAndDrop() {
           }
           if (row2[j]) {
             processedData.push({
+              id: idCounter++,
               nome_piatto: row2[j].trim(),
               tipo_piatto: "Secondo",
               data: formattedDate,
@@ -85,6 +90,7 @@ export default function DragAndDrop() {
         for (let j = 5; j <= 7; j++) {
           if (row1[j]) {
             processedData.push({
+              id: idCounter++,
               nome_piatto: row1[j].trim(),
               tipo_piatto: "Contorno",
               data: formattedDate,
@@ -92,6 +98,7 @@ export default function DragAndDrop() {
           }
           if (row2[j]) {
             processedData.push({
+              id: idCounter++,
               nome_piatto: row2[j].trim(),
               tipo_piatto: "Contorno",
               data: formattedDate,

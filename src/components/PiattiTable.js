@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
 import { formatDateForDisplay } from "../util/FormatDateForDisplay";
-import { Calendar } from "primereact/calendar";
 
 export default function PiattiTable({ data, setData }) {
   const tipoPiattoOptions = [
@@ -13,11 +12,6 @@ export default function PiattiTable({ data, setData }) {
     { label: "Contorno", value: 3 },
     { label: "Piatto unico", value: 4 },
   ];
-
-  const onEditorValueChange = (props, value) => {
-    let updatedData = [...data];
-    updatedData[props.rowIndex][props.field] = value;
-  };
 
   const formatDateForPiattiTable = (dateString) => {
     const [year, month, day] = dateString.split("-");
@@ -40,36 +34,125 @@ export default function PiattiTable({ data, setData }) {
     return formatDateForPiattiTable(rowData.data);
   };
 
+  const onEditorValueChange = (rowData, field, value) => {
+    const updatedData = data.map((item) =>
+      // Ensure 'id' is unique for each item
+      item.id === rowData.id ? { ...item, [field]: value } : item
+    );
+    setData(updatedData);
+  };
+
+  // **TextEditor Component with Local State**
+  const TextEditor = ({ rowData, field }) => {
+    const [value, setValue] = useState(rowData[field] || "");
+
+    const handleChange = (e) => {
+      setValue(e.target.value);
+    };
+
+    const handleBlur = () => {
+      onEditorValueChange(rowData, field, value);
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Enter") {
+        onEditorValueChange(rowData, field, value);
+      }
+    };
+
+    return (
+      <InputText
+        value={value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        autoFocus
+        onFocus={(e) => e.target.select()}
+        className="p-inputtext p-component"
+      />
+    );
+  };
+
+  // **Dropdown Editor (No Changes Needed)**
+  const dropdownEditor = (props) => {
+    return (
+      <Dropdown
+        value={props.value}
+        options={tipoPiattoOptions}
+        onChange={(e) =>
+          onEditorValueChange(props.rowData, props.field, e.value)
+        }
+        className="w-full"
+      />
+    );
+  };
+
+  const [menuItems, setMenuItems] = useState([]);
+
+  const handleEdit = (itemToEdit) => {
+    setMenuItems((prevItems) =>
+      prevItems.map((item) => {
+        // Match the specific item using multiple fields to ensure uniqueness
+        if (
+          item.data === itemToEdit.data &&
+          item.nome_piatto === itemToEdit.nome_piatto &&
+          item.tipo_piatto === itemToEdit.tipo_piatto
+        ) {
+          return { ...item, isEditing: true };
+        }
+        return item;
+      })
+    );
+  };
+
+  const handleSave = (updatedItem) => {
+    setMenuItems((prevItems) =>
+      prevItems.map((item) => {
+        if (
+          item.data === updatedItem.data &&
+          item.nome_piatto === updatedItem.nome_piatto &&
+          item.tipo_piatto === updatedItem.tipo_piatto
+        ) {
+          return { ...updatedItem, isEditing: false };
+        }
+        return item;
+      })
+    );
+  };
+
   return (
     <div className="card">
-      <DataTable value={data} responsiveLayout="scroll">
+      <DataTable
+        value={data}
+        dataKey="id" // Ensure each row has a unique 'id'
+        responsiveLayout="scroll"
+        editMode="cell"
+        showGridlines
+      >
         <Column
           field="nome_piatto"
           header="Nome Piatto"
           style={{ width: "33%" }}
-          bodyEditor={(props) => (
-            <InputText
-              value={props.data[props.field]}
-              onChange={(e) => onEditorValueChange(props, e.target.value)}
-            />
+          editor={(props) => (
+            <TextEditor rowData={props.rowData} field={props.field} />
           )}
         />
         <Column
           field="tipo_piatto"
           header="Tipo Piatto"
           style={{ width: "33%" }}
-          bodyEditor={(props) => (
-            <Dropdown
-              options={tipoPiattoOptions}
-              value={props.data[props.field]}
-              onChange={(e) => onEditorValueChange(props, e.value)}
-            />
-          )}
+          editor={dropdownEditor}
+          body={(rowData) => {
+            const tipo = tipoPiattoOptions.find(
+              (option) => option.value === rowData.tipo_piatto
+            );
+            return tipo ? tipo.label : rowData.tipo_piatto;
+          }}
         />
         <Column
           field="data"
           header="Data"
-          style={{ width: "33%" }}
+          style={{ width: "34%" }}
           body={dateBodyTemplate}
         />
       </DataTable>
