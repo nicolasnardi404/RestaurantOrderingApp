@@ -3,92 +3,74 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
+import { formatDateForDisplay } from "../util/FormatDateForDisplay";
 import { Calendar } from "primereact/calendar";
 
-const TIPO_OPTIONS = [
-  { label: "Primo piatto", value: "Primo piatto" },
-  { label: "Secondo piatto", value: "Secondo piatto" },
-  { label: "Contorno", value: "Contorno" },
-];
-
 export default function PiattiTable({ data, setData }) {
-  const onRowEditComplete = (e) => {
-    let _data = [...data];
-    let { newData, index } = e;
-    _data[index] = newData;
-    setData(_data);
+  const tipoPiattoOptions = [
+    { label: "Primo", value: 1 },
+    { label: "Secondo", value: 2 },
+    { label: "Contorno", value: 3 },
+    { label: "Piatto unico", value: 4 },
+  ];
+
+  const onEditorValueChange = (props, value) => {
+    let updatedData = [...data];
+    updatedData[props.rowIndex][props.field] = value;
   };
 
-  const textEditor = (options) => {
-    return (
-      <InputText
-        type="text"
-        value={options.value}
-        onChange={(e) => options.editorCallback(e.target.value)}
-      />
-    );
+  const formatDateForPiattiTable = (dateString) => {
+    const [year, month, day] = dateString.split("-");
+    const date = new Date(year, month - 1, day);
+    const dayNames = [
+      "Domenica",
+      "Lunedì",
+      "Martedì",
+      "Mercoledì",
+      "Giovedì",
+      "Venerdì",
+      "Sabato",
+    ];
+    const weekday = dayNames[date.getDay()];
+
+    return `${weekday} ${day.padStart(2, "0")}/${month.padStart(2, "0")}/${year}`;
   };
 
-  const tipoEditor = (options) => {
-    return (
-      <Dropdown
-        value={options.value}
-        options={TIPO_OPTIONS}
-        onChange={(e) => options.editorCallback(e.value)}
-        placeholder="Select a Type"
-      />
-    );
-  };
-
-  const dateEditor = (options) => {
-    return (
-      <Calendar
-        value={new Date(options.value)}
-        onChange={(e) =>
-          options.editorCallback(e.value.toISOString().split("T")[0])
-        }
-        dateFormat="yy-mm-dd"
-      />
-    );
+  const dateBodyTemplate = (rowData) => {
+    return formatDateForPiattiTable(rowData.data);
   };
 
   return (
     <div className="card">
-      <DataTable
-        value={data}
-        editMode="row"
-        dataKey="id"
-        onRowEditComplete={onRowEditComplete}
-        responsiveLayout="scroll"
-      >
+      <DataTable value={data} responsiveLayout="scroll">
         <Column
-          field="nome"
+          field="nome_piatto"
           header="Nome Piatto"
-          editor={(options) => textEditor(options)}
-          style={{ width: "25%" }}
+          style={{ width: "33%" }}
+          bodyEditor={(props) => (
+            <InputText
+              value={props.data[props.field]}
+              onChange={(e) => onEditorValueChange(props, e.target.value)}
+            />
+          )}
         />
         <Column
-          field="tipo"
-          header="Tipo"
-          editor={(options) => tipoEditor(options)}
-          style={{ width: "25%" }}
-        />
-        <Column
-          field="giorno"
-          header="Giorno"
-          editor={(options) => textEditor(options)}
-          style={{ width: "25%" }}
+          field="tipo_piatto"
+          header="Tipo Piatto"
+          style={{ width: "33%" }}
+          bodyEditor={(props) => (
+            <Dropdown
+              options={tipoPiattoOptions}
+              value={props.data[props.field]}
+              onChange={(e) => onEditorValueChange(props, e.value)}
+            />
+          )}
         />
         <Column
           field="data"
           header="Data"
-          editor={(options) => dateEditor(options)}
-          style={{ width: "25%" }}
-        />
-        <Column
-          rowEditor
-          headerStyle={{ width: "10%", minWidth: "8rem" }}
-          bodyStyle={{ textAlign: "center" }}
+          style={{ width: "33%" }}
+          body={dateBodyTemplate}
         />
       </DataTable>
     </div>

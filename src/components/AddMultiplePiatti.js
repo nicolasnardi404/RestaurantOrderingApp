@@ -71,7 +71,7 @@ const AddMultiplePiatti = () => {
       }));
 
       const formattedDate = formatCalendarData(commonDate); // Format to YYYY-MM-DD
-
+      console.log(piatti);
       await api.post(`/piatto/createDishes/${formattedDate}`, piattiToSave);
 
       showToast("success", "Successo", "Piatti aggiunti con successo");
