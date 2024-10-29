@@ -3,9 +3,17 @@ import { read, utils } from "xlsx";
 import { useDropzone } from "react-dropzone";
 import { Card } from "primereact/card";
 import PiattiTable from "./PiattiTable";
+import axios from "axios";
 
 export default function DragAndDrop() {
   const [piattiData, setPiattiData] = useState([]);
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const tipoPiattoOptions = [
+    { label: "Primo", value: "Primo" },
+    { label: "Secondo", value: "Secondo" },
+    { label: "Contorno", value: "Contorno" },
+    { label: "Piatto unico", value: "Piatto unico" },
+  ];
 
   const processExcelData = (data) => {
     const worksheet = data.Sheets[data.SheetNames[0]];
@@ -41,17 +49,15 @@ export default function DragAndDrop() {
         for (let j = 1; j <= 2; j++) {
           if (row1[j]) {
             processedData.push({
-              nome: row1[j].trim(),
-              tipo: "Primo",
-              giorno: row1[0],
+              nome_piatto: row1[j].trim(),
+              tipo_piatto: "Primo",
               data: formattedDate,
             });
           }
           if (row2[j]) {
             processedData.push({
-              nome: row2[j].trim(),
-              tipo: "Primo",
-              giorno: row1[0],
+              nome_piatto: row2[j].trim(),
+              tipo_piatto: "Primo",
               data: formattedDate,
             });
           }
@@ -61,17 +67,15 @@ export default function DragAndDrop() {
         for (let j = 3; j <= 4; j++) {
           if (row1[j]) {
             processedData.push({
-              nome: row1[j].trim(),
-              tipo: "Secondo",
-              giorno: row1[0],
+              nome_piatto: row1[j].trim(),
+              tipo_piatto: "Secondo",
               data: formattedDate,
             });
           }
           if (row2[j]) {
             processedData.push({
-              nome: row2[j].trim(),
-              tipo: "Secondo",
-              giorno: row1[0],
+              nome_piatto: row2[j].trim(),
+              tipo_piatto: "Secondo",
               data: formattedDate,
             });
           }
@@ -81,17 +85,15 @@ export default function DragAndDrop() {
         for (let j = 5; j <= 7; j++) {
           if (row1[j]) {
             processedData.push({
-              nome: row1[j].trim(),
-              tipo: "Contorno",
-              giorno: row1[0],
+              nome_piatto: row1[j].trim(),
+              tipo_piatto: "Contorno",
               data: formattedDate,
             });
           }
           if (row2[j]) {
             processedData.push({
-              nome: row2[j].trim(),
-              tipo: "Contorno",
-              giorno: row1[0],
+              nome_piatto: row2[j].trim(),
+              tipo_piatto: "Contorno",
               data: formattedDate,
             });
           }
@@ -104,10 +106,26 @@ export default function DragAndDrop() {
       if (a.data !== b.data) {
         return a.data.localeCompare(b.data);
       }
-      return a.tipo.localeCompare(b.tipo);
+      return a.tipo_piatto.localeCompare(b.tipo_piatto);
     });
 
     setPiattiData(processedData);
+    console.log(processedData);
+    sendDataToServer(processedData);
+  };
+
+  const sendDataToServer = async (data) => {
+    try {
+      const response = await axios.post(`${apiUrl}/piatto/createDishes`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Data successfully sent:", response.data);
+    } catch (error) {
+      console.error("Error sending data:", error);
+    }
   };
 
   const getStartOfWeek = () => {
