@@ -6,12 +6,15 @@ import { Button } from "primereact/button";
 import PiattiTable from "./PiattiTable";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for React Router v6
+import "../styles/DragAndDrop.css"; // Import the CSS file
 
 export default function DragAndDrop() {
   const [piattiData, setPiattiData] = useState([]);
   const [fileDropped, setFileDropped] = useState(false);
   const apiUrl = process.env.REACT_APP_API_URL;
   const { getToken } = useAuth();
+  const navigate = useNavigate(); // Initialize the navigate function
 
   const tipoPiattoMapping = {
     Primo: 1,
@@ -141,6 +144,7 @@ export default function DragAndDrop() {
 
       console.log("Data successfully sent:", response.data);
       alert("Data saved successfully!");
+      navigate("/managepiatti"); // Navigate to the "Manage Piatti" page
     } catch (error) {
       console.error("Error sending data:", error);
       alert("Error saving data. Please try again.");
@@ -171,22 +175,18 @@ export default function DragAndDrop() {
   });
 
   return (
-    <div className="card p-4">
+    <div className="drag-and-drop-container">
       {!fileDropped && (
-        <div {...getRootProps()}>
-          <Card
-            className={`text-center cursor-pointer ${isDragActive ? "bg-blue-50" : ""}`}
-            style={{
-              border: "2px dashed #ccc",
-              padding: "2rem",
-              marginBottom: "2rem",
-            }}
-          >
+        <div
+          {...getRootProps()}
+          className={`drop-zone ${isDragActive ? "active" : ""}`}
+        >
+          <Card>
             <input {...getInputProps()} />
-            <p className="m-0">
+            <p>
               {isDragActive
-                ? "Drop the Excel file here..."
-                : "Drag and drop an Excel file here, or click to select"}
+                ? "Rilascia il file Excel qui..."
+                : "Trascina e rilascia un file Excel qui, o clicca per selezionare"}
             </p>
           </Card>
         </div>
@@ -196,9 +196,9 @@ export default function DragAndDrop() {
         <>
           <PiattiTable data={piattiData} setData={setPiattiData} />
           <Button
-            label="Save Data"
+            label="Invia menu"
             onClick={sendDataToServer}
-            className="p-button-success mt-3"
+            className="save-button"
           />
         </>
       )}

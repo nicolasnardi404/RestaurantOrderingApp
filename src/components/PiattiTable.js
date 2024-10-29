@@ -4,7 +4,7 @@ import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { formatDateForDisplay } from "../util/FormatDateForDisplay";
+import "../styles/DragAndDrop.css";
 
 // Utility function to generate the current week's weekdays (Monday to Friday)
 const getCurrentWeekWeekdays = () => {
@@ -108,7 +108,7 @@ export default function PiattiTable({ data, setData }) {
         value={options.value}
         options={tipoPiattoOptions}
         onChange={(e) => options.editorCallback(e.value)}
-        className="w-full"
+        className="dropdown-user"
       />
     );
   };
@@ -121,7 +121,7 @@ export default function PiattiTable({ data, setData }) {
         options={weekDateOptions}
         onChange={(e) => options.editorCallback(e.value)}
         placeholder="Seleziona una data"
-        className="w-full"
+        className="dropdown-user"
       />
     );
   };
@@ -165,12 +165,6 @@ export default function PiattiTable({ data, setData }) {
     // Debugging: Check the updatedRow
     console.log("Saving updated row:", updatedRow);
 
-    // Validate updatedRow if necessary
-    if (!updatedRow.nome || !updatedRow.tipo_piatto || !updatedRow.data) {
-      alert("Tutti i campi sono obbligatori.");
-      return;
-    }
-
     // Update the main data state
     const updatedData = data.map((item) =>
       item.id === updatedRow.id ? updatedRow : item
@@ -210,7 +204,7 @@ export default function PiattiTable({ data, setData }) {
   };
 
   return (
-    <div className="card">
+    <div className="piatti-table-container">
       <DataTable
         value={data}
         dataKey="id"
@@ -244,7 +238,7 @@ export default function PiattiTable({ data, setData }) {
         <Column
           field="data"
           header="Data"
-          style={{ width: "25%" }}
+          style={{ width: "35%" }}
           body={dateBodyTemplate}
           editor={dataEditor}
         />
