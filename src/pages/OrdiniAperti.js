@@ -12,7 +12,7 @@ import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import "../styles/ViewOpenOrders.css";
+import "../styles/OrdiniAperti.css";
 import "primeicons/primeicons.css";
 import formatDateforServer from "../util/formatDateForServer";
 import { formatCalendarData } from "../util/FormatCalendarData";
@@ -20,7 +20,7 @@ import { formatDateForDisplay } from "../util/FormatDateForDisplay";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
-const ViewOpenOrders = () => {
+export default function OrdiniAperti() {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -676,6 +676,4 @@ const ViewOpenOrders = () => {
       </Dialog>
     </div>
   );
-};
-
-export default ViewOpenOrders;
+}

@@ -11,7 +11,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.ruolo)) {
     console.error("Don't have permission!");
-    return <Navigate to="/open-orders" replace />;
+    return <Navigate to="/ordini-aperti" replace />;
   }
 
   return <Outlet />;

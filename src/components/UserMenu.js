@@ -27,10 +27,14 @@ export default function UserMenu() {
 
   const getMenuItems = () => {
     const commonItems = [
-      { label: "Ordini Aperti", icon: "list", path: "/open-orders" },
-      { label: "Prenota Pasto", icon: "shopping-cart", path: "/menu" },
-      { label: "Controllo Consegna", icon: "book", path: "/day-order" },
-      { label: "Storico", icon: "calendar", path: "/historic" },
+      { label: "Ordini Aperti", icon: "list", path: "/ordini-aperti" },
+      { label: "Prenota Pasto", icon: "shopping-cart", path: "/prenota-pasto" },
+      {
+        label: "Controllo Consegna",
+        icon: "book",
+        path: "/controllo-consegna",
+      },
+      { label: "Storico", icon: "calendar", path: "/storico" },
     ];
 
     const amministratoreItems = [];
@@ -55,7 +59,7 @@ export default function UserMenu() {
         <div className="dropdown-menu">
           <button
             className="dropdown-item"
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate("/profilo")}
           >
             <i className="pi pi-user"></i> Profilo
           </button>
@@ -64,13 +68,13 @@ export default function UserMenu() {
               <hr></hr>
               <button
                 className="dropdown-item"
-                onClick={() => navigate("/managepiatti")}
+                onClick={() => navigate("/gestione-menu")}
               >
                 <i className="pi pi-bars"></i> Gestione Menu
               </button>
               <button
                 className="dropdown-item"
-                onClick={() => navigate("/users")}
+                onClick={() => navigate("/gestione-utente")}
               >
                 <i className="pi pi-user-edit"></i> Gestione Utente
               </button>
@@ -130,7 +134,7 @@ export default function UserMenu() {
   return (
     <header className="user-menu-header">
       <div className="logo-container">
-        <a href="/open-orders">
+        <a href="/ordini-aperti">
           <img src={Logo} alt="Logo" className="logo" />
         </a>
       </div>

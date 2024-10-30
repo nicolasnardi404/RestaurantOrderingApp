@@ -3,9 +3,9 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import "../styles/ProfilePage.css";
+import "../styles/Profilo.css";
 
-export default function ProfilePage() {
+export default function Profilo() {
   const { user, getToken } = useAuth();
   const [selectedDays, setSelectedDays] = useState([]);
   const [hasWarnings, setHasWarnings] = useState(false);

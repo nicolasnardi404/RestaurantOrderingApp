@@ -9,11 +9,11 @@ import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { formatCalendarData } from "../util/FormatCalendarData";
 import { Calendar } from "primereact/calendar";
 import "../util/addLocale";
-import "../styles/AddMultiplePiatti.css";
+import "../styles/AggiungiMenuPerGiorno.css";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
-const AddMultiplePiatti = () => {
+export default function AggiungiMenuPerGiorno() {
   const [piatti, setPiatti] = useState([
     { nome_piatto: "", idTipoPiatto: 1, nome_tipo: "Primo" },
   ]);
@@ -182,6 +182,4 @@ const AddMultiplePiatti = () => {
       </div>
     </div>
   );
-};
-
-export default AddMultiplePiatti;
+}
