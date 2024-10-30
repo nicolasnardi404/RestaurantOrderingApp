@@ -144,7 +144,7 @@ export default function DragAndDrop() {
 
       console.log("Data successfully sent:", response.data);
       alert("Data saved successfully!");
-      navigate("/managepiatti"); // Navigate to the "Manage Piatti" page
+      navigate("/gestione-menu"); // Navigate to the "Manage Piatti" page
     } catch (error) {
       console.error("Error sending data:", error);
       alert("Error saving data. Please try again.");

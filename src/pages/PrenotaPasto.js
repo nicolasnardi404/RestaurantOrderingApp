@@ -12,9 +12,9 @@ import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { useAuth } from "../context/AuthContext";
 import "../util/addLocale";
-import "../styles/DisplayMenu.css";
+import "../styles/PrenotaPasto.css";
 
-function MenuPage() {
+export default function PrenotaPasto() {
   const [selectedDay, setSelectedDay] = useState(null);
   const [availableDates, setAvailableDates] = useState([]); // Set default to current date
   const [showMenu, setShowMenu] = useState(false);
@@ -528,7 +528,7 @@ function MenuPage() {
 
   const handleGoToOpenOrders = () => {
     setShowSuccessModal(false);
-    navigate("/open-orders");
+    navigate("/ordini-aperti");
   };
 
   const handleBackToMenu = () => {
@@ -711,5 +711,3 @@ function MenuPage() {
     </div>
   );
 }
-
-export default MenuPage;

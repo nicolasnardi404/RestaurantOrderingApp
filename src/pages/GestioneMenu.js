@@ -11,7 +11,7 @@ import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { Toast } from "primereact/toast"; // Import Toast component
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import "../styles/EditPiatto.css";
+import "../styles/GestioneMenu.css";
 import "../util/addLocale";
 import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
 import { formatCalendarData } from "../util/FormatCalendarData";
@@ -20,7 +20,7 @@ import { Checkbox } from "primereact/checkbox";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
-function ManagePiatti() {
+export default function GestioneMenu() {
   const [weeklyPiatti, setWeeklyPiatti] = useState([]);
   const [editingPiatto, setEditingPiatto] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -265,7 +265,7 @@ function ManagePiatti() {
         <Button
           label="Aggiungi il Menu per Giorno"
           icon="pi pi-plus"
-          onClick={() => navigate("/add-multiple-piatti")} // Navigate to the new page
+          onClick={() => navigate("/aggiungi-menu-per-giorno")} // Navigate to the new page
           className="p-button-primary add-piatto-button"
         />
         <Button
@@ -396,5 +396,3 @@ function ManagePiatti() {
     </div>
   );
 }
-
-export default ManagePiatti;

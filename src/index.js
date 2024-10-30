@@ -11,18 +11,17 @@ import UserMenu from "./components/UserMenu";
 
 // Import pages
 import Login from "./pages/Login";
-import Register from "./components/Register";
 import MyApp from "./_app";
-import UserManagement from "./pages/UserManagement";
-import ManagePiatti from "./pages/ManagePiatti";
-import DisplayMenu from "./pages/DisplayMenu";
-import AddMultiplePiatti from "./pages/AddMultiplePiatti";
-import AllOrdersOfDayComponent from "./pages/AllOrdersOfDayComponent";
+import GestioneUtente from "./pages/GestioneUtente";
+import GestioneMenu from "./pages/GestioneMenu";
+import PrenotaPasto from "./pages/PrenotaPasto";
+import AggiungiMenuPerGiorno from "./pages/AggiungiMenuPerGiorno";
+import ControlloConsegna from "./pages/ControlloConsegna";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
-import ViewOpenOrders from "./pages/ViewOpenOrders";
-import ProfileComponent from "./pages/ProfileComponent";
-import HistoricComponent from "./pages/HistoricComponent";
+import OrdiniAperti from "./pages/OrdiniAperti";
+import Profilo from "./pages/Profilo";
+import Storico from "./pages/Storico";
 import DragAndDrop from "./pages/DragAndDrop";
 
 function App() {
@@ -46,11 +45,14 @@ function App() {
                 </>
               }
             >
-              <Route path="/menu" element={<DisplayMenu />} />
-              <Route path="/open-orders" element={<ViewOpenOrders />} />
-              <Route path="/day-order" element={<AllOrdersOfDayComponent />} />
-              <Route path="/historic" element={<HistoricComponent />} />
-              <Route path="/profile" element={<ProfileComponent />} />
+              <Route path="/prenota-pasto" element={<PrenotaPasto />} />
+              <Route path="/ordini-aperti" element={<OrdiniAperti />} />
+              <Route
+                path="/controllo-consegna"
+                element={<ControlloConsegna />}
+              />
+              <Route path="/storico" element={<Storico />} />
+              <Route path="/profilo" element={<Profilo />} />
             </Route>
           </Route>
 
@@ -63,12 +65,11 @@ function App() {
                 </>
               }
             >
-              <Route path="/users" element={<UserManagement />} />
-              {/* <Route path="/register" element={<Register />} /> */}
-              <Route path="/managepiatti" element={<ManagePiatti />} />
+              <Route path="/gestione-utente" element={<GestioneUtente />} />
+              <Route path="/gestione-menu" element={<GestioneMenu />} />
               <Route
-                path="/add-multiple-piatti"
-                element={<AddMultiplePiatti />}
+                path="/aggiungi-menu-per-giorno"
+                element={<AggiungiMenuPerGiorno />}
               />
 
               <Route path="/drag-and-drop" element={<DragAndDrop />} />

@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import "primeicons/primeicons.css";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import "../styles/UserManagement.css";
+import "../styles/GestioneUtente.css";
 import { Checkbox } from "primereact/checkbox";
 
-const GestioneUtenti = () => {
+export default function GestioneUtente() {
   const [utenti, setUtenti] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -306,6 +306,4 @@ const GestioneUtenti = () => {
       {renderConfirmDialog()}
     </div>
   );
-};
-
-export default GestioneUtenti;
+}

@@ -13,7 +13,7 @@ import formatDateforServer from "../util/formatDateForServer";
 import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import { UseDataLocal } from "../util/UseDataLocal";
 import { useAuth } from "../context/AuthContext";
-import "../styles/HistoricComponent.css";
+import "../styles/Storico.css";
 import * as XLSX from "xlsx";
 import { ScrollTop } from "primereact/scrolltop";
 
@@ -75,7 +75,7 @@ const processMonthlyOverviewData = (data) => {
   };
 };
 
-const HistoricComponent = () => {
+export default function Storico() {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -749,9 +749,7 @@ const HistoricComponent = () => {
       <ScrollTop />
     </div>
   );
-};
-
-export default HistoricComponent;
+}
 
 // Add this CSS to your stylesheet (e.g., HistoricComponent.css)
 /*

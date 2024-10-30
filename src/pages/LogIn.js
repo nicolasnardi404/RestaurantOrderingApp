@@ -29,7 +29,7 @@ const Login = () => {
       // Passar o valor de rememberMe para a função de login
       login(token, rememberMe);
 
-      navigate("/open-orders");
+      navigate("/ordini-aperti");
     } catch (error) {
       setErrorMessage("Accesso non riuscito. Controlla le tue credenziali.");
       console.error("There was an error logging in!", error);

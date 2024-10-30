@@ -10,13 +10,13 @@ import { ITALIAN_LOCALE_CONFIG } from "../util/ItalianLocaleConfigData";
 import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import "../styles/AllOrderOfDayComponent.css";
+import "../styles/ControlloConsegna.css";
 import { useAuth } from "../context/AuthContext"; // Import useAuth
 import { formatCalendarData } from "../util/FormatCalendarData";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
-const AllOrderOfDayComponent = () => {
+export default function ControlloConsegna() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyOrders, setDailyOrders] = useState([]);
   const [dailySummary, setDailySummary] = useState([]);
@@ -250,6 +250,4 @@ const AllOrderOfDayComponent = () => {
       </Card>
     </div>
   );
-};
-
-export default AllOrderOfDayComponent;
+}

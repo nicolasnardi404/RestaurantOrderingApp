@@ -6,7 +6,7 @@ const NotFound = () => {
   const { user } = useAuth();
 
   if (user) {
-    return <Navigate to="/open-orders" replace />;
+    return <Navigate to="/ordini-aperti" replace />;
   }
 
   return <Navigate to="/login" replace />;
