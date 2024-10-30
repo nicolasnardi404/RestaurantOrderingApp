@@ -10,24 +10,20 @@ import { createRoot } from "react-dom/client";
 import UserMenu from "./components/UserMenu";
 
 // Import pages
-import Login from "./components/Login";
-
+import Login from "./pages/Login";
 import Register from "./components/Register";
-import OpenOrders from "./pages/OpenOrders";
 import MyApp from "./_app";
-import UserManagement from "./components/UserManagement";
-import ManagePiatti from "./components/ManagePiatti";
-import DisplayMenu from "./components/DisplayMenu";
-import AddMultiplePiatti from "./components/AddMultiplePiatti";
-import AllOrdersOfDayComponent from "./components/AllOrdersOfDayComponent";
+import UserManagement from "./pages/UserManagement";
+import ManagePiatti from "./pages/ManagePiatti";
+import DisplayMenu from "./pages/DisplayMenu";
+import AddMultiplePiatti from "./pages/AddMultiplePiatti";
+import AllOrdersOfDayComponent from "./pages/AllOrdersOfDayComponent";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./components/NotFound";
-import MultiplePiatti from "./pages/MultiplePiatti";
-import ViewOpenOrders from "./components/ViewOpenOrders";
-import ProfileComponent from "./components/ProfileComponent";
-import HistoricComponent from "./components/HistoricComponent";
-import DragAndDrop from "./components/DragAndDrop";
-
+import ViewOpenOrders from "./pages/ViewOpenOrders";
+import ProfileComponent from "./pages/ProfileComponent";
+import HistoricComponent from "./pages/HistoricComponent";
+import DragAndDrop from "./pages/DragAndDrop";
 
 function App() {
   return (
@@ -68,7 +64,7 @@ function App() {
               }
             >
               <Route path="/users" element={<UserManagement />} />
-              <Route path="/register" element={<Register />} />
+              {/* <Route path="/register" element={<Register />} /> */}
               <Route path="/managepiatti" element={<ManagePiatti />} />
               <Route
                 path="/add-multiple-piatti"
@@ -76,7 +72,6 @@ function App() {
               />
 
               <Route path="/drag-and-drop" element={<DragAndDrop />} />
-
             </Route>
           </Route>
 
