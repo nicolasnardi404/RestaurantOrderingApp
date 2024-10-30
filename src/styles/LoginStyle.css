@@ -8,91 +8,94 @@ body {
 
 .container {
   width: 100%;
-  max-width: 400px; /* Ajuste o tamanho máximo para garantir que caiba na tela */
-  margin: 100px auto; /* Centraliza a caixa no meio da tela */
-  background-color: #ffffff; /* Cor de fundo da caixa de login */
-  padding: 0; /* Remova o padding para evitar invasão de espaço */
+  max-width: 400px;
+  margin: 100px auto;
+  background-color: #ffffff;
+  padding: 0;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra mais suave */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #007bff; /* Cor mais vibrante para o cabeçalho */
-  padding: 15px; /* Aumenta o padding do cabeçalho */
+  background-color: #007bff;
+  padding: 15px;
   border-radius: 10px 10px 0 0;
 }
 
 .logo {
-  height: 40px; /* Ajuste a altura do logo */
+  height: 40px;
+  min-height: 32px;
+  max-height: 32px;
+  margin-left: 10px;
 }
 
 .register-btn-inLog {
-  background-color: #007bff; /* Botão branco */
-  color: #ffffff; /* Texto azul */
-  border: 2px solid #007bff; /* Bordas azuis */
+  background-color: #007bff;
+  color: #ffffff;
+  border: 2px solid #007bff;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
   transition:
     background-color 0.3s,
-    color 0.3s; /* Transição suave */
+    color 0.3s;
 }
 
 .register-btn-inLog:hover {
-  background-color: #007bff; /* Cor de fundo ao passar o mouse */
-  color: white; /* Texto branco ao passar o mouse */
+  background-color: #007bff;
+  color: white;
 }
 
 .login-box {
-  padding: 30px; /* Aumenta o espaçamento interno */
-  background-color: #ffffff; /* Cor de fundo branca para a caixa de login */
+  padding: 30px;
+  background-color: #ffffff;
   border-radius: 0 0 10px 10px;
 }
 
 label {
   display: block;
   margin: 15px 0 5px;
-  font-weight: bold; /* Texto em negrito */
+  font-weight: bold;
 }
 
 input {
   width: calc(100% - 20px);
-  padding: 12px; /* Aumenta o padding para mais conforto */
-  margin-bottom: 15px; /* Aumenta o espaçamento entre inputs */
+  padding: 12px;
+  margin-bottom: 15px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 16px; /* Aumenta o tamanho da fonte */
+  font-size: 16px;
 }
 
 .error-message {
-  color: red; /* Cor da mensagem de erro */
-  margin-top: 10px; /* Espaçamento acima da mensagem de erro */
+  color: red;
+  margin-top: 10px;
 }
 
 .register-msg {
   font-size: 14px;
   color: #555;
-  margin: 20px 0; /* Ajusta o espaçamento acima e abaixo */
-  text-align: center; /* Centraliza a mensagem de registro */
+  margin: 20px 0;
+  text-align: center;
 }
 
 .login-btn {
   width: 95%;
-  padding: 12px; /* Aumenta o padding do botão */
-  background-color: #007bff; /* Cor de fundo azul */
+  padding: 12px;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px; /* Aumenta o tamanho da fonte */
-  transition: background-color 0.3s; /* Transição suave */
+  font-size: 16px;
+  transition: background-color 0.3s;
 }
 
 .login-btn:hover {
-  background-color: #0056b3; /* Cor mais escura ao passar o mouse */
+  background-color: #0056b3;
 }
 
 a {
@@ -100,8 +103,8 @@ a {
 }
 
 .rimani-line {
-  display: flex; /* Usar flexbox para melhor controle de layout */
-  align-items: center; /* Centraliza verticalmente */
-  margin: 10px 0; /* Espaçamento superior e inferior */
-  white-space: nowrap; /* Impede que o texto quebre para uma nova linha */
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+  white-space: nowrap;
 }

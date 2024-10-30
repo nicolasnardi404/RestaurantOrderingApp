@@ -1,17 +1,20 @@
 
 ### Public Routes
-- `/login` - Login page
-- `/` - Redirects to login
+- `/login` - Pagina di accesso
+- `/` - Reindirizza alla pagina di accesso
 
 ### Protected Routes (Amministratore & Dipendente)
-- `/menu` - Display menu and place orders
-- `/open-orders` - View current open orders
-- `/day-order` - View daily order summary
-- `/historic` - View order history
-- `/profile` - User profile management
+- `/prenota-pasto` - Prenotazione del pasto
+- `/ordini-aperti` - Visualizza ordini aperti
+- `/controllo-consegna` - Controllo della consegna
+- `/storico` - Visualizza lo storico degli ordini
+- `/profilo` - Gestione del profilo utente
 
 ### Admin-Only Routes
-- `/users` - User management
-- `/register` - New user registration
-- `/managepiatti` - Menu item management
-- `/add-multiple-piatti` - Bulk menu item addition
+- `/gestione-utente` - Gestione degli utenti
+- `/gestione-menu` - Gestione del menu
+- `/aggiungi-menu-per-giorno` - Aggiunta di menu per giorno
+- `/drag-and-drop` - Funzionalità di trascinamento
+
+### Not Found Route
+- `*` - Pagina non trovata
