@@ -3,7 +3,7 @@ import { read, utils } from "xlsx";
 import { useDropzone } from "react-dropzone";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import PiattiTable from "./PiattiTable";
+import PiattiTable from "../components/PiattiTable";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for React Router v6
