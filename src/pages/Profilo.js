@@ -17,6 +17,7 @@ export default function Profilo() {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [userState, setUser] = useState(user);
   const toast = useRef(null);
+  const [userDetails, setUserDetails] = useState(null);
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -46,6 +47,33 @@ export default function Profilo() {
 
     fetchAlerts();
   }, [getToken, user.userId]);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const token = await getToken();
+        const response = await axios.get(
+          `${apiUrl}/user/readById/${user.userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUserDetails(response.data);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Failed to load user details",
+          life: 3000,
+        });
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   const daysOfWeek = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì"];
 
@@ -115,17 +143,28 @@ export default function Profilo() {
     const form = { nickname: newNickname };
 
     try {
-      await axios.put(`${apiUrl}/user/updateNickname/${user.userId}`, form, {
+      // Update nickname
+      await axios.put(`${apiUrl}/user/updateNickname/${userDetails.id}`, form, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      // Update local user data
-      setUser({ ...user, nickname: newNickname });
-      setShowChangeNickname(false);
+      // Immediately fetch updated user details
+      const updatedUserResponse = await axios.get(
+        `${apiUrl}/user/readById/${user.userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      // Show success message (optional)
+      // Update state with new user details
+      setUserDetails(updatedUserResponse.data);
+      setShowChangeNickname(false);
+      setNewNickname("");
+
       toast.current.show({
         severity: "success",
         summary: "Success",
@@ -144,7 +183,7 @@ export default function Profilo() {
   };
 
   const openNicknameDialog = () => {
-    setNewNickname(user.nickname);
+    setNewNickname(userDetails.nickname);
     setShowChangeNickname(true);
   };
 
@@ -177,13 +216,13 @@ export default function Profilo() {
       </div>
       <div className="profile-details">
         <p className="profile-detail">
-          <strong>Nome:</strong> {user.nome}
+          <strong>Nome:</strong> {userDetails?.nome}
         </p>
         <p className="profile-detail">
-          <strong>Nickname:</strong> {user.nickname}
+          <strong>Nickname:</strong> {userDetails?.nickname}
         </p>
         <p className="profile-detail">
-          <strong>Email:</strong> {user.email}
+          <strong>Email:</strong> {userDetails?.email}
         </p>
         <p className="profile-detail">
           <strong>Ruolo:</strong> {user.ruolo}
