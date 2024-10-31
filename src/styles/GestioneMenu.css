@@ -250,3 +250,10 @@
   justify-content: center;
   align-items: center;
 }
+
+.delete-modal {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}

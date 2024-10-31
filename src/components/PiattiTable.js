@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
+import { Dialog } from "primereact/dialog";
 import "../styles/DragAndDrop.css";
 
 const getCurrentWeekWeekdays = () => {
@@ -50,6 +53,9 @@ export default function PiattiTable({ data, setData }) {
   const [editingRows, setEditingRows] = useState({});
   const [clonedData, setClonedData] = useState({});
   const [weekDateOptions, setWeekDateOptions] = useState([]);
+  const [displayDialog, setDisplayDialog] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const toast = useRef(null);
 
   useEffect(() => {
     const options = getCurrentWeekWeekdays();
@@ -161,6 +167,28 @@ export default function PiattiTable({ data, setData }) {
 
   const handleDelete = (id) => {
     setData((prevData) => prevData.filter((item) => item.id !== id));
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Piatto eliminato con successo",
+      life: 3000,
+    });
+  };
+
+  const confirmDelete = (rowData) => {
+    setDeleteId(rowData.id);
+    setDisplayDialog(true);
+  };
+
+  const cancelDialog = () => {
+    setDisplayDialog(false);
+    setDeleteId(null);
+  };
+
+  const confirmDeleteAction = () => {
+    handleDelete(deleteId);
+    setDisplayDialog(false);
+    setDeleteId(null);
   };
 
   const actionBodyTemplate = (rowData) => {
@@ -193,7 +221,7 @@ export default function PiattiTable({ data, setData }) {
             <Button
               icon="pi pi-trash"
               className="btn-delete"
-              onClick={() => handleDelete(rowData.id)}
+              onClick={() => confirmDelete(rowData)}
               tooltip="Elimina piatto"
             />
           </>
@@ -211,6 +239,7 @@ export default function PiattiTable({ data, setData }) {
 
   return (
     <div className="piatti-table-container">
+      <Toast ref={toast} />
       <DataTable
         value={data}
         dataKey="id"
@@ -318,6 +347,32 @@ export default function PiattiTable({ data, setData }) {
           body={actionBodyTemplate}
         />
       </DataTable>
+
+      <Dialog
+        visible={displayDialog}
+        style={{ width: "450px" }}
+        header="Conferma eliminazione"
+        modal
+        footer={
+          <div className="delete-modal">
+            <Button
+              label="No"
+              icon="pi pi-times"
+              onClick={cancelDialog}
+              className="p-button-text"
+            />
+            <Button
+              label="Sì"
+              icon="pi pi-check"
+              onClick={confirmDeleteAction}
+              className="p-button-text"
+            />
+          </div>
+        }
+        onHide={cancelDialog}
+      >
+        <p>Sei sicuro di voler eliminare questo piatto?</p>
+      </Dialog>
     </div>
   );
 }
