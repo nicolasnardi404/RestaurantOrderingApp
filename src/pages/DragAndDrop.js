@@ -128,7 +128,18 @@ export default function DragAndDrop() {
     console.log(processedData);
   };
 
+  const hasEmptyFields = useCallback(() => {
+    return piattiData.some(
+      (piatto) => !piatto.nome || !piatto.tipo_piatto || !piatto.data
+    );
+  }, [piattiData]);
+
   const sendDataToServer = async () => {
+    if (hasEmptyFields()) {
+      alert("Compilare tutti i campi prima di inviare il menu.");
+      return;
+    }
+
     const token = getToken();
     try {
       console.log(piattiData);
@@ -174,6 +185,13 @@ export default function DragAndDrop() {
     },
   });
 
+  // Add this style to pass to PiattiTable
+  const getRowClassName = (rowData) => {
+    return !rowData.nome || !rowData.tipo_piatto || !rowData.data
+      ? "invalid-row"
+      : "";
+  };
+
   return (
     <div className="drag-and-drop-container">
       {!fileDropped && (
@@ -194,7 +212,18 @@ export default function DragAndDrop() {
 
       {piattiData.length > 0 && (
         <>
-          <PiattiTable data={piattiData} setData={setPiattiData} />
+          <PiattiTable
+            data={piattiData}
+            setData={setPiattiData}
+            getRowClassName={getRowClassName}
+          />
+          {hasEmptyFields() && (
+            <div>
+              <h2 className="error-message-add-piatto">
+                Attenzione: Compilare tutti i campi prima di inviare il menu
+              </h2>
+            </div>
+          )}
           <div
             className="button-container"
             style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}
@@ -202,7 +231,8 @@ export default function DragAndDrop() {
             <Button
               label="Invia menu"
               onClick={sendDataToServer}
-              className="save-button"
+              disabled={hasEmptyFields()}
+              style={{ backgroundColor: "green" }}
             />
             <Button
               label="Aggiungi Piatto"
@@ -221,7 +251,7 @@ export default function DragAndDrop() {
                   },
                 ]);
               }}
-              className="p-button-secondary"
+              style={{ flex: 1 }}
             />
           </div>
         </>

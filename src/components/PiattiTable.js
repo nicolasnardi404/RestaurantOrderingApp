@@ -42,7 +42,7 @@ const getCurrentWeekWeekdays = () => {
   return weekWeekdays;
 };
 
-export default function PiattiTable({ data, setData }) {
+export default function PiattiTable({ data, setData, getRowClassName }) {
   const tipoPiattoOptions = [
     { label: "Primo", value: 1 },
     { label: "Secondo", value: 2 },
@@ -251,6 +251,7 @@ export default function PiattiTable({ data, setData }) {
         onRowEditCancel={onRowEditCancel}
         onRowEditSave={onRowEditSave}
         onRowEditComplete={onRowEditComplete}
+        rowClassName={getRowClassName}
       >
         <Column
           field="nome"
