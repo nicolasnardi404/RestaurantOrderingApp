@@ -1,70 +1,111 @@
-# Getting Started with Create React App
+<div align="center">
+  <h1>🍽️ Mensa Management System</h1>
+  <p>
+    <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react" alt="React">
+    <img src="https://img.shields.io/badge/PrimeReact-UI-6366F1?style=for-the-badge&logo=react" alt="PrimeReact">
+    <img src="https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens" alt="JWT">
+    <img src="https://img.shields.io/badge/Axios-HTTP-5A29E4?style=for-the-badge&logo=axios" alt="Axios">
+  </p>
+</div>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<div align="center">
+  <p>A comprehensive React-based platform for managing cafeteria meals, orders, and user management with role-based access control.</p>
+</div>
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">🔐</td>
+      <td><strong>Authentication</strong><br/>Secure JWT-based login with remember me functionality</td>
+      <td align="center">👥</td>
+      <td><strong>User Management</strong><br/>Complete user profile and role management</td>
+    </tr>
+    <tr>
+      <td align="center">🍽️</td>
+      <td><strong>Menu Management</strong><br/>Weekly menu planning and special items</td>
+      <td align="center">📊</td>
+      <td><strong>Order Management</strong><br/>Order tracking and delivery control</td>
+    </tr>
+    <tr>
+      <td align="center">📅</td>
+      <td><strong>Scheduling</strong><br/>Advanced calendar integration</td>
+      <td align="center">📈</td>
+      <td><strong>Reports</strong><br/>Historical data and statistics</td>
+    </tr>
+  </table>
+</div>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠️ Technical Stack
 
-### `npm test`
+<div align="center">
+  <table>
+    <tr>
+      <td align="center">⚛️</td>
+      <td><strong>Frontend</strong><br/>React 18 with Hooks</td>
+      <td align="center">🎨</td>
+      <td><strong>UI Framework</strong><br/>PrimeReact Components</td>
+    </tr>
+    <tr>
+      <td align="center">🔒</td>
+      <td><strong>Authentication</strong><br/>JWT with Context API</td>
+      <td align="center">🌐</td>
+      <td><strong>HTTP Client</strong><br/>Axios with Interceptors</td>
+    </tr>
+  </table>
+</div>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 💻 Core Components
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🔑 Authentication System
+- Secure JWT-based authentication
+- Remember me functionality
+- Role-based access control
+- Protected routes for different user types
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 👤 User Management
+- Profile management with nickname and password updates
+- Role-based permissions (Administrator/Employee)
+- User registration and management (Admin only)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🍽️ Menu Management
+- Weekly menu planning
+- Special items management
+- Drag and drop interface
+- Daily menu assignments
 
-### `npm run eject`
+### 📊 Order System
+- Meal reservation system
+- Order tracking
+- Delivery confirmation
+- Historical order data
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🚀 Routes Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Public Routes
+- `/login` - Authentication page
+- `/` - Redirects to login
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Protected Routes (Administrator & Employee)
+- `/prenota-pasto` - Meal reservation
+- `/ordini-aperti` - Open orders
+- `/controllo-consegna` - Delivery control
+- `/storico` - Order history
+- `/profilo` - User profile
 
-## Learn More
+### Admin-Only Routes
+- `/gestione-utente` - User management
+- `/gestione-menu` - Menu management
+- `/aggiungi-menu-per-giorno` - Daily menu addition
+- `/drag-and-drop` - Menu organization
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
