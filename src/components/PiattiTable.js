@@ -47,7 +47,6 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
     { label: "Primo", value: 1 },
     { label: "Secondo", value: 2 },
     { label: "Contorno", value: 3 },
-    { label: "Piatto unico", value: 4 },
   ];
 
   const [editingRows, setEditingRows] = useState({});
@@ -56,6 +55,14 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const toast = useRef(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingPiatto, setEditingPiatto] = useState(null);
+
+  const tipoPiattoHeaders = {
+    1: "Primo",
+    2: "Secondo",
+    3: "Contorno",
+  };
 
   useEffect(() => {
     const options = getCurrentWeekWeekdays();
@@ -83,7 +90,18 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
     )}/${year}`;
   };
 
-  const dateBodyTemplate = (rowData) => formatDateForPiattiTable(rowData.data);
+  const dateBodyTemplate = (rowData) => (
+    <div className="date-cell">
+      <strong>
+        {new Date(rowData.date).toLocaleDateString("it-IT", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </strong>
+    </div>
+  );
 
   const nomePiattoEditor = (options) => (
     <InputText
@@ -165,8 +183,9 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
     });
   };
 
-  const handleDelete = (id) => {
-    setData((prevData) => prevData.filter((item) => item.id !== id));
+  const handleDelete = (piatto) => {
+    const updatedData = data.filter((p) => p.id !== piatto.id);
+    setData(updatedData);
     toast.current.show({
       severity: "success",
       summary: "Success",
@@ -237,142 +256,202 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
     setData(_data);
   };
 
+  const handlePiattoClick = (piatto) => {
+    setEditingPiatto(piatto);
+    setEditModalVisible(true);
+  };
+
+  const handleEditSave = (editedPiatto) => {
+    const updatedData = data.map((item) =>
+      item.id === editedPiatto.id ? editedPiatto : item
+    );
+    setData(updatedData);
+    setEditModalVisible(false);
+    setEditingPiatto(null);
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Piatto modificato con successo",
+      life: 3000,
+    });
+  };
+
+  // Group piatti by date and type
+  const groupPiattiByDate = (data) => {
+    // Sort data by date first
+    const sortedData = [...data].sort(
+      (a, b) => new Date(a.data) - new Date(b.data)
+    );
+
+    return sortedData.reduce((acc, piatto) => {
+      const dateExists = acc.find((group) => group.date === piatto.data);
+
+      if (!dateExists) {
+        acc.push({
+          date: piatto.data,
+          primo: [],
+          secondo: [],
+          contorno: [],
+        });
+      }
+
+      const group = acc.find((group) => group.date === piatto.data);
+
+      switch (piatto.tipo_piatto) {
+        case 1:
+          group.primo.push(piatto);
+          break;
+        case 2:
+          group.secondo.push(piatto);
+          break;
+        case 3:
+          group.contorno.push(piatto);
+          break;
+        default:
+          break;
+      }
+
+      return acc;
+    }, []);
+  };
+
+  const PiattoCell = ({ piatto, onEdit, onDelete }) => {
+    return (
+      <div className="piatto-name-cell">
+        <span className="piatto-name" onClick={() => onEdit(piatto)}>
+          {piatto.nome}
+        </span>
+        <button
+          className="delete-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(piatto);
+          }}
+        >
+          <i className="pi pi-times" />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <div className="piatti-table-container">
       <Toast ref={toast} />
       <DataTable
-        value={data}
-        dataKey="id"
-        editMode="row"
+        value={groupPiattiByDate(data)}
+        dataKey="date"
         responsiveLayout="scroll"
         showGridlines
-        editingRows={editingRows}
-        onRowEditInit={onRowEditInit}
-        onRowEditCancel={onRowEditCancel}
-        onRowEditSave={onRowEditSave}
-        onRowEditComplete={onRowEditComplete}
-        rowClassName={getRowClassName}
       >
+        <Column field="date" header="Data" body={dateBodyTemplate} />
         <Column
-          field="nome"
-          header="Nome Piatto"
-          style={{ width: "25%" }}
-          body={(rowData) => {
-            if (editingRows[rowData.id]) {
-              return (
-                <InputText
-                  value={rowData.nome}
-                  onChange={(e) => {
-                    const updatedData = [...data];
-                    const index = updatedData.findIndex(
-                      (item) => item.id === rowData.id
-                    );
-                    updatedData[index] = {
-                      ...updatedData[index],
-                      nome: e.target.value,
-                    };
-                    setData(updatedData);
-                  }}
-                  className="p-inputtext p-component"
+          header="Primo"
+          body={(rowData) => (
+            <div className="piatti-cell">
+              {rowData.primo?.map((piatto) => (
+                <PiattoCell
+                  key={piatto.id}
+                  piatto={piatto}
+                  onEdit={handlePiattoClick}
+                  onDelete={handleDelete}
                 />
-              );
-            }
-            return rowData.nome;
-          }}
+              ))}
+            </div>
+          )}
         />
         <Column
-          field="tipo_piatto"
-          header="Tipo Piatto"
-          style={{ width: "25%" }}
-          body={(rowData) => {
-            if (editingRows[rowData.id]) {
-              return (
-                <Dropdown
-                  value={rowData.tipo_piatto}
-                  options={tipoPiattoOptions}
-                  onChange={(e) => {
-                    const updatedData = [...data];
-                    const index = updatedData.findIndex(
-                      (item) => item.id === rowData.id
-                    );
-                    updatedData[index] = {
-                      ...updatedData[index],
-                      tipo_piatto: e.value,
-                    };
-                    setData(updatedData);
-                  }}
-                  className="dropdown-user"
-                  optionLabel="label"
+          header="Secondo"
+          body={(rowData) => (
+            <div className="piatti-cell">
+              {rowData.secondo?.map((piatto) => (
+                <PiattoCell
+                  key={piatto.id}
+                  piatto={piatto}
+                  onEdit={handlePiattoClick}
+                  onDelete={handleDelete}
                 />
-              );
-            }
-            const tipo = tipoPiattoOptions.find(
-              (option) => option.value === rowData.tipo_piatto
-            );
-            return tipo ? tipo.label : rowData.tipo_piatto;
-          }}
+              ))}
+            </div>
+          )}
         />
         <Column
-          field="data"
-          header="Data"
-          style={{ width: "35%" }}
-          body={(rowData) => {
-            if (editingRows[rowData.id]) {
-              return (
-                <Dropdown
-                  value={rowData.data}
-                  options={weekDateOptions}
-                  onChange={(e) => {
-                    const updatedData = [...data];
-                    const index = updatedData.findIndex(
-                      (item) => item.id === rowData.id
-                    );
-                    updatedData[index] = {
-                      ...updatedData[index],
-                      data: e.value,
-                    };
-                    setData(updatedData);
-                  }}
-                  placeholder="Seleziona una data"
-                  className="dropdown-user"
-                  optionLabel="label"
+          header="Contorno"
+          body={(rowData) => (
+            <div className="piatti-cell">
+              {rowData.contorno?.map((piatto) => (
+                <PiattoCell
+                  key={piatto.id}
+                  piatto={piatto}
+                  onEdit={handlePiattoClick}
+                  onDelete={handleDelete}
                 />
-              );
-            }
-            return dateBodyTemplate(rowData);
-          }}
-        />
-        <Column
-          headerStyle={{ width: "15%", textAlign: "center" }}
-          bodyStyle={{ textAlign: "center" }}
-          body={actionBodyTemplate}
+              ))}
+            </div>
+          )}
         />
       </DataTable>
 
+      {/* Edit Modal */}
       <Dialog
-        visible={displayDialog}
+        visible={editModalVisible}
         style={{ width: "450px" }}
-        header="Conferma eliminazione"
+        header="Modifica Piatto"
         modal
-        footer={
-          <div className="delete-modal">
-            <Button
-              label="No"
-              icon="pi pi-times"
-              onClick={cancelDialog}
-              className="p-button-text"
-            />
-            <Button
-              label="Sì"
-              icon="pi pi-check"
-              onClick={confirmDeleteAction}
-              className="p-button-text"
-            />
-          </div>
-        }
-        onHide={cancelDialog}
+        onHide={() => setEditModalVisible(false)}
       >
-        <p>Sei sicuro di voler eliminare questo piatto?</p>
+        {editingPiatto && (
+          <div className="edit-piatto-form">
+            <div className="field">
+              <label htmlFor="data">Data</label>
+              <Dropdown
+                id="data"
+                value={editingPiatto.data}
+                options={weekDateOptions}
+                onChange={(e) =>
+                  setEditingPiatto({ ...editingPiatto, data: e.value })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="nome">Nome Piatto</label>
+              <InputText
+                id="nome"
+                value={editingPiatto.nome}
+                onChange={(e) =>
+                  setEditingPiatto({ ...editingPiatto, nome: e.target.value })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="tipo">Tipo Piatto</label>
+              <Dropdown
+                id="tipo"
+                value={editingPiatto.tipo_piatto}
+                options={tipoPiattoOptions}
+                onChange={(e) =>
+                  setEditingPiatto({ ...editingPiatto, tipo_piatto: e.value })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="edit-modal-footer">
+              <Button
+                label="Annulla"
+                icon="pi pi-times"
+                onClick={() => setEditModalVisible(false)}
+                className="p-button-text"
+              />
+              <Button
+                label="Salva"
+                icon="pi pi-check"
+                onClick={() => handleEditSave(editingPiatto)}
+                autoFocus
+              />
+            </div>
+          </div>
+        )}
       </Dialog>
     </div>
   );

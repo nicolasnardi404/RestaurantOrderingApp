@@ -192,6 +192,41 @@ export default function DragAndDrop() {
       : "";
   };
 
+  // Add this new function to process data for grouped display
+  const processDataForDisplay = (data) => {
+    const groupedData = [];
+    let currentDate = null;
+    let dishesInCurrentDay = 0;
+
+    // First pass to count dishes per day
+    const dishesPerDay = data.reduce((acc, piatto) => {
+      acc[piatto.data] = (acc[piatto.data] || 0) + 1;
+      return acc;
+    }, {});
+
+    data.forEach((piatto) => {
+      if (currentDate !== piatto.data) {
+        // Reset counter and update current date
+        dishesInCurrentDay = 0;
+        currentDate = piatto.data;
+        // Add the spanning information to the first dish of the day
+        groupedData.push({
+          ...piatto,
+          isFirstOfDay: true,
+          dishesInDay: dishesPerDay[piatto.data],
+        });
+      } else {
+        // Regular dish row
+        groupedData.push({
+          ...piatto,
+          isFirstOfDay: false,
+        });
+      }
+      dishesInCurrentDay++;
+    });
+    return groupedData;
+  };
+
   return (
     <div className="drag-and-drop-container">
       {!fileDropped && (
@@ -213,7 +248,7 @@ export default function DragAndDrop() {
       {piattiData.length > 0 && (
         <>
           <PiattiTable
-            data={piattiData}
+            data={processDataForDisplay(piattiData)}
             setData={setPiattiData}
             getRowClassName={getRowClassName}
           />

@@ -63,3 +63,73 @@
 .invalid-row {
   background-color: lightpink !important;
 }
+
+.piatto-name-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.piatto-name {
+  cursor: pointer;
+  flex-grow: 1;
+}
+
+.piatto-name:hover {
+  color: #2196f3;
+}
+
+.delete-button {
+  visibility: hidden;
+  background: none !important;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  line-height: 1;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-button:hover,
+.delete-button:active,
+.delete-button:focus {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.piatto-name-cell:hover {
+  background-color: #f0f0f0;
+}
+
+.piatto-name-cell:hover .delete-button {
+  visibility: visible;
+}
+
+.delete-button i {
+  font-size: 0.8rem;
+}
+
+.edit-piatto-form .field {
+  margin-bottom: 1rem;
+}
+
+.edit-piatto-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.edit-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
