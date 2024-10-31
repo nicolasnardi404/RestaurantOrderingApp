@@ -128,7 +128,18 @@ export default function DragAndDrop() {
     console.log(processedData);
   };
 
+  const hasEmptyFields = useCallback(() => {
+    return piattiData.some(
+      (piatto) => !piatto.nome || !piatto.tipo_piatto || !piatto.data
+    );
+  }, [piattiData]);
+
   const sendDataToServer = async () => {
+    if (hasEmptyFields()) {
+      alert("Compilare tutti i campi prima di inviare il menu.");
+      return;
+    }
+
     const token = getToken();
     try {
       console.log(piattiData);
@@ -174,6 +185,13 @@ export default function DragAndDrop() {
     },
   });
 
+  // Add this style to pass to PiattiTable
+  const getRowClassName = (rowData) => {
+    return !rowData.nome || !rowData.tipo_piatto || !rowData.data
+      ? "invalid-row"
+      : "";
+  };
+
   return (
     <div className="drag-and-drop-container">
       {!fileDropped && (
@@ -194,12 +212,48 @@ export default function DragAndDrop() {
 
       {piattiData.length > 0 && (
         <>
-          <PiattiTable data={piattiData} setData={setPiattiData} />
-          <Button
-            label="Invia menu"
-            onClick={sendDataToServer}
-            className="save-button"
+          <PiattiTable
+            data={piattiData}
+            setData={setPiattiData}
+            getRowClassName={getRowClassName}
           />
+          {hasEmptyFields() && (
+            <div>
+              <h2 className="error-message-add-piatto">
+                Attenzione: Compilare tutti i campi prima di inviare il menu
+              </h2>
+            </div>
+          )}
+          <div
+            className="button-container"
+            style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}
+          >
+            <Button
+              label="Invia menu"
+              onClick={sendDataToServer}
+              disabled={hasEmptyFields()}
+              style={{ backgroundColor: "green" }}
+            />
+            <Button
+              label="Aggiungi Piatto"
+              onClick={() => {
+                const newId =
+                  piattiData.length > 0
+                    ? Math.max(...piattiData.map((p) => p.id)) + 1
+                    : 0;
+                setPiattiData([
+                  ...piattiData,
+                  {
+                    id: newId,
+                    nome: "",
+                    tipo_piatto: 1,
+                    data: new Date().toISOString().split("T")[0],
+                  },
+                ]);
+              }}
+              style={{ flex: 1 }}
+            />
+          </div>
         </>
       )}
     </div>

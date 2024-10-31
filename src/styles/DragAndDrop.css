@@ -55,3 +55,11 @@
   margin: 0 auto;
   max-width: 80%;
 }
+
+.error-message-add-piatto {
+  color: red !important;
+}
+
+.invalid-row {
+  background-color: lightpink !important;
+}
