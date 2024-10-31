@@ -6,18 +6,14 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import "../styles/DragAndDrop.css";
 
-// Utility function to generate the current week's weekdays (Monday to Friday)
 const getCurrentWeekWeekdays = () => {
   const currentDate = new Date();
-  const dayOfWeek = currentDate.getDay(); // 0 (Sun) to 6 (Sat)
-
-  // Calculate how many days to subtract to get Monday
+  const dayOfWeek = currentDate.getDay();
   const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
   const monday = new Date(currentDate);
   monday.setDate(currentDate.getDate() + mondayOffset);
 
   const weekWeekdays = [];
-
   const dayNames = [
     "Domenica",
     "Lunedì",
@@ -28,7 +24,6 @@ const getCurrentWeekWeekdays = () => {
     "Sabato",
   ];
 
-  // Generate dates for Monday to Friday
   for (let i = 0; i < 5; i++) {
     const date = new Date(monday);
     date.setDate(monday.getDate() + i);
@@ -37,8 +32,7 @@ const getCurrentWeekWeekdays = () => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     const formattedDate = `${dayName} ${day}/${month}/${year}`;
-    const isoDate = date.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-
+    const isoDate = date.toISOString().split("T")[0];
     weekWeekdays.push({ label: formattedDate, value: isoDate });
   }
 
@@ -57,13 +51,11 @@ export default function PiattiTable({ data, setData }) {
   const [clonedData, setClonedData] = useState({});
   const [weekDateOptions, setWeekDateOptions] = useState([]);
 
-  // Generate weekly date options (Monday to Friday) on component mount
   useEffect(() => {
     const options = getCurrentWeekWeekdays();
     setWeekDateOptions(options);
   }, []);
 
-  // Formatter for the 'data' field
   const formatDateForPiattiTable = (dateString) => {
     if (!dateString) return "";
     const [year, month, day] = dateString.split("-");
@@ -85,50 +77,37 @@ export default function PiattiTable({ data, setData }) {
     )}/${year}`;
   };
 
-  // Body template for 'data' column
-  const dateBodyTemplate = (rowData) => {
-    return formatDateForPiattiTable(rowData.data);
-  };
+  const dateBodyTemplate = (rowData) => formatDateForPiattiTable(rowData.data);
 
-  // Editor for 'nome_piatto' column
-  const nomePiattoEditor = (options) => {
-    return (
-      <InputText
-        value={options.value}
-        onChange={(e) => options.editorCallback(e.target.value)}
-        className="p-inputtext p-component"
-      />
-    );
-  };
+  const nomePiattoEditor = (options) => (
+    <InputText
+      value={options.value}
+      onChange={(e) => options.editorCallback(e.target.value)}
+      className="p-inputtext p-component"
+    />
+  );
 
-  // Editor for 'tipo_piatto' column
-  const tipoPiattoEditor = (options) => {
-    return (
-      <Dropdown
-        value={options.value}
-        options={tipoPiattoOptions}
-        onChange={(e) => options.editorCallback(e.value)}
-        className="dropdown-user"
-      />
-    );
-  };
+  const tipoPiattoEditor = (options) => (
+    <Dropdown
+      value={options.value}
+      options={tipoPiattoOptions}
+      onChange={(e) => options.editorCallback(e.value)}
+      className="dropdown-user"
+    />
+  );
 
-  // Editor for 'data' column (Dropdown with weekdays only)
-  const dataEditor = (options) => {
-    return (
-      <Dropdown
-        value={options.value}
-        options={weekDateOptions}
-        onChange={(e) => options.editorCallback(e.value)}
-        placeholder="Seleziona una data"
-        className="dropdown-user"
-      />
-    );
-  };
+  const dataEditor = (options) => (
+    <Dropdown
+      value={options.value}
+      options={weekDateOptions}
+      onChange={(e) => options.editorCallback(e.value)}
+      placeholder="Seleziona una data"
+      className="dropdown-user"
+    />
+  );
 
-  // Handle row edit initiation
   const onRowEditInit = (event) => {
-    const { data: rowData } = event;
+    const rowData = event.data;
     setClonedData((prev) => ({
       ...prev,
       [rowData.id]: { ...rowData },
@@ -136,9 +115,8 @@ export default function PiattiTable({ data, setData }) {
     setEditingRows((prev) => ({ ...prev, [rowData.id]: true }));
   };
 
-  // Handle row edit cancellation
   const onRowEditCancel = (event) => {
-    const { data: rowData } = event;
+    const rowData = event.data;
     const clonedRow = clonedData[rowData.id];
     const updatedData = data.map((item) =>
       item.id === rowData.id ? clonedRow : item
@@ -158,49 +136,77 @@ export default function PiattiTable({ data, setData }) {
     });
   };
 
-  // Handle row edit completion
   const onRowEditSave = (event) => {
-    const updatedRow = event.data;
+    const rowData = event.data;
 
-    // Debugging: Check the updatedRow
-    console.log("Saving updated row:", updatedRow);
-
-    // Update the main data state
+    // Update the data array with the edited row
     const updatedData = data.map((item) =>
-      item.id === updatedRow.id ? updatedRow : item
+      item.id === rowData.id ? rowData : item
     );
     setData(updatedData);
 
-    // Clear cloned data and editing state
+    // Clear editing states
     setClonedData((prev) => {
       const newClonedData = { ...prev };
-      delete newClonedData[updatedRow.id];
+      delete newClonedData[rowData.id];
       return newClonedData;
     });
 
     setEditingRows((prev) => {
       const newEditingRows = { ...prev };
-      delete newEditingRows[updatedRow.id];
+      delete newEditingRows[rowData.id];
       return newEditingRows;
     });
   };
 
-  const onRowEditComplete = (e) => {
-    let _data = [...data];
-    let { newData, index } = e;
-
-    _data[index] = newData;
-    setData(_data);
+  const handleDelete = (id) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id));
   };
 
-  const textEditor = (options) => {
+  const actionBodyTemplate = (rowData) => {
+    const isEditing = editingRows[rowData.id];
     return (
-      <InputText
-        type="text"
-        value={options.value}
-        onChange={(e) => options.editorCallback(e.target.value)}
-      />
+      <div className="action-buttons">
+        {isEditing ? (
+          <>
+            <Button
+              icon="pi pi-check"
+              className="btn-edit"
+              onClick={() => onRowEditSave({ data: rowData })}
+              tooltip="Salva modifiche"
+            />
+            <Button
+              icon="pi pi-times"
+              className="btn-delete"
+              onClick={() => onRowEditCancel({ data: rowData })}
+              tooltip="Annulla modifiche"
+            />
+          </>
+        ) : (
+          <>
+            <Button
+              icon="pi pi-pencil"
+              className="btn-edit"
+              onClick={() => onRowEditInit({ data: rowData })}
+              tooltip="Modifica piatto"
+            />
+            <Button
+              icon="pi pi-trash"
+              className="btn-delete"
+              onClick={() => handleDelete(rowData.id)}
+              tooltip="Elimina piatto"
+            />
+          </>
+        )}
+      </div>
     );
+  };
+
+  const onRowEditComplete = (e) => {
+    let { newData, index } = e;
+    let _data = [...data];
+    _data[index] = newData;
+    setData(_data);
   };
 
   return (
@@ -211,24 +217,65 @@ export default function PiattiTable({ data, setData }) {
         editMode="row"
         responsiveLayout="scroll"
         showGridlines
+        editingRows={editingRows}
         onRowEditInit={onRowEditInit}
         onRowEditCancel={onRowEditCancel}
         onRowEditSave={onRowEditSave}
-        editingRows={editingRows}
         onRowEditComplete={onRowEditComplete}
       >
         <Column
           field="nome"
           header="Nome Piatto"
           style={{ width: "25%" }}
-          editor={(options) => textEditor(options)}
+          body={(rowData) => {
+            if (editingRows[rowData.id]) {
+              return (
+                <InputText
+                  value={rowData.nome}
+                  onChange={(e) => {
+                    const updatedData = [...data];
+                    const index = updatedData.findIndex(
+                      (item) => item.id === rowData.id
+                    );
+                    updatedData[index] = {
+                      ...updatedData[index],
+                      nome: e.target.value,
+                    };
+                    setData(updatedData);
+                  }}
+                  className="p-inputtext p-component"
+                />
+              );
+            }
+            return rowData.nome;
+          }}
         />
         <Column
           field="tipo_piatto"
           header="Tipo Piatto"
           style={{ width: "25%" }}
-          editor={tipoPiattoEditor}
           body={(rowData) => {
+            if (editingRows[rowData.id]) {
+              return (
+                <Dropdown
+                  value={rowData.tipo_piatto}
+                  options={tipoPiattoOptions}
+                  onChange={(e) => {
+                    const updatedData = [...data];
+                    const index = updatedData.findIndex(
+                      (item) => item.id === rowData.id
+                    );
+                    updatedData[index] = {
+                      ...updatedData[index],
+                      tipo_piatto: e.value,
+                    };
+                    setData(updatedData);
+                  }}
+                  className="dropdown-user"
+                  optionLabel="label"
+                />
+              );
+            }
             const tipo = tipoPiattoOptions.find(
               (option) => option.value === rowData.tipo_piatto
             );
@@ -239,13 +286,36 @@ export default function PiattiTable({ data, setData }) {
           field="data"
           header="Data"
           style={{ width: "35%" }}
-          body={dateBodyTemplate}
-          editor={dataEditor}
+          body={(rowData) => {
+            if (editingRows[rowData.id]) {
+              return (
+                <Dropdown
+                  value={rowData.data}
+                  options={weekDateOptions}
+                  onChange={(e) => {
+                    const updatedData = [...data];
+                    const index = updatedData.findIndex(
+                      (item) => item.id === rowData.id
+                    );
+                    updatedData[index] = {
+                      ...updatedData[index],
+                      data: e.value,
+                    };
+                    setData(updatedData);
+                  }}
+                  placeholder="Seleziona una data"
+                  className="dropdown-user"
+                  optionLabel="label"
+                />
+              );
+            }
+            return dateBodyTemplate(rowData);
+          }}
         />
         <Column
-          rowEditor
-          headerStyle={{ width: "10%", textAlign: "center" }}
+          headerStyle={{ width: "15%", textAlign: "center" }}
           bodyStyle={{ textAlign: "center" }}
+          body={actionBodyTemplate}
         />
       </DataTable>
     </div>
