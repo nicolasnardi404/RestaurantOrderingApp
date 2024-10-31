@@ -126,6 +126,9 @@ export default function Profilo() {
           <strong>Nome:</strong> {user.nome}
         </p>
         <p className="profile-detail">
+          <strong>Nickname:</strong> {user.nickname}
+        </p>
+        <p className="profile-detail">
           <strong>Email:</strong> {user.email}
         </p>
         <p className="profile-detail">

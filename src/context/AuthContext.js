@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
         nome: decodedToken.data.nome,
         email: decodedToken.data.email,
         ruolo: decodedToken.data.ruolo,
+        nickname: decodedToken.data.nickname,
       });
     } else {
       console.error("Token expired");
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }) => {
         nome: decodedToken.data.nome,
         email: decodedToken.data.email,
         ruolo: decodedToken.data.ruolo,
+        nickname: decodedToken.data.nickname,
       });
 
       if (rememberMe) {

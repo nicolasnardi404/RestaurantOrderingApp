@@ -77,11 +77,11 @@ export default function GestioneUtente() {
 
   const updateUtente = async () => {
     try {
-      const { nome, email, password, idRuolo, attivo } = userToUpdate;
+      const { nome, nickname, email, password, idRuolo, attivo } = userToUpdate;
       const token = getToken();
       await axios.put(
         `${apiUrl}/user/update/${userToUpdate.id}`,
-        { nome, email, password, idRuolo, attivo },
+        { nome, nickname, email, password, idRuolo, attivo },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchUtenti();
@@ -143,6 +143,15 @@ export default function GestioneUtente() {
           />
         </div>
         <div className="p-col-12">
+          <label>Nickname:</label>
+          <InputText
+            value={newUser.nickname}
+            onChange={(e) =>
+              setNewUser({ ...newUser, nickname: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-col-12">
           <label>Email:</label>
           <InputText
             value={newUser.email}
@@ -178,6 +187,15 @@ export default function GestioneUtente() {
             value={userToUpdate.nome}
             onChange={(e) =>
               setUserToUpdate({ ...userToUpdate, nome: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-col-12">
+          <label>Nickname:</label>
+          <InputText
+            value={userToUpdate.nickname}
+            onChange={(e) =>
+              setUserToUpdate({ ...userToUpdate, nickname: e.target.value })
             }
           />
         </div>
@@ -269,6 +287,7 @@ export default function GestioneUtente() {
         <thead>
           <tr>
             <th>Nome</th>
+            <th>Nickname</th>
             <th>Email</th>
             <th>Attivo</th>
             <th>Azioni</th>
@@ -278,6 +297,7 @@ export default function GestioneUtente() {
           {utenti.map((utente) => (
             <tr className="user-item" key={utente.id}>
               <td>{utente.nome}</td>
+              <td>{utente.nickname}</td>
               <td>{utente.email}</td>
               <td>{utente.attivo ? "Attivo" : "Inattivo"}</td>
               <td>
