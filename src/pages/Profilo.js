@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import "../styles/Profilo.css";
 
 export default function Profilo() {
@@ -11,7 +12,11 @@ export default function Profilo() {
   const [hasWarnings, setHasWarnings] = useState(false);
   const [password, setPassword] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showChangeNickname, setShowChangeNickname] = useState(false);
+  const [newNickname, setNewNickname] = useState("");
   const apiUrl = process.env.REACT_APP_API_URL;
+  const [userState, setUser] = useState(user);
+  const toast = useRef(null);
 
   useEffect(() => {
     const fetchAlerts = async () => {
@@ -104,14 +109,60 @@ export default function Profilo() {
     }
   };
 
+  const handleChangeNickname = async (e) => {
+    e.preventDefault();
+    const token = await getToken();
+    const form = { nickname: newNickname };
+
+    try {
+      await axios.put(`${apiUrl}/user/updateNickname/${user.userId}`, form, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Update local user data
+      setUser({ ...user, nickname: newNickname });
+      setShowChangeNickname(false);
+
+      // Show success message (optional)
+      toast.current.show({
+        severity: "success",
+        summary: "Success",
+        detail: "Nickname updated successfully",
+        life: 3000,
+      });
+    } catch (error) {
+      console.error("Error in update of nickname:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Error updating nickname. Please try again.",
+        life: 3000,
+      });
+    }
+  };
+
+  const openNicknameDialog = () => {
+    setNewNickname(user.nickname);
+    setShowChangeNickname(true);
+  };
+
   const footerDialog = (
     <div>
       <Button label="Salva" icon="pi pi-check" onClick={handleChangePassword} />
     </div>
   );
 
+  const footerNicknameDialog = (
+    <div>
+      <Button label="Salva" icon="pi pi-check" onClick={handleChangeNickname} />
+    </div>
+  );
+
   return (
     <div className="profile-page">
+      <Toast ref={toast} />
       <div className="div-header">
         <h1 className="profile-title">Profilo Utente</h1>
         <button
@@ -119,6 +170,9 @@ export default function Profilo() {
           className="pass-button"
         >
           Cambiare la password
+        </button>
+        <button onClick={openNicknameDialog} className="pass-button">
+          Cambiare Nickname
         </button>
       </div>
       <div className="profile-details">
@@ -185,6 +239,25 @@ export default function Profilo() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+        </form>
+      </Dialog>
+
+      <Dialog
+        header="Cambiare Nickname"
+        visible={showChangeNickname}
+        onHide={() => setShowChangeNickname(false)}
+        footer={footerNicknameDialog}
+      >
+        <form onSubmit={handleChangeNickname}>
+          <label>
+            Nuovo Nickname:
+            <input
+              type="text"
+              value={newNickname}
+              onChange={(e) => setNewNickname(e.target.value)}
               required
             />
           </label>
