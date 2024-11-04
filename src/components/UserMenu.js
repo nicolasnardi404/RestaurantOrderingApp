@@ -78,6 +78,12 @@ export default function UserMenu() {
               >
                 <i className="pi pi-user-edit"></i> Gestione Utente
               </button>
+              <button
+                className="dropdown-item"
+                onClick={() => navigate("/gestione-email")}
+              >
+                <i className="pi pi-envelope"></i> Gestione Email
+              </button>
               <hr></hr>
             </>
           )}

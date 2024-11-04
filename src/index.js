@@ -14,6 +14,7 @@ import Login from "./pages/Login";
 import MyApp from "./_app";
 import GestioneUtente from "./pages/GestioneUtente";
 import GestioneMenu from "./pages/GestioneMenu";
+import GestioneEmail from "./pages/GestioneEmail";
 import PrenotaPasto from "./pages/PrenotaPasto";
 import AggiungiMenuPerGiorno from "./pages/AggiungiMenuPerGiorno";
 import ControlloConsegna from "./pages/ControlloConsegna";
@@ -67,6 +68,7 @@ function App() {
             >
               <Route path="/gestione-utente" element={<GestioneUtente />} />
               <Route path="/gestione-menu" element={<GestioneMenu />} />
+              <Route path="/gestione-email" element={<GestioneEmail />} />
               <Route
                 path="/aggiungi-menu-per-giorno"
                 element={<AggiungiMenuPerGiorno />}
