@@ -57,6 +57,8 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
   const toast = useRef(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [editingPiatto, setEditingPiatto] = useState(null);
+  const [addModalVisible, setAddModalVisible] = useState(false);
+  const [newPiatto, setNewPiatto] = useState(null);
 
   const tipoPiattoHeaders = {
     1: "Primo",
@@ -91,15 +93,27 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
   };
 
   const dateBodyTemplate = (rowData) => (
-    <div className="date-cell">
-      <strong>
-        {new Date(rowData.date).toLocaleDateString("it-IT", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </strong>
+    <div className="date-cell" onClick={() => handleAddClick(rowData.date)}>
+      <span className="date-text">
+        <div className="weekday">
+          <strong>
+            {new Date(rowData.date)
+              .toLocaleDateString("it-IT", {
+                weekday: "long",
+              })
+              .toUpperCase()}
+          </strong>
+        </div>
+        <div className="date">
+          {new Date(rowData.date).toLocaleDateString("it-IT", {
+            day: "numeric",
+            month: "long",
+          })}
+        </div>
+      </span>
+      <span className="add-icon">
+        <i className="pi pi-plus" />
+      </span>
     </div>
   );
 
@@ -334,6 +348,55 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
     );
   };
 
+  const PiattoColumn = ({ title, piatti, onEdit, onDelete }) => {
+    return (
+      <div className="piatti-column">
+        <div className="piatti-cell">
+          {piatti?.map((piatto) => (
+            <PiattoCell
+              key={piatto.id}
+              piatto={piatto}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const handleAddClick = (date) => {
+    setNewPiatto({
+      data: date,
+      tipo_piatto: 1, // Default value, can be changed in modal
+      nome: "",
+    });
+    setAddModalVisible(true);
+  };
+
+  const handleAddSave = () => {
+    if (!newPiatto.nome.trim()) {
+      toast.current.show({
+        severity: "error",
+        summary: "Errore",
+        detail: "Il nome del piatto è obbligatorio",
+        life: 3000,
+      });
+      return;
+    }
+
+    const updatedData = [...data, { ...newPiatto, id: Date.now() }];
+    setData(updatedData);
+    setAddModalVisible(false);
+    setNewPiatto(null);
+    toast.current.show({
+      severity: "success",
+      summary: "Success",
+      detail: "Piatto aggiunto con successo",
+      life: 3000,
+    });
+  };
+
   return (
     <div className="piatti-table-container">
       <Toast ref={toast} />
@@ -347,46 +410,34 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
         <Column
           header="Primo"
           body={(rowData) => (
-            <div className="piatti-cell">
-              {rowData.primo?.map((piatto) => (
-                <PiattoCell
-                  key={piatto.id}
-                  piatto={piatto}
-                  onEdit={handlePiattoClick}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
+            <PiattoColumn
+              title="Primo"
+              piatti={rowData.primo}
+              onEdit={handlePiattoClick}
+              onDelete={handleDelete}
+            />
           )}
         />
         <Column
           header="Secondo"
           body={(rowData) => (
-            <div className="piatti-cell">
-              {rowData.secondo?.map((piatto) => (
-                <PiattoCell
-                  key={piatto.id}
-                  piatto={piatto}
-                  onEdit={handlePiattoClick}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
+            <PiattoColumn
+              title="Secondo"
+              piatti={rowData.secondo}
+              onEdit={handlePiattoClick}
+              onDelete={handleDelete}
+            />
           )}
         />
         <Column
           header="Contorno"
           body={(rowData) => (
-            <div className="piatti-cell">
-              {rowData.contorno?.map((piatto) => (
-                <PiattoCell
-                  key={piatto.id}
-                  piatto={piatto}
-                  onEdit={handlePiattoClick}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
+            <PiattoColumn
+              title="Contorno"
+              piatti={rowData.contorno}
+              onEdit={handlePiattoClick}
+              onDelete={handleDelete}
+            />
           )}
         />
       </DataTable>
@@ -448,6 +499,68 @@ export default function PiattiTable({ data, setData, getRowClassName }) {
                 icon="pi pi-check"
                 onClick={() => handleEditSave(editingPiatto)}
                 autoFocus
+              />
+            </div>
+          </div>
+        )}
+      </Dialog>
+
+      {/* Add Modal */}
+      <Dialog
+        visible={addModalVisible}
+        style={{ width: "450px" }}
+        header={`Aggiungi piatto`}
+        modal
+        onHide={() => setAddModalVisible(false)}
+      >
+        {newPiatto && (
+          <div className="add-piatto-form">
+            <h4>
+              {new Date(newPiatto.data)
+                .toLocaleDateString("it-IT", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                })
+                .trim()
+                .toUpperCase()}
+            </h4>
+            <div className="field">
+              <label htmlFor="tipo">Tipo Piatto</label>
+              <Dropdown
+                id="tipo"
+                value={newPiatto.tipo_piatto}
+                options={tipoPiattoOptions}
+                onChange={(e) =>
+                  setNewPiatto({ ...newPiatto, tipo_piatto: e.value })
+                }
+                className="w-full"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="nome">Nome Piatto*</label>
+              <InputText
+                id="nome"
+                value={newPiatto.nome}
+                onChange={(e) =>
+                  setNewPiatto({ ...newPiatto, nome: e.target.value })
+                }
+                className="w-full"
+                autoFocus
+              />
+            </div>
+            <div className="edit-modal-footer">
+              <Button
+                label="Annulla"
+                icon="pi pi-times"
+                onClick={() => setAddModalVisible(false)}
+                className="p-button-text"
+              />
+              <Button
+                label="Salva"
+                icon="pi pi-check"
+                onClick={handleAddSave}
+                disabled={!newPiatto.nome.trim()}
               />
             </div>
           </div>

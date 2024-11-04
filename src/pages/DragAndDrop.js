@@ -269,25 +269,6 @@ export default function DragAndDrop() {
               disabled={hasEmptyFields()}
               style={{ backgroundColor: "green" }}
             />
-            <Button
-              label="Aggiungi Piatto"
-              onClick={() => {
-                const newId =
-                  piattiData.length > 0
-                    ? Math.max(...piattiData.map((p) => p.id)) + 1
-                    : 0;
-                setPiattiData([
-                  ...piattiData,
-                  {
-                    id: newId,
-                    nome: "",
-                    tipo_piatto: 1,
-                    data: new Date().toISOString().split("T")[0],
-                  },
-                ]);
-              }}
-              style={{ flex: 1 }}
-            />
           </div>
         </>
       )}
