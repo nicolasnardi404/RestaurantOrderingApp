@@ -1,0 +1,91 @@
+.email-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.email-container h2 {
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.email-container .button-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.email-container .p-button {
+  min-width: 200px;
+  margin: 1rem;
+}
+
+.email-container .p-grid {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.confirmation-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.confirmation-content p {
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.p-dialog .p-dialog-header {
+  padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  text-align: right;
+}
+
+.p-dialog .p-dialog-footer button {
+  margin: 0;
+  min-width: 6rem;
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  transition: all 0.2s ease;
+}
+
+.p-dialog .p-dialog-footer button:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.p-toast {
+  opacity: 1;
+  z-index: 1000;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  gap: 0.5rem;
+}
