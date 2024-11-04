@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate from react
 import { formatCalendarData } from "../util/FormatCalendarData";
 import formatDateforServer from "../util/formatDateForServer";
 import { Checkbox } from "primereact/checkbox";
+import { formatTableDate } from "../util/FormatDateForDisplay";
 
 UseDataLocal(ITALIAN_LOCALE_CONFIG);
 
@@ -284,7 +285,11 @@ export default function GestioneMenu() {
         <Column field="nome_piatto" header="Piatto" />
         <Column field="nome_tipo" header="Tipo Piatto" />
         <Column field="dayOfWeek" header="Giorno Della Settimana" />
-        <Column field="data" header="Data" />
+        <Column
+          field="data"
+          header="Data"
+          body={(rowData) => formatTableDate(rowData.data)}
+        />
         <Column
           field="sempreDisponibile"
           header="Sempre Disponibile"
