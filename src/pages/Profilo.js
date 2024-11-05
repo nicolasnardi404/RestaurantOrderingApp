@@ -235,7 +235,7 @@ export default function Profilo() {
             <strong>Giorni di Presenza in Ufficio:</strong>{" "}
             {selectedDays.join(", ") || "Nessuno"}
           </p>
-          <button onClick={handleDelete} className="delete-button">
+          <button onClick={handleDelete} className="delete-butto">
             Elimina Giorni di Presenza in Ufficio
           </button>
         </div>

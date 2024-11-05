@@ -58,7 +58,7 @@
 }
 
 .save-button,
-.delete-button,
+.delete-butto,
 .pass-button {
   padding: 10px;
   /* Espaço interno do botão */
@@ -84,14 +84,14 @@
   /* Cor do botão quando o mouse está sobre ele */
 }
 
-.delete-button {
+.delete-butto {
   background-color: #dc3545;
   /* Cor de fundo vermelho */
   color: white;
   /* Cor do texto do botão */
 }
 
-.delete-button:hover {
+.delete-butto:hover {
   background-color: #c82333;
   /* Cor do botão quando o mouse está sobre ele */
 }
